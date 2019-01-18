@@ -1,0 +1,4203 @@
+--- 
+title: "Declaring and Diagnosing Research Designs"
+author: "Graeme Blair, Jasper Cooper, Alexander Coppock, and Macartan Humphreys"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [bib/book.bib, bib/packages.bib]
+biblio-style: apsr
+link-citations: yes
+description: "describe the book"
+---
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+
+
+# Preface 
+
+```{r bib-setup, echo = FALSE, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, cache = TRUE)
+```
+
+With this book, we hope to promote a new, comprehensive way of thinking about research designs in the social sciences. We hope this way of thinking will make research designs more transparent and more robust. But we also hope it will make research design easier, easier to produce good designs, but also easier to share designs and build off of the designs that others have developed.
+
+The core idea is to start think of a design as an object that can be interrogated. The design encodes your beliefs about the world, it describes your questions, and it lays out  how you go about answering those questions, in terms both of what data you use and how you use it. A key idea is that all of these features can be provided in code and if done right the information provided is enough to be able to simulate a run of the design and assess its properties. 
+
+For a researcher, being able to simulate a design puts you in a powerful position as you can then start assessing the conditions under which a design perfoms well or badly.
+
+For a reader, a complete declaration lets you quickly examine the analytic core of a design. As you work through designs in this book we hope you will develop a nose for quickly parsing what goes in the model, what are the kinds of inquiries you should expect to see, what are the data strategies, what are analysis strategies, and how these all link together.
+
+
+What this book will not do 
+
+  - derive estimators
+  - no analytic results
+  - no optimality guarantees
+  - GIGO
+
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:index.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# (PART) Declaring and Diagnosing Research Designs {-} 
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/00_Part_A_Declaring_Diagnosing.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# What is a Design?
+
+We make heavy use of a fairly general framework for describing the core elements of a research design. The basic idea is a research design is a specification of a problem and a strategy to answer it. We build on two influential frameworks. @kkv1994 enumerate four components of a research design: a theory, a research question, data, and an approach to using the data. @geddes2003paradigms articulates the links between theory formation, research question formulation, case selection and coding strategies, and strategies for case comparison and inference. In both cases the set of steps are closely aligned to those in the framework we propose. In the exposition, we also employ elements from @Pearl2009 approach to structural modeling, which provides a syntax for mapping design inputs to design outputs as well as the potential outcomes framework as presented, for example, in @Imbens2015, which many political scientists use to clarify their inferential targets. We characterize the design problem at a high level of generality with the central focus being on the relationship between questions and answer strategies. 
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/01_What_is_a_Design/00_Chapter_What_is_a_Design.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Elements of a Research Design
+
+The specification of a problem requires a description of the world and the question to be asked about the world as described. The answering requires a description of what information is used and how conclusions are reached given the information. 
+
+At its most basic we think of a research design, $\Delta$, as including four elements $<M,I,D,A>$:
+
+*  A \textbf{model}, $M$, of how the world works. In general following Pearl's definition of a probabilistic causal model we will assume that a model contains three core elements. First, a specification of the variables $X$  about which research is being conducted. This includes endogenous and exogenous variables ($V$ and $U$ respectively) and the ranges of these variables. In the formal literature this is sometimes called the \textit{signature} of a model [@halpern2000].   Second, a specification of how each endogenous variable depends on other variables (the ``functional relations'' or, as in @Imbens2015, ``potential outcomes''), $F$. Third, a probability distribution over exogenous variables, $P(U)$.  
+
+* An \textbf{inquiry}, $I$, about the distribution of variables, $X$, perhaps given interventions on some variables.  Using Pearl's notation we can distinguish between questions that ask about the conditional values of variables, such as $\Pr(X_1 | X_2 =1)$ and questions that ask about values that would arise under interventions: $\Pr(X_1 | do(X_2 = 1))$.\footnote{
+		The distinction lies in whether the conditional probability is recorded through passive observation or active intervention to manipulate the probabilities of the conditioning distribution. For example, $\Pr(X_1 | X_2 =1)$ might indicate the conditional probability that it is raining, given that Jack has his umbrella, whereas $\Pr(X_1 | do(X_2 =1))$ would indicate the probability with which it would rain, given Jack is made to carry an umbrella.
+	} We let $a^M$ denote the answer to $I$ \textit{under the model}. Conditional on the model, $a^M$ is the value of the estimand, the quantity that the researcher wants to learn about.  
+
+* A \textbf{data} strategy, $D$, generates data $d$ on $X$. Data $d$ arises, under model $M$ with probability $P_M(d|D)$. The data strategy includes sampling strategies and assignment strategies, which we denote with $P_S$ and $P_Z$ respectively. Measurement techniques are also a part of data strategies and can be thought of as a selection of observable variables that carry information about unobservable variables.
+
+* An **answer** strategy, $A$, that generates answer $a^A$ using data $d$. 
+
+
+A key feature of this bare specification is that if $M$, $D$, and $A$ are sufficiently well described, the answer to question $I$ has a distribution $P_M(a^A|D)$. Moreover, one can construct a distribution of comparisons of this answer to the correct answer, under $M$, for example by assessing $P_M(a^M-a^A|D)$. One can also compare this to results under different data or analysis strategies, $P_M(a^M-a^A|D')$ and $P_M(a^M-a^{A'}|D)$, and to answers generated under alternative models, $P_M(a^{M'}-a^{A}|D)$, as long as these possess signatures that are consistent with inquiries and answer strategies.  
+
+
+*MIDA* captures the analysis-relevant features of a design, but it does not describe substantive elements, such as how theories are derived or interventions are implemented. Yet many other aspects of a design that are not explicitly labeled in these features enter into this framework if they are analytically relevant. For example, logistical details of data collection such as the duration of time between a treatment being administered and endline data collection enter into the model if the longer time until data collection affects subject recall of the treatment. However, information in {\it MIDA} is typically insufficient to assess those substantive elements, an important and separate part of assessing the quality of a research study.
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/01_What_is_a_Design/01_Elements_of_Design.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Using diagnosands to evaluate a design
+
+The ability to calculate distributions of answers, given a model, opens multiple avenues for assessment and critique. How good is the answer you expect to get from a given strategy? Would you do better, given some desideratum, with a different data strategy? With a different analysis strategy? How good is the strategy if the model is wrong in some way or another? 
+
+To allow for this kind of *diagnosis* of a design, we introduce two further concepts, both functions of research designs. These are quantities that a researcher or a third party could calculate with respect to a design. 
+
+* A {\textbf{Diagnostic Statistic}} is a summary statistic generated from a "run" of a design---that is, the results given a possible realization of variables, given the model and data strategy. A diagnostic statistic may or may not depend on the model as well as realized data. For example the statistic: $e=$ "difference between the estimated and the actual average treatment effect" depends on the model (since the ATE depends on the model's assumptions about potential outcomes). The statistic $s = \mathbb{1}(p \leq 0.05)$, interpreted as "the result is considered statistically significant at the 5\% level",'' does not depend on the model but it does presuppose an answer strategy that reports a $p$ value. 
+	
+	Diagnostic statistics are governed by probability distributions that arise because both the model and the data generation, given the model, may be stochastic.
+	
+* A *Diagnosand* is a summary of the distribution of a diagnostic statistic. For example, (expected) \emph{bias} in the estimated treatment effect is  $\mathbb{E}(e)$ and statistical \emph{power} is $\mathbb{E}(s)$. 
+
+To illustrate, consider the following design. A model *M* specifies three variables $X$, $Y$ and $Z$ (all defined on the reals). These form the signature. In additional we assume functional relationships between them that allow for the possibility of confounding (for example, $Y =  bX + Z + \epsilon_Y; X = Z+ \epsilon_X$, with $Z, \epsilon_X, \epsilon_Z$ distributed standard normal). The inquiry $I$ is ``what would be the average effect of a unit increase in $X$ on $Y$ in the population?'' Note that this question depends on the signature of the model, but not the functional equations of the model (the answer provided by the model does of course depend on the functional equations). Consider now a data strategy, $D$, in which data is gathered on $X$ and $Y$ for $n$ randomly selected units. An answer $a^A$, is then generated using ordinary least squares as the answer strategy, $A$. 
+
+We have specified all the components of MIDA. We now ask: How strong is this research design? One way to answer this question is with respect to the diagnosand "expected error." Here the model's functional equations provide an answer, $a^M$ to the inquiry (for any draw of $\beta$), and so the distribution of the expected error, *given the model*, $a^A-a^M$, can be calculated.  
+
+In this example the expected performance of the design may be poor, as measured by this diagnosand, because the data and analysis strategy do not handle the confounding described by the model. In comparison, better performance may be achieved through an alternative data strategy (e.g., where $D'$ randomly assigned $X$ to $n$ units before recording $X$ and $Y$) or an alternative analysis strategy (e.g., $A'$  conditions on $Z$). These design evaluations depend on the model, and so one might reasonably ask how performance would look were the model different (for example if the underlying process involved nonlinearities). 
+
+In all cases, the evaluation of a design depends on the assessment of a diagnosand, and comparing the diagnoses to what could be achieved under alternative designs.
+
+In section X we discuss possible choices of diagnosands and operate a set of these
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/01_What_is_a_Design/02_Using_Diagnosands.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+
+
+## What is a *Complete*  Design Declaration?
+
+A declaration of a research design that is in some sense complete is required in order to implement it, communicate its essential features, and to assess its properties. Yet existing definitions make clear that there is no single conception of a complete research design: the [Consolidated Standards of Reporting Trials (CONSORT) Statement](http://www.consort-statement.org) widely used in medicine includes 22 features and other proposals range from nine to 60 components.
+
+
+We propose a conditional notion of completeness: we say a design is ``diagnosand-complete'' for a given diagnosand if that diagnosand can be calculated from the declared design. Thus a design that is diagnosand complete for one diagnosand may not be for another. Consider for example the diagnosand statistical power.  Power is the probability that a *p*-value is lower than a critical value. Thus, power-completeness requires that the answer strategy return a *p* value.  It does not, however, require a well-defined estimand. In contrast, Bias- or RMSE-completeness does not require a hypothesis test, but does require the specification of an estimand. 
+
+Diagnosand-completeness is a desirable property to the extent that it means a diagnosand can be calculated. How useful this is depends however on how useful the diagnosand is for decision making. Thus evaluating completeness should focus first on whether diagnosands for which completeness holds are indeed useful ones.
+
+This usefulness depends in part on whether the information on which diagnoses are made is *believable*. A design may be bias-complete for instance under the assumptions of a particular spillover structure, for example. Readers may disagree with these assumptions but there are still gains from the declaration as the grounds for claims for unbiasedness are clear and the effects of deviations from model assumptions can be assessed. In practice, different research communities set different standards for what constitutes sufficient information to make such conjectures about the world plausible. 
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/01_What_is_a_Design/03_Complete_Design.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Designs as concatenations of steps
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/01_What_is_a_Design/04_Designs_as_Steps.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Designs as *strategies*
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/01_What_is_a_Design/05_Designs_as_Strategies.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Model-Inquiry-Data-Strategy-Answer Strategy
+
+beginning of chapter on MIDA
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/02_How_to_Declare_Diagnose/00_Chapter_How_to_Declare_Diagnose.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Model steps
+
+### Simple data
+### Hierarchical data
+### Time series data
+### Panel data
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/02_How_to_Declare_Diagnose/01_Model.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+
+## Inquiry steps
+
+### Potential outcomes metadata
+
+### Potential outcomes functions
+
+Creating metadata is either implausible or insufficient for designs with contunuous outcome data or with complex spillovers.
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/02_How_to_Declare_Diagnose/02_Inquiry.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Data steps
+
+### Simple random sampling
+### Stratified, clustered random sampling
+### Arbitrary sampling
+
+### Simple assignments
+### Block clustered assignments
+
+### Randomization workflow
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/02_How_to_Declare_Diagnose/03_Data_Strategy.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Answer steps
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/02_How_to_Declare_Diagnose/04_Answer_Strategy.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Putting it all together
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/02_How_to_Declare_Diagnose/05_Putting_it_Together.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Diagnsosis
+
+### Standard diagnosands
+### Custom diagnosands
+### Is a diagnosand part of a design? 
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:01_Part_A_Declaring_Diagnosing/02_How_to_Declare_Diagnose/06_Diagnosis.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# (PART) Design Library  {-} 
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/00_Part_B_Design_Library.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Observational Designs for Descriptive Inference
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/00_Chapter_Observational_Descriptive.Rmd-->
+
+
+
+## Simple Random Sampling
+### Design Declaration
+### Takeaways
+### Exercises
+### Design Inspector
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/01_Simple_Random_Sampling.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Stratified clustered random sampling
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/02_Stratified_Clustered_Sampling.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Respondent driven sampling
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/03_Respondent_Driven_Sampling.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Sample re-sample
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/04_Sample_Resample.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Measuring latent variables
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/05_Measuring_Latent_Variables.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Topic analysis
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/06_Topic_Analysis.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Multilevel regression and poststratification
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/01_Observational_Descriptive/07_Multilevel_Regression_and_Postratification.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Experimental Designs for Descriptive Inference
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/02_Experimental_Descriptive/00_Chapter_Experimental_Descriptive.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## 	Audit experiments
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/02_Experimental_Descriptive/01_Audit_Experiments.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## 	List experiments
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/02_Experimental_Descriptive/02_List_Experiments.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## 	Randomized response
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/02_Experimental_Descriptive/03_Randomized_Response.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## 	Conjoint experiments
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/02_Experimental_Descriptive/04_Conjoint_Experiments.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## 	Experimental games
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/02_Experimental_Descriptive/05_Experimental_Games.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Observational Designs for causal inference
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/00_Chapter_Observational_Causal.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Difference in differences
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/01_Difference_in_Difference.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Matching
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/02_Matching.Rmd-->
+
+
+
+## Regression Discontinuity
+### Design Declaration
+### Takeaways 
+### Further Reading
+### Exercises
+### Design Inspector
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/03_Regression_discontinuity.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Synthetic control
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/04_Synthetic_Control.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Cross national time series
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/05_Cross_national_time_series.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Qualtitative Comparative Analysis
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/06_QCA.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Process tracing
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/03_Observational_Causal/07_Process_tracing.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Experimental Designs for Causal Inference
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/00_Chapter_Experimental_Causal.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Multiarm designs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/01_Multiarm_designs.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Experiments with blocks and clusters
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/02_Blocked_and_Clusters.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Factorial designs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/03_Factorial_Designs.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Encouragement designs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/04_Encouragement_Designs.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Stepped wedge designs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/05_Stepped_Wedge_Designs.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Crossover designs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/06_Crossover_Designs.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Parallel design for mediation effects
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/07_Parallel_Design_Mediation.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Partial population design for spillover analysis
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/08_Partial_population_Design.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Selective trials
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/09_Selective_Trials.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Adaptive trials
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:02_Part_B_Design_Library/04_Experimental_Causal/10_Adaptive_Trials.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# (PART) Principles of Research Designs {-} 
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/00_Part_C_Principles.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Model principles
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/01_Model_Principles/00_Chapter_Model_Principles.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Generate null models
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/01_Model_Principles/01_Generate_Null_Models.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Generality makes models vulnerable
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/01_Model_Principles/02_Generality_Makes_Models_Vulnerable.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Specify which variables are manipulable
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/01_Model_Principles/03_Specify_Which_Variables_Are_Manipulated.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Assign over vectors
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/01_Model_Principles/04_Assign_Over_Vectors.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Inquiry principles
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/02_Inquiry_Principles/00_Chapter_Inquiry_Principles.Rmd-->
+
+
+
+## Some designs have badly posed questions but design diagnosis can alert you to the problem
+### A design with sometimes undefined outcomes
+### What we find from diagnosis
+### Other instances of this problem
+### Keep thinking
+
+<!--chapter:end:03_Part_C_Principles/02_Inquiry_Principles/01_Check_that_your_estimands_are_well_defined.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## There is no causation without manipulation
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/02_Inquiry_Principles/02_No_Causation_without_Manipulation.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Know what ATE averages over
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/02_Inquiry_Principles/03_Know_What_ATE_Averages_Over.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Know what is local in a LATE
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/02_Inquiry_Principles/04_Know_What_Is_Local_In_LATE.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Know when SATEs are informative for PATEs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/02_Inquiry_Principles/05_Know_When_SATEs_Are_Informative_For_PATEs.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Inquiry strategies before inquiries are defined
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/02_Inquiry_Principles/06_Inquiry_Strategies_Before_Inquiries_Are_Defined.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Data Principles
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/00_Chapter_Data_Principles.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Why systematic data collection is not random sampling
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/01_Systematic_Data_Collection.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Keep treatment and control groups parallel
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/02_Keep_Treatment_Groups_Parallel.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## How blocking improves precision
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/03_How_Blocking_Improves_Precision.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## How clusters reduce precision
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/04_How_Clustering_Reduces_Precision.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Answer strategies matter for power
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/05_Designs_as_Strategies.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Allocating treatments at extremes can improve precision
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/06_Allocating_treatments_at_extremes.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Gains from multiple measurements
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/07_Gains_from_multiple_measurements.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Gains from continuous measures
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/08_Gains_from_continuous_measures.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Factorial designs can be more powerful than multiarm designs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/09_Factorial_designs_can_be_more_powerful.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Allocating treatments at extremes can improve precision
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/10_Preserve_a_matrix_of_assignments.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Balance tests tests the null of randomization, not the null of balance
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/11_Balance_tests.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Assess imbalance on substantive rather than statistical grounds
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/12_Assess_imbalance_on_substantive.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## The dangers of the big stick
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/03_Data_Principles/13_The_dangers_of_the_big_stick.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Answer principles
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/00_Chapter_Answer_Principles.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Use controls for prognostic pretreatment covariates
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/01_Use_controls_for_prognostic_pretreatment_covariates.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## 	Conditioning on post treatment variables can introduce bias
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/02_post_treatment.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Even pretreatment controls can introduce bias in observational analysis
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/03_pretreatment_controls_can_introduce_bias.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Heterogeneous treatment propensities cannot be ignored
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/04_Heterogeneous_treatment_propensities_cannot_be_ignored.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## The source of uncertainty matters for inference
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/05_source_of_uncertainty.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Neyman variance is conservative for sample variance
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/06_Neyman_variance.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Cluster standard errors at the level of treatment assignment for the SATE
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/07_cluster_your_errors.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Test selection should take account of both validity and power
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/08_validity_and_power.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Randomization does not justify the t-distribution
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/09_randomization_t.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## You can check whether confidence intervals are correct, given the model 
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/10_confidence_interval_check.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## No evidence of an effect is not evidence of no effect, except for Bayesians
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/04_Answer_Principles/11_evidence_of_effect.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Cross MIDA principles
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/05_Cross_MIDA_Principles/00_Chapter_Cross_MIDA_Principles.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## As ye randomize so shall ye analyze
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/05_Cross_MIDA_Principles/01_analyze_as_ye_randomize.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Selective reporting introduces bias
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/05_Cross_MIDA_Principles/02_selective_reporting.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## There is often a bias-variance tradeoff
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/05_Cross_MIDA_Principles/03_bias_variance.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Spillovers are a design challenge
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/05_Cross_MIDA_Principles/04_spillovers.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Identify primary questions
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/05_Cross_MIDA_Principles/05_primary_questions.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Check your models
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:03_Part_C_Principles/05_Cross_MIDA_Principles/06_check_your_models.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# (PART) Putting Declared Designs to Use {-}
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/00_Part_D_declarations_in_use.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Workflows
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/01_Workflows/00_Chapter_What_is_a_Design.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Design development
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/01_Workflows/01_Design_Development.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Design Registration and Reconciliation
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/01_Workflows/02_Design_Registration_and_Reconciliation.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Critique
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/02_Critique/00_Chapter_How_to_Declare_Diagnose.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## New principles for replication and critique
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/02_Critique/01_replication_and_critique.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Polemics
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/02_Critique/02_polemics.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+# Community
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/03_Community/00_Chapter_How_to_Declare_Diagnose.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## Evaluating and supporting research
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/03_Community/01_Evaluating_and_Supporting.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## A library of designs
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/03_Community/02_Library_of_Designs.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+## AJR example
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:04_Part_D_Declarations_in_Use/03_Community/03_AJR_Example.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+
+source("scripts/package_list.R")
+
+lapply(bookwide_packages, function(x)
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x)
+    library(x, character.only = TRUE)
+  })
+
+set.seed(42)
+# rerun_templates <- FALSE
+# do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+
+pro_con_colors <- c("#C67800", "#205C8A")
+
+source("scripts/ggplot_dd_theme.R")
+
+theme_set(dd_theme())
+```
+
+`r if (knitr::is_html_output()) '
+# References {-}
+'`
+```{r include=FALSE, cache=FALSE}
+source("scripts/package_list.R")
+
+# detach packages
+
+packages <- sapply(sessionInfo()$otherPkgs, function(x) x$Package)
+packages <- packages[!packages %in% bookwide_packages]
+packages <- sapply(packages, function(p) paste0("package:", p))
+lapply(packages, detach, character.only = TRUE, unload = TRUE)
+# clear environment
+rm(list = ls())
+gc()
+```
+
+<!--chapter:end:999_References/00_references.Rmd-->
+

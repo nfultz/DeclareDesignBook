@@ -1,1 +1,1 @@
-# booknew
+This is the DeclareDesign book. See it at https://book.declaredesign.org

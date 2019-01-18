@@ -1,0 +1,10 @@
+## Data steps
+
+### Simple random sampling
+### Stratified, clustered random sampling
+### Arbitrary sampling
+
+### Simple assignments
+### Block clustered assignments
+
+### Randomization workflow

@@ -1,0 +1,1 @@
+## Test selection should take account of both validity and power

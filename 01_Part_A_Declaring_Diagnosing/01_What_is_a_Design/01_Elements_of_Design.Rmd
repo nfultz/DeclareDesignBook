@@ -1,0 +1,21 @@
+## Elements of a Research Design
+
+The specification of a problem requires a description of the world and the question to be asked about the world as described. The answering requires a description of what information is used and how conclusions are reached given the information. 
+
+At its most basic we think of a research design, $\Delta$, as including four elements $<M,I,D,A>$:
+
+*  A \textbf{model}, $M$, of how the world works. In general following Pearl's definition of a probabilistic causal model we will assume that a model contains three core elements. First, a specification of the variables $X$  about which research is being conducted. This includes endogenous and exogenous variables ($V$ and $U$ respectively) and the ranges of these variables. In the formal literature this is sometimes called the \textit{signature} of a model [@halpern2000].   Second, a specification of how each endogenous variable depends on other variables (the ``functional relations'' or, as in @Imbens2015, ``potential outcomes''), $F$. Third, a probability distribution over exogenous variables, $P(U)$.  
+
+* An \textbf{inquiry}, $I$, about the distribution of variables, $X$, perhaps given interventions on some variables.  Using Pearl's notation we can distinguish between questions that ask about the conditional values of variables, such as $\Pr(X_1 | X_2 =1)$ and questions that ask about values that would arise under interventions: $\Pr(X_1 | do(X_2 = 1))$.\footnote{
+		The distinction lies in whether the conditional probability is recorded through passive observation or active intervention to manipulate the probabilities of the conditioning distribution. For example, $\Pr(X_1 | X_2 =1)$ might indicate the conditional probability that it is raining, given that Jack has his umbrella, whereas $\Pr(X_1 | do(X_2 =1))$ would indicate the probability with which it would rain, given Jack is made to carry an umbrella.
+	} We let $a^M$ denote the answer to $I$ \textit{under the model}. Conditional on the model, $a^M$ is the value of the estimand, the quantity that the researcher wants to learn about.  
+
+* A \textbf{data} strategy, $D$, generates data $d$ on $X$. Data $d$ arises, under model $M$ with probability $P_M(d|D)$. The data strategy includes sampling strategies and assignment strategies, which we denote with $P_S$ and $P_Z$ respectively. Measurement techniques are also a part of data strategies and can be thought of as a selection of observable variables that carry information about unobservable variables.
+
+* An **answer** strategy, $A$, that generates answer $a^A$ using data $d$. 
+
+
+A key feature of this bare specification is that if $M$, $D$, and $A$ are sufficiently well described, the answer to question $I$ has a distribution $P_M(a^A|D)$. Moreover, one can construct a distribution of comparisons of this answer to the correct answer, under $M$, for example by assessing $P_M(a^M-a^A|D)$. One can also compare this to results under different data or analysis strategies, $P_M(a^M-a^A|D')$ and $P_M(a^M-a^{A'}|D)$, and to answers generated under alternative models, $P_M(a^{M'}-a^{A}|D)$, as long as these possess signatures that are consistent with inquiries and answer strategies.  
+
+
+*MIDA* captures the analysis-relevant features of a design, but it does not describe substantive elements, such as how theories are derived or interventions are implemented. Yet many other aspects of a design that are not explicitly labeled in these features enter into this framework if they are analytically relevant. For example, logistical details of data collection such as the duration of time between a treatment being administered and endline data collection enter into the model if the longer time until data collection affects subject recall of the treatment. However, information in {\it MIDA} is typically insufficient to assess those substantive elements, an important and separate part of assessing the quality of a research study.

@@ -1,0 +1,12 @@
+
+
+## What is a *Complete*  Design Declaration?
+
+A declaration of a research design that is in some sense complete is required in order to implement it, communicate its essential features, and to assess its properties. Yet existing definitions make clear that there is no single conception of a complete research design: the [Consolidated Standards of Reporting Trials (CONSORT) Statement](http://www.consort-statement.org) widely used in medicine includes 22 features and other proposals range from nine to 60 components.
+
+
+We propose a conditional notion of completeness: we say a design is ``diagnosand-complete'' for a given diagnosand if that diagnosand can be calculated from the declared design. Thus a design that is diagnosand complete for one diagnosand may not be for another. Consider for example the diagnosand statistical power.  Power is the probability that a *p*-value is lower than a critical value. Thus, power-completeness requires that the answer strategy return a *p* value.  It does not, however, require a well-defined estimand. In contrast, Bias- or RMSE-completeness does not require a hypothesis test, but does require the specification of an estimand. 
+
+Diagnosand-completeness is a desirable property to the extent that it means a diagnosand can be calculated. How useful this is depends however on how useful the diagnosand is for decision making. Thus evaluating completeness should focus first on whether diagnosands for which completeness holds are indeed useful ones.
+
+This usefulness depends in part on whether the information on which diagnoses are made is *believable*. A design may be bias-complete for instance under the assumptions of a particular spillover structure, for example. Readers may disagree with these assumptions but there are still gains from the declaration as the grounds for claims for unbiasedness are clear and the effects of deviations from model assumptions can be assessed. In practice, different research communities set different standards for what constitutes sufficient information to make such conjectures about the world plausible. 

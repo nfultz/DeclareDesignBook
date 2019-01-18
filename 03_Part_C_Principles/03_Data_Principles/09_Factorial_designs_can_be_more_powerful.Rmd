@@ -1,0 +1,1 @@
+## Factorial designs can be more powerful than multiarm designs
