@@ -1,0 +1,29 @@
+language: r
+pandoc_version: 2.5
+
+branches:
+  only:
+    - master
+
+cache:
+  packages: yes
+  directories:
+    - $HOME/bin
+
+r_packages:
+  - bookdown
+  - checkpoint
+
+script:
+  - Rscript -e 'library(checkpoint); found_packages <- scanForPackages(".", use.knitr = TRUE)$pkgs; if(length(found_packages[!found_packages%in% installed.packages()]) > 0) install.packages(found_packages[!found_packages%in% installed.packages()])'
+  - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
+  - echo 'book.declaredesign.org' > _book/CNAME
+
+deploy:
+  local-dir: _book
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  on:
+    branch: master
