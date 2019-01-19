@@ -39,3 +39,7 @@ rsconnect/
 .DS_Store
 
 # bookdown stuff
+_book/**
+book_cache**
+book_files**
+book.Rmd
