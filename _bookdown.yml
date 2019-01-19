@@ -1,9 +1,0 @@
-book_filename: "book"
-delete_merged_file: true
-rmd_subdir: true # this goes into subdirectories looking for rmd https://bookdown.org/yihui/bookdown/configuration.html
-new_session: no
-before_chapter_script: scripts/before_chapter_script.R # https://github.com/rstudio/bookdown/issues/418
-after_chapter_script: scripts/after_chapter_script.R # https://github.com/rstudio/bookdown/issues/418
-language:
-  ui:
-    chapter_name: "Chapter "
