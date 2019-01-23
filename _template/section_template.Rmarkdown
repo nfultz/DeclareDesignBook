@@ -44,11 +44,15 @@ This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
 simulations_pilot <- simulate_design(design, sims = sims)
 ```
 
-Right after you do simulations, you want to save the simulations rds. Please use the helper function `save_book_file`, which will handle the paths and such. In this case, the command is `save_book_file(simulations_pilot)`.  This chuck has `echo = FALSE`, and `purl = FALSE`.  The reason to set `purl` to `FALSE` is that we don't want this saving and loading business in the purl'd `.r` files. And right after you'll run the helper function `load_book_file`.  In this case, it's `load_book_file("simulations_pilot")`. Note you must have the object name (no quotes) for save and you must have quotes for load.
+Right after you do simulations, you want to save the simulations rds. 
 
 ```{r, echo = FALSE, purl = FALSE}
-if (do_diagnosis & !exists("do_bookdown")) save_book_file(simulations_pilot)
-load_book_file("simulations_pilot")
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("section_template"), "/simulations_pilot.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(simulations_pilot, path = rds_file_path)
+}
+simulations_pilot <- read_rds(rds_file_path)
 ```
 
 Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
