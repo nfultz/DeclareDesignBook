@@ -17,7 +17,9 @@ bookwide_packages <-
     "tidyr",
     "gridExtra",
     "forcats",
+    "tibble",
+    "stringr",
     "knitr",
     "kableExtra",
-    "blockTools"
+    "readr"
   )

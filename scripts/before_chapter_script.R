@@ -18,3 +18,17 @@ pro_con_colors <- c("#C67800", "#205C8A")
 source("scripts/ggplot_dd_theme.R")
 
 theme_set(dd_theme())
+
+load_book_file <- function(obj_name){
+  obj_name <- paste0(obj_name, ".RDS")
+  path <- file.path("rfiles", gsub(".Rmd", "", knitr::current_input()))
+  obj_file <- read_rds(paste(path, obj_name, sep = "/"))
+  assign(x = obj_name, value = obj_file)
+}
+
+save_book_file <- function(obj){
+  obj_name <- paste0(substitute(obj), ".RDS")
+  path <- file.path("rfiles", gsub(".Rmd", "", knitr::current_input()))
+  dir.create(path, showWarnings = FALSE)
+  write_rds(obj, path = paste(path, obj_name, sep = "/"))
+}

@@ -1,0 +1,65 @@
+---
+title: "Section title in sentence case"
+date: "2019-01-23"
+output: html_document
+bibliography: ../bib/book.bib
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+```{r, echo = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- TRUE
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+```
+
+You can use the global bib file via rmarkdown cites like this: @imai2008
+
+```{r}
+design <-
+  declare_population(N = 100, u = rnorm(N)) +
+  declare_potential_outcomes(Y ~ Z + u) +
+  declare_assignment(prob = 0.5) +
+  declare_reveal(Y, Z) +
+  declare_estimator(Y ~ Z, model = difference_in_means)
+```
+
+
+This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+simulations_pilot <- simulate_design(design, sims = sims)
+```
+
+Right after you do simulations, you want to save the simulations rds. Please use the helper function `save_book_file`, which will handle the paths and such. In this case, the command is `save_book_file(simulations_pilot)`.  This chuck has `echo = FALSE`, and `purl = FALSE`.  The reason to set `purl` to `FALSE` is that we don't want this saving and loading business in the purl'd `.r` files. And right after you'll run the helper function `load_book_file`.  In this case, it's `load_book_file("simulations_pilot")`. Note you must have the object name (no quotes) for save and you must have quotes for load.
+
+```{r, echo = FALSE, purl = FALSE}
+if (do_diagnosis & !exists("do_bookdown")) save_book_file(simulations_pilot)
+load_book_file("simulations_pilot")
+```
+
+Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
+
+```{r}
+kable(head(simulations_pilot))
+```
+
+# References
+
+
+
+
+

@@ -11,8 +11,10 @@ description: "describe the book"
 
 # Preface 
 
-```{r bib-setup, echo = FALSE, include = FALSE}
+```{r book-setup, echo = FALSE, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+do_bookdown <- TRUE
 ```
 
 With this book, we hope to promote a new, comprehensive way of thinking about research designs in the social sciences. We hope this way of thinking will make research designs more transparent and more robust. But we also hope it will make research design easier, easier to produce good designs, but also easier to share designs and build off of the designs that others have developed.

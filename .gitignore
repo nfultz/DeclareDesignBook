@@ -43,3 +43,9 @@ _book/**
 book_cache**
 book_files**
 book.Rmd
+
+# ignore testing files - cache or HTML
+*.html
+**_cache**
+rfiles/**
+rfiles**
