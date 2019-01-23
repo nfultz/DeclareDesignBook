@@ -1,3 +1,30 @@
+---
+title: "Some designs have badly posed questions but design diagnosis can alert you to the problem"
+output: html_document
+# bibliography: ../bib/book.bib 
+bibliography: ../../bib/book.bib # use this line comment the above
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+```{r, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- TRUE
+sims <- 10
+b_sims <- 20
+```
+
 ## Some designs have badly posed questions but design diagnosis can alert you to the problem
 
 An obvious requirement of a good research design is that the question it seeks to answer does in fact *have* an answer, at least under plausible models of the world. 
@@ -41,7 +68,6 @@ Table: Causal Types
 This design can be declared formally like this:
 
 ```{r}
-
 # Model -------------------------------------------------------------------
 population <- declare_population(
   N = 500, noise = rnorm(N),
@@ -76,11 +102,20 @@ design <- population + pos + estimands + assignment + reveal + est1 + est2
 
 Here is a diagnosis of this design:
 
-```{r}
-diagnosis <- diagnose_design(design, sims = sims)
+```{r, eval = do_diagnosis}
+diagnosis <- diagnose_design(design, sims = sims, bootstrap_sims = b_sims)
 ```
 
-```{r, echo=FALSE}
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("Check_that_your_estimands_are_well_defined"), "/diagnosis.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis, path = rds_file_path)
+}
+diagnosis <- read_rds(rds_file_path)
+```
+
+```{r, echo = FALSE}
 kable(reshape_diagnosis(diagnosis)[,-2])
 ```
 
