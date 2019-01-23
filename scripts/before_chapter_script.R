@@ -8,10 +8,6 @@ lapply(bookwide_packages, function(x)
   })
 
 set.seed(42)
-# rerun_templates <- FALSE
-# do_diagnosis <- FALSE
-sims <- 100
-b_sims <- 20
 
 pro_con_colors <- c("#C67800", "#205C8A")
 
