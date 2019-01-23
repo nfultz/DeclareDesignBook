@@ -49,3 +49,4 @@ book.Rmd
 **_cache**
 rfiles/**
 rfiles**
+.Rproj.user
