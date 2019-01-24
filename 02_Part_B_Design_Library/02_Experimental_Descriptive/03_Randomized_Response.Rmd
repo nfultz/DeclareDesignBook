@@ -1,1 +1,79 @@
+---
+title: "Section title in sentence case"
+output: html_document
+# bibliography: ../bib/book.bib 
+bibliography: ../../bib/book.bib # use this line comment the above
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+```{r, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- TRUE
+sims <- 100
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(rr)
+```
+
 ## 	Randomized response
+
+```{r}
+library(rr)
+
+rr_forced_known_tidy <- function(data) {
+  fit  <- rrreg(Y_forced_known ~ 1, data = data, p = 2/3, p0 = 1/6, p1 = 1/6, design = "forced-known")
+  pred <- as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE))
+  names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
+  pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+  pred
+}
+
+rr_mirrored_tidy <- function(data) {
+  fit  <- rrreg(Y_mirrored ~ 1, data = dat, p = 2/3, design = "mirrored")
+  pred <- as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE))
+  names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
+  pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+  pred
+}
+
+rr_design <-
+  declare_population(N = 500, 
+                     truthful_response = rbinom(n = N, size = 1, prob = 0.3)) +
+  declare_estimand(sensitive_item_proportion = mean(truthful_response)) +
+  declare_potential_outcomes(Y_forced_known ~ (dice == 1) * 0 + (dice %in% 2:5) * truthful_response + (dice == 6) * 1, conditions = 1:6, assignment_variable = "dice") +
+  declare_potential_outcomes(Y_mirrored ~ (coin == "heads") * truthful_response + (coin == "tails") * (1 - truthful_response), conditions = c("heads", "tails"), assignment_variable = "coin") +
+  declare_assignment(prob_each = rep(1/6, 6), conditions = 1:6, assignment_variable = "dice") +
+  declare_assignment(prob_each = c(2/3, 1/3), conditions = c("heads", "tails"), assignment_variable = "coin") +
+  declare_reveal(Y_forced_known, dice) +
+  declare_reveal(Y_mirrored, coin) +
+  declare_estimator(handler = tidy_estimator(rr_forced_known_tidy), label = "forced_known", estimand = "sensitive_item_proportion") +
+  declare_estimator(handler = tidy_estimator(rr_mirrored_tidy), label = "mirrored", estimand = "sensitive_item_proportion")
+
+rr_design <- set_diagnosands(rr_design, diagnosands = declare_diagnosands(select = c(bias, rmse, power)))
+
+diag <- diagnose_design(rr_design, sims = 100, bootstrap_sims = 100)
+```
+
+
+
+
+
+
+
+
+
