@@ -1,8 +1,7 @@
 ---
 title: "Section title in sentence case"
 output: html_document
-bibliography: ../bib/book.bib 
-# bibliography: ../../bib/book.bib # use this line comment the above
+bibliography: ../../bib/book.bib 
 ---
 
 <!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
@@ -18,15 +17,20 @@ source("scripts/before_chapter_script.R")
 
 <!-- start post here, do not edit above -->
 
-```{r, echo = FALSE, output = FALSE, purl = FALSE}
+## Section title in sentence case
+
+<!-- make sure to rename the section title below -->
+
+```{r section_title, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- TRUE
+do_diagnosis <- FALSE
 sims <- 100
 b_sims <- 20
 ```
 
 ```{r, echo = FALSE}
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(blockTools)
 ```
 
 You can use the global bib file via rmarkdown cites like this: @imai2008

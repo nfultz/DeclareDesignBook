@@ -18,11 +18,11 @@ source("scripts/before_chapter_script.R")
 
 <!-- start post here, do not edit above -->
 
-```{r, echo = FALSE, output = FALSE, purl = FALSE}
+```{r randomized_response, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- TRUE
-sims <- 1000
-b_sims <- 1000
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 100
 ```
 
 ```{r, echo = FALSE}
