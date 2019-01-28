@@ -22,7 +22,7 @@ source("scripts/before_chapter_script.R")
 
 ```{r, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- TRUE
+do_diagnosis <- FALSE
 sims <- 500
 b_sims <- 20
 ```
@@ -200,23 +200,23 @@ rr_design <-
 rr_design <- set_diagnosands(rr_design, diagnosands = declare_diagnosands(select = c(mean_estimate, bias, rmse, power)))
 ```
 
-# commented it out due to intermittent errors in RR
-# ```{r, eval = do_diagnosis}
-# rr_diagnosis <- diagnose_design(rr_design, sims = sims, bootstrap_sims = b_sims)
-# ```
-# 
-# ```{r, echo = FALSE, purl = FALSE}
-# # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-# rds_file_path <- paste0(get_dropbox_path("list_experiments"), "/rr_diagnosis.RDS")
-# if (do_diagnosis & !exists("do_bookdown")) {
-#   write_rds(rr_diagnosis, path = rds_file_path)
-# }
-# rr_diagnosis <- read_rds(rds_file_path)
-# ```
-# 
-# ```{r}
-# kable(reshape_diagnosis(rr_diagnosis))
-# ```
+<!-- # commented it out due to intermittent errors in RR -->
+<!-- ```{r, eval = do_diagnosis} -->
+<!-- rr_diagnosis <- diagnose_design(rr_design, sims = sims, bootstrap_sims = b_sims) -->
+<!-- ``` -->
+
+<!-- ```{r, echo = FALSE, purl = FALSE} -->
+<!-- # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file -->
+<!-- rds_file_path <- paste0(get_dropbox_path("list_experiments"), "/rr_diagnosis.RDS") -->
+<!-- if (do_diagnosis & !exists("do_bookdown")) { -->
+<!--   write_rds(rr_diagnosis, path = rds_file_path) -->
+<!-- } -->
+<!-- rr_diagnosis <- read_rds(rds_file_path) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- kable(reshape_diagnosis(rr_diagnosis)) -->
+<!-- ``` -->
 
 
 # References
