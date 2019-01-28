@@ -15,6 +15,10 @@ r_packages:
   - checkpoint
 
 script:
+  - mkdir ~/Dropbox
+  - mkdir ~/Dropbox/DeclareDesign_book_rfiles
+  - wget -O ~/Dropbox/files.zip $DOWNLOAD_BOOK_RDS_URL
+  - unzip ~/Dropbox/files.zip -d DeclareDesign_book_rfiles
   - Rscript -e 'library(checkpoint); found_packages <- scanForPackages(".", use.knitr = TRUE)$pkgs; if(length(found_packages[!found_packages%in% installed.packages()]) > 0) install.packages(found_packages[!found_packages%in% installed.packages()])'
   - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
   - echo 'book.declaredesign.org' > _book/CNAME
