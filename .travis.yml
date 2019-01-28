@@ -23,10 +23,8 @@ before_script:
 
 script:
   - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
-  
-after_script:
   - echo 'book.declaredesign.org' > _book/CNAME
-
+  
 deploy:
   local-dir: _book
   provider: pages
