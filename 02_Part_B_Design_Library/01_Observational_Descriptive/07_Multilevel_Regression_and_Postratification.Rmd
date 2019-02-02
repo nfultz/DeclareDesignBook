@@ -92,6 +92,11 @@ design <-
   declare_estimator(policy_support ~ 1, model = lm_robust)
   # declare_estimator(handler = mrp)
 
+# need to figure out how to write the mrp function
+# 1. write my own stan model
+# 2. compile it (using model())
+# 3. draw samples from it
+# 4. get out samples using tidybayes and post-stratify using dplyr
 
 # mrp <- function(data){
 #   brm_fit <- brm(
