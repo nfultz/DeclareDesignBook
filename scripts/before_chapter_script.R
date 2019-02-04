@@ -21,6 +21,11 @@ get_dropbox_path <- function(section){
   } else if (.Platform$OS.type == "windows") {
     path <- file.path("C:", "Dropbox", "DeclareDesign_book_rfiles", section)
   }
+  if(grepl("jasper",getwd(),TRUE)){
+    path <- file.path("~","Dropbox", "09_Software_Development",
+                      "DeclareDesign_", "__book",
+                      "DeclareDesign_book_rfiles", section)
+  }
   dir.create(path, showWarnings = FALSE)
   return(path)
 }
