@@ -1,0 +1,82 @@
+## Patient Preference
+
+This design:
+
+- takes as given we know how much "utility" a patient would derive from being treated and we've parameterized it from 0 to 1.
+- We can either assign people to treatment, using this utility as the probability of assignment
+- or we can assign with prob = 0.5
+- the "slider" is a weighted average between those two approaches.
+- The plot is supposed to show the precision / utility tradeoff.  the "expected total subject utility" is a diagnosand. The higher the utility, the worse the precision / power.
+- I've shown it in "precision", but could do in power.
+
+```{r}
+library(DeclareDesign)
+library(tidyverse)
+
+slider <- 0
+
+design <-
+  # Model -------------------------------------------------------------------
+  declare_population(
+    N = 100,
+    utility_from_treatment = runif(N),
+    assignment_prob = 0.5 * slider + utility_from_treatment * (1 - slider),
+    noise = rnorm(N)
+  ) +
+  declare_potential_outcomes(Y ~ 0.5 * Z+-0.2 * utility_from_treatment * Z + utility_from_treatment + noise) +
+  # Inquiry -----------------------------------------------------------------
+  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  # Data Strategy -----------------------------------------------------------
+  declare_assignment(
+    prob = assignment_prob,
+    simple = TRUE,
+    assignment_variable = "Z"
+  ) +
+  declare_reveal(Y, Z) +
+  # Answer Strategy ---------------------------------------------------------
+  declare_estimator(
+    handler = tidy_estimator(function(data) {
+      with(data, data.frame(estimate = sum(utility_from_treatment * Z)))
+    }),
+    label = "total utility"
+  ) +
+  declare_estimator(
+    Y ~ Z,
+    model = lm_robust,
+    weights = 1 / (assignment_prob * Z + (1 - assignment_prob) * (1 - Z)),
+    label = "IPW"
+  )
+
+designs <- redesign(design, slider = seq(0, 1, length.out = 5))
+sims <- simulate_designs(designs, sims = 500)
+
+diagnose_designs(sims, bootstrap_sims = FALSE)
+
+summary_df <- 
+sims %>%
+  group_by(slider, estimator_label) %>%
+  summarise(var_estimate = var(estimate),
+            mean_estimate = mean(estimate)) %>%
+  group_by(slider) %>%
+  summarise(total_utility = mean_estimate[estimator_label == "total utility"],
+            precision = 1/var_estimate[estimator_label == "IPW"])
+
+
+g1 <-
+  summary_df %>%
+  ggplot(aes(precision, total_utility, color = slider)) +
+  geom_point() +
+  geom_line()
+
+g2 <-
+  summary_df %>%
+  gather(key, value, total_utility, precision) %>%
+  ggplot(aes(slider, value)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(vars(key), scales = "free")
+
+g1
+g2
+```
+
