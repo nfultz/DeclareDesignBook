@@ -1,4 +1,25 @@
-## Patient Preference
+---
+title: "Patient preference trials"
+output: html_document
+bibliography: ../../bib/book.bib 
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+## Patient Preference Trials
+
+<!-- make sure to rename the section title below -->
 
 This design:
 
@@ -9,13 +30,19 @@ This design:
 - The plot is supposed to show the precision / utility tradeoff.  the "expected total subject utility" is a diagnosand. The higher the utility, the worse the precision / power.
 - I've shown it in "precision", but could do in power.
 
+```{r section_title, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+```
+
 ```{r}
-library(DeclareDesign)
-library(tidyverse)
 
 slider <- 0
 
 design <-
+  
   # Model -------------------------------------------------------------------
   declare_population(
     N = 100,
@@ -24,8 +51,10 @@ design <-
     noise = rnorm(N)
   ) +
   declare_potential_outcomes(Y ~ 0.5 * Z+-0.2 * utility_from_treatment * Z + utility_from_treatment + noise) +
+  
   # Inquiry -----------------------------------------------------------------
   declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  
   # Data Strategy -----------------------------------------------------------
   declare_assignment(
     prob = assignment_prob,
@@ -33,6 +62,7 @@ design <-
     assignment_variable = "Z"
   ) +
   declare_reveal(Y, Z) +
+  
   # Answer Strategy ---------------------------------------------------------
   declare_estimator(
     handler = tidy_estimator(function(data) {
@@ -46,14 +76,28 @@ design <-
     weights = 1 / (assignment_prob * Z + (1 - assignment_prob) * (1 - Z)),
     label = "IPW"
   )
+```
 
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
 designs <- redesign(design, slider = seq(0, 1, length.out = 5))
-sims <- simulate_designs(designs, sims = 500)
+simulations <- simulate_designs(designs, sims = sims)
+```
 
-diagnose_designs(sims, bootstrap_sims = FALSE)
 
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("Patient_Preference.Rmd"), "/simulations_patient_preference.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(simulations, path = rds_file_path)
+}
+simulations <- read_rds(rds_file_path)
+```
+
+Two looks at graphs. need to visualize two series with respect to "slider" . Dont want a double y-axis.  I think I prefer the facetted.
+
+```{r}
 summary_df <- 
-sims %>%
+  simulations %>%
   group_by(slider, estimator_label) %>%
   summarise(var_estimate = var(estimate),
             mean_estimate = mean(estimate)) %>%
@@ -79,4 +123,10 @@ g2 <-
 g1
 g2
 ```
+
+# References
+
+
+
+
 
