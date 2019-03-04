@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>14.2 Design Registration and Reconciliation | Declaring and Diagnosing Research Designs</title>
+  <title>8.11 Patient Preference | Declaring and Diagnosing Research Designs</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown  and GitBook 2.6.7" />
 
-  <meta property="og:title" content="14.2 Design Registration and Reconciliation | Declaring and Diagnosing Research Designs" />
+  <meta property="og:title" content="8.11 Patient Preference | Declaring and Diagnosing Research Designs" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="14.2 Design Registration and Reconciliation | Declaring and Diagnosing Research Designs" />
+  <meta name="twitter:title" content="8.11 Patient Preference | Declaring and Diagnosing Research Designs" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="design-development.html">
-<link rel="next" href="critique.html">
+<link rel="prev" href="adaptive-trials.html">
+<link rel="next" href="model-principles.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -311,18 +311,136 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="design-registration-and-reconciliation" class="section level2">
-<h2><span class="header-section-number">14.2</span> Design Registration and Reconciliation</h2>
+<div id="patient-preference" class="section level2">
+<h2><span class="header-section-number">8.11</span> Patient Preference</h2>
+<p>This design:</p>
+<ul>
+<li>takes as given we know how much “utility” a patient would derive from being treated and we’ve parameterized it from 0 to 1.</li>
+<li>We can either assign people to treatment, using this utility as the probability of assignment</li>
+<li>or we can assign with prob = 0.5</li>
+<li>the “slider” is a weighted average between those two approaches.</li>
+<li>The plot is supposed to show the precision / utility tradeoff. the “expected total subject utility” is a diagnosand. The higher the utility, the worse the precision / power.</li>
+<li>I’ve shown it in “precision”, but could do in power.</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DeclareDesign)
+<span class="kw">library</span>(tidyverse)
+
+slider &lt;-<span class="st"> </span><span class="dv">0</span>
+
+design &lt;-
+<span class="st">  </span><span class="co"># Model -------------------------------------------------------------------</span>
+<span class="st">  </span><span class="kw">declare_population</span>(
+    <span class="dt">N =</span> <span class="dv">100</span>,
+    <span class="dt">utility_from_treatment =</span> <span class="kw">runif</span>(N),
+    <span class="dt">assignment_prob =</span> <span class="fl">0.5</span> <span class="op">*</span><span class="st"> </span>slider <span class="op">+</span><span class="st"> </span>utility_from_treatment <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>slider),
+    <span class="dt">noise =</span> <span class="kw">rnorm</span>(N)
+  ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span> <span class="op">*</span><span class="st"> </span>Z<span class="op">+-</span><span class="fl">0.2</span> <span class="op">*</span><span class="st"> </span>utility_from_treatment <span class="op">*</span><span class="st"> </span>Z <span class="op">+</span><span class="st"> </span>utility_from_treatment <span class="op">+</span><span class="st"> </span>noise) <span class="op">+</span>
+<span class="st">  </span><span class="co"># Inquiry -----------------------------------------------------------------</span>
+<span class="st">  </span><span class="kw">declare_estimand</span>(<span class="dt">ATE =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="co"># Data Strategy -----------------------------------------------------------</span>
+<span class="st">  </span><span class="kw">declare_assignment</span>(
+    <span class="dt">prob =</span> assignment_prob,
+    <span class="dt">simple =</span> <span class="ot">TRUE</span>,
+    <span class="dt">assignment_variable =</span> <span class="st">&quot;Z&quot;</span>
+  ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">declare_reveal</span>(Y, Z) <span class="op">+</span>
+<span class="st">  </span><span class="co"># Answer Strategy ---------------------------------------------------------</span>
+<span class="st">  </span><span class="kw">declare_estimator</span>(
+    <span class="dt">handler =</span> <span class="kw">tidy_estimator</span>(<span class="cf">function</span>(data) {
+      <span class="kw">with</span>(data, <span class="kw">data.frame</span>(<span class="dt">estimate =</span> <span class="kw">sum</span>(utility_from_treatment <span class="op">*</span><span class="st"> </span>Z)))
+    }),
+    <span class="dt">label =</span> <span class="st">&quot;total utility&quot;</span>
+  ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">declare_estimator</span>(
+    Y <span class="op">~</span><span class="st"> </span>Z,
+    <span class="dt">model =</span> lm_robust,
+    <span class="dt">weights =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(assignment_prob <span class="op">*</span><span class="st"> </span>Z <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>assignment_prob) <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Z)),
+    <span class="dt">label =</span> <span class="st">&quot;IPW&quot;</span>
+  )
+
+designs &lt;-<span class="st"> </span><span class="kw">redesign</span>(design, <span class="dt">slider =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">5</span>))
+sims &lt;-<span class="st"> </span><span class="kw">simulate_designs</span>(designs, <span class="dt">sims =</span> <span class="dv">500</span>)
+
+<span class="kw">diagnose_designs</span>(sims, <span class="dt">bootstrap_sims =</span> <span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+## Research design diagnosis based on 500 simulations.
+## 
+##  Design Label slider Estimand Label Estimator Label Term  Bias  RMSE Power
+##      design_1      0            ATE             IPW    Z  0.06  0.32  0.48
+##      design_1      0            ATE   total utility &lt;NA&gt; 32.99 33.21    NA
+##      design_2   0.25            ATE             IPW    Z  0.01  0.24  0.42
+##      design_2   0.25            ATE   total utility &lt;NA&gt; 30.52 30.74    NA
+##      design_3    0.5            ATE             IPW    Z  0.00  0.23  0.46
+##      design_3    0.5            ATE   total utility &lt;NA&gt; 28.61 28.81    NA
+##      design_4   0.75            ATE             IPW    Z -0.00  0.21  0.46
+##      design_4   0.75            ATE   total utility &lt;NA&gt; 26.76 26.99    NA
+##      design_5      1            ATE             IPW    Z  0.01  0.20  0.49
+##      design_5      1            ATE   total utility &lt;NA&gt; 24.34 24.58    NA
+##  Coverage Mean Estimate SD Estimate Mean Se Type S Rate Mean Estimand
+##      0.92          0.46        0.31    0.27        0.00          0.40
+##        NA         33.39        3.84      NA          NA          0.40
+##      0.94          0.41        0.24    0.24        0.00          0.40
+##        NA         30.92        3.59      NA          NA          0.40
+##      0.95          0.40        0.23    0.22        0.00          0.40
+##        NA         29.01        3.37      NA          NA          0.40
+##      0.95          0.40        0.21    0.21        0.00          0.40
+##        NA         27.16        3.49      NA          NA          0.40
+##      0.97          0.41        0.20    0.21        0.00          0.40
+##        NA         24.74        3.39      NA          NA          0.40
+##  N Sims
+##     500
+##     500
+##     500
+##     500
+##     500
+##     500
+##     500
+##     500
+##     500
+##     500</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">summary_df &lt;-<span class="st"> </span>
+sims <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(slider, estimator_label) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">var_estimate =</span> <span class="kw">var</span>(estimate),
+            <span class="dt">mean_estimate =</span> <span class="kw">mean</span>(estimate)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(slider) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">total_utility =</span> mean_estimate[estimator_label <span class="op">==</span><span class="st"> &quot;total utility&quot;</span>],
+            <span class="dt">precision =</span> <span class="dv">1</span><span class="op">/</span>var_estimate[estimator_label <span class="op">==</span><span class="st"> &quot;IPW&quot;</span>])
+
+
+g1 &lt;-
+<span class="st">  </span>summary_df <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(precision, total_utility, <span class="dt">color =</span> slider)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>()
+
+g2 &lt;-
+<span class="st">  </span>summary_df <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">gather</span>(key, value, total_utility, precision) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(slider, value)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="kw">vars</span>(key), <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>)
+
+g1</code></pre>
+<p><img src="book_files/figure-html/unnamed-chunk-113-1.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r">g2</code></pre>
+<p><img src="book_files/figure-html/unnamed-chunk-113-2.png" width="672" /></p>
 
 </div>
 <!-- </div> -->
+
+
+
+</div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="design-development.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="critique.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="adaptive-trials.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="model-principles.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
