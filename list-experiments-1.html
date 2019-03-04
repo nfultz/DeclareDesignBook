@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>5.2 List Experiments | Declaring and Diagnosing Research Designs</title>
+  <title>6.1 List experiments | Declaring and Diagnosing Research Designs</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown  and GitBook 2.6.7" />
 
-  <meta property="og:title" content="5.2 List Experiments | Declaring and Diagnosing Research Designs" />
+  <meta property="og:title" content="6.1 List experiments | Declaring and Diagnosing Research Designs" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="5.2 List Experiments | Declaring and Diagnosing Research Designs" />
+  <meta name="twitter:title" content="6.1 List experiments | Declaring and Diagnosing Research Designs" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="audit-experiments.html">
-<link rel="next" href="randomized-response.html">
+<link rel="prev" href="references.html">
+<link rel="next" href="conjoint-experiments.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -182,14 +182,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5" data-path="experimental-designs-for-descriptive-inference.html"><a href="experimental-designs-for-descriptive-inference.html"><i class="fa fa-check"></i><b>5</b> Experimental Designs for Descriptive Inference</a><ul>
 <li class="chapter" data-level="5.1" data-path="audit-experiments.html"><a href="audit-experiments.html"><i class="fa fa-check"></i><b>5.1</b> Audit experiments</a></li>
-<li class="chapter" data-level="5.2" data-path="list-experiments.html"><a href="list-experiments.html"><i class="fa fa-check"></i><b>5.2</b> List Experiments</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="list-experiments.html"><a href="list-experiments.html#list-experiments-1"><i class="fa fa-check"></i><b>5.2.1</b> List experiments</a></li>
-<li class="chapter" data-level="5.2.2" data-path="list-experiments.html"><a href="list-experiments.html#randomized-response-technique"><i class="fa fa-check"></i><b>5.2.2</b> Randomized response technique</a></li>
+<li class="chapter" data-level="5.2" data-path="experiments-for-sensitive-questions.html"><a href="experiments-for-sensitive-questions.html"><i class="fa fa-check"></i><b>5.2</b> Experiments for sensitive questions</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="experiments-for-sensitive-questions.html"><a href="experiments-for-sensitive-questions.html#list-experiments"><i class="fa fa-check"></i><b>5.2.1</b> List experiments</a></li>
+<li class="chapter" data-level="5.2.2" data-path="experiments-for-sensitive-questions.html"><a href="experiments-for-sensitive-questions.html#randomized-response-technique"><i class="fa fa-check"></i><b>5.2.2</b> Randomized response technique</a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="randomized-response.html"><a href="randomized-response.html"><i class="fa fa-check"></i><b>5.3</b> Randomized response</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>6</b> References</a><ul>
-<li class="chapter" data-level="6.1" data-path="list-experiments-2.html"><a href="list-experiments-2.html"><i class="fa fa-check"></i><b>6.1</b> List experiments</a></li>
+<li class="chapter" data-level="6.1" data-path="list-experiments-1.html"><a href="list-experiments-1.html"><i class="fa fa-check"></i><b>6.1</b> List experiments</a></li>
 <li class="chapter" data-level="6.2" data-path="conjoint-experiments.html"><a href="conjoint-experiments.html"><i class="fa fa-check"></i><b>6.2</b> Conjoint experiments</a></li>
 <li class="chapter" data-level="6.3" data-path="experimental-games.html"><a href="experimental-games.html"><i class="fa fa-check"></i><b>6.3</b> Experimental games</a></li>
 </ul></li>
@@ -311,128 +310,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="list-experiments" class="section level2">
-<h2><span class="header-section-number">5.2</span> List Experiments</h2>
-<p>Sometimes, subjects might not tell the truth when  asked about certain attitudes or behaviors. Responses may be affected by sensitivity bias, or the tendancy of survey subjects to dissemble for fear of negative repercussions if some reference group learns their true response <span class="citation">(Blair, Coppock, and Moor <a href="#ref-blair2018list">2018</a>)</span>. In such cases, standard survey estimates based on direct questions will be biased. One class of solutions to this problem is to obscure individual responses, providing protection from social or legal pressures. When we obscure responses systematically through an experiment, we can often still identify average quantities of interest. One such design is the list experiment (introduced by <span class="citation">Miller (<a href="#ref-miller1984new">1984</a>)</span>), which asks respondents for the count of the number of `yes’ responses to a series of questions including the sensitive item, rather than for a yes or no answer on the sensitive item itself. List experiments give subjects cover by aggregating their answer to the sensitive item with responses to other questions.</p>
-<p>During the 2016 Presidential Election in the U.S., some observers were concerned that pre-election estimates of support for Donald Trump might have been downwardly biased by “Shy Trump Supporters” – survey respondents who supported Trump in their hearts, but were embarrased to admit it to pollsters. To assess this possibility, <span class="citation">Coppock (<a href="#ref-coppock2017did">2017</a>)</span> obtained estimates of Trump support that were free of social desirability bias using a list experiment. Subjects in the control and treatment groups were asked: “Here is a list of [three/four] things that some people would do and some people would not. Please tell me HOW MANY of them you would do. We do not want to know which ones of these you would do, just how many. Here are the [three/four] things:”</p>
-<table>
-<colgroup>
-<col width="36%" />
-<col width="63%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Control</th>
-<th>Treatment</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>If it were up for a vote, I would vote to raise the minimum wage to 15 dollars an hour</td>
-<td>If it were up for a vote, I would vote to raise the minimum wage to 15 dollars an hour</td>
-</tr>
-<tr class="even">
-<td>If it were up for a vote, I would vote to repeal the Affordable Care Act, also known as Obamacare</td>
-<td>If it were up for a vote, I would vote to repeal the Affordable Care Act, also known as Obamacare</td>
-</tr>
-<tr class="odd">
-<td>If it were up for a vote, I would vote to ban assault weapons</td>
-<td>If it were up for a vote, I would vote to ban assault weapons</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>If the 2016 presidential election were being held today and the candidates were Hillary Clinton (Democrat) and Donald Trump (Republican), I would vote for Donald Trump.</td>
-</tr>
-</tbody>
-</table>
-<p>The treatment group averaged 1.843 items while the control group averaged 1.548 items, for a difference-in-means estimate of support for Donald Trump of 29.6% (note that this estimate is representative of US adults and not of US adults who would actually vote). The trouble with this estimate is that, while it’s plausibly free from social desirability bias, it’s also much higher variance. The 95% confidence interval for the list experiment estimate is nearly 14 percentage points wide, whereas the the 95% confidence interval for the (possibly biased!) direct question asked of the same sample is closer to 4 percentage points.</p>
-<p>The choice between list experiments and direct question is therefore a <strong>bias-variance tradeoff</strong>. List experiments may have less bias, but they are higher variance. Direct questions may be biased, but they have less variance.</p>
-<div id="list-experiments-1" class="section level3">
-<h3><span class="header-section-number">5.2.1</span> List experiments</h3>
-<ul>
-<li><p><strong>M</strong>odel: Our model includes subjects’ true support for Donald Trump and whether or not they are “shy”. These two variables combine to determine how subjects will respond when asked directly about Trump support.</p>
-<p>The potential outcomes model combines three types of information to determine how subjects will respond to the list experiment: their responses to the three nonsensitive control items, their true support for Trump, and whether they are assigned to see the treatment or the control list. Notice that our definition of the potential outcomes embeds the “No Liars” and “No Design Effects” assumptions required for the list experiment design (see Blair and Imai 2012 for more on these assumptions).</p>
-<p>We also have a global parameter that reflects our expectations about the proportion of Trump supporters who are shy. It’s set at 6%, which is large enough to make a difference for polling, but not so large as to be implausible.</p></li>
-<li><p><strong>I</strong>nquiry: Our estimand is the proportion of voters who actually plan to vote for Trump.</p></li>
-<li><p><strong>D</strong>ata strategy: First we sample 500 respondents from the U.S. population at random, then we randomly assign 250 of the 500 to treatment and the remainder to control. In the survey, we ask subjects both the direct question and the list experiment question.</p></li>
-<li><p><strong>A</strong>nswer strategy: We estimate the proportion of truthful Trump voters in two ways. First, we take the mean of answers to the direct question. Second, we take the difference in means in the responses to the list experiment question.</p></li>
-</ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Model -------------------------------------------------------------------</span>
-proportion_shy &lt;-<span class="st"> </span><span class="fl">.06</span>
+<div id="list-experiments-1" class="section level2">
+<h2><span class="header-section-number">6.1</span> List experiments</h2>
 
-list_design &lt;-
-<span class="st">  </span>
-<span class="st">  </span><span class="co"># Model</span>
-<span class="st">  </span><span class="kw">declare_population</span>(
-    <span class="dt">N =</span> <span class="dv">5000</span>,
-    <span class="co"># true trump vote (unobservable)</span>
-    <span class="dt">truthful_trump_vote =</span> <span class="kw">draw_binary</span>(.<span class="dv">45</span>, N),
-    
-    <span class="co"># shy voter (unobservable)</span>
-    <span class="dt">shy =</span> <span class="kw">draw_binary</span>(proportion_shy, N),
-    
-    <span class="co"># Direct question response (1 if Trump supporter and not shy, 0 otherwise)</span>
-    <span class="dt">Y_direct =</span> <span class="kw">as.numeric</span>(truthful_trump_vote <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>shy <span class="op">==</span><span class="st"> </span><span class="dv">0</span>),
-    
-    <span class="co"># Nonsensitive list experiment items</span>
-    <span class="dt">raise_minimum_wage =</span> <span class="kw">draw_binary</span>(.<span class="dv">8</span>, N),
-    <span class="dt">repeal_obamacare =</span> <span class="kw">draw_binary</span>(.<span class="dv">6</span>, N),
-    <span class="dt">ban_assault_weapons =</span> <span class="kw">draw_binary</span>(.<span class="dv">5</span>, N)
-  ) <span class="op">+</span>
-<span class="st">  </span>
-<span class="st">  </span><span class="kw">declare_potential_outcomes</span>(
-    <span class="dt">Y_list_Z_0 =</span> raise_minimum_wage <span class="op">+</span><span class="st"> </span>repeal_obamacare <span class="op">+</span><span class="st"> </span>ban_assault_weapons,
-    <span class="dt">Y_list_Z_1 =</span> Y_list_Z_<span class="dv">0</span> <span class="op">+</span><span class="st"> </span>truthful_trump_vote
-  ) <span class="op">+</span>
-<span class="st">  </span>
-<span class="st">  </span><span class="co"># Inquiry</span>
-<span class="st">  </span><span class="kw">declare_estimand</span>(<span class="dt">proportion_truthful_trump_vote =</span> <span class="kw">mean</span>(truthful_trump_vote)) <span class="op">+</span>
-<span class="st">  </span>
-<span class="st">  </span><span class="co"># Data Strategy</span>
-<span class="st">  </span><span class="kw">declare_sampling</span>(<span class="dt">n =</span> <span class="dv">500</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">declare_assignment</span>(<span class="dt">prob =</span> <span class="fl">.5</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">declare_reveal</span>(Y_list) <span class="op">+</span>
-<span class="st">  </span>
-<span class="st">  </span><span class="co"># Answer Strategy</span>
-<span class="st">  </span><span class="kw">declare_estimator</span>(
-    Y_direct <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,
-    <span class="dt">model =</span> lm_robust,
-    <span class="dt">term =</span> <span class="st">&quot;(Intercept)&quot;</span>,
-    <span class="dt">estimand =</span> <span class="st">&quot;proportion_truthful_trump_vote&quot;</span>,
-    <span class="dt">label =</span> <span class="st">&quot;direct&quot;</span>
-  ) <span class="op">+</span>
-<span class="st">  </span><span class="kw">declare_estimator</span>(
-    Y_list <span class="op">~</span><span class="st"> </span>Z,
-    <span class="dt">model =</span> difference_in_means,
-    <span class="dt">estimand =</span> <span class="st">&quot;proportion_truthful_trump_vote&quot;</span>,
-    <span class="dt">label =</span> <span class="st">&quot;list&quot;</span>)</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">simulations_list &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(list_design, <span class="dt">sims =</span> sims)</code></pre>
-<p>The plot shows the sampling distribution of the direct and list experimetn estimators. The sampling distribution of the direct question is tight but biased; the list experiment (if the requisite assumptions hold) is unbiased, but higher variance. The choice between these two estimators of the prevalence rate depends on which – bias or variance – is more important in a particular setting. See <span class="citation">Blair, Coppock, and Moor (<a href="#ref-blair2018list">2018</a>)</span> for an extended discussion of how the choice of research design depends deeply on the purpose of the project.</p>
-<p><img src="book_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
-</div>
-<div id="randomized-response-technique" class="section level3">
-<h3><span class="header-section-number">5.2.2</span> Randomized response technique</h3>
-</div>
-</div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-blair2018list">
-<p>Blair, Graeme, Alexander Coppock, and Margaret Moor. 2018. “When to Worry About Sensitivity Bias: Evidence from 30 Years of List Experiments.” <em>Unpublished Manuscript</em>.</p>
-</div>
-<div id="ref-coppock2017did">
-<p>Coppock, Alexander. 2017. “Did Shy Trump Supporters Bias the 2016 Polls? Evidence from a Nationally-Representative List Experiment.” <em>Statistics, Politics and Policy</em> 8 (1): 29–40.</p>
-</div>
-<div id="ref-miller1984new">
-<p>Miller, Judith Droitcour. 1984. “A New Survey Technique for Studying Deviant Behavior.” PhD thesis, George Washington University. <a href="https://books.google.com/books/about/A_New_Survey_Technique_for_Studying_Devi.html?id=UZSgQgAACAAJ">https://books.google.com/books/about/A_New_Survey_Technique_for_Studying_Devi.html?id=UZSgQgAACAAJ</a>.</p>
-</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="audit-experiments.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="randomized-response.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="references.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conjoint-experiments.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
