@@ -1,1 +1,113 @@
+---
+title: "Topic analysis"
+output: html_document
+bibliography: ../../bib/book.bib 
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
 ## Topic analysis
+
+```{r section_title, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(tidytext)
+library(gutenbergr)
+library(tm)
+library(topicmodels)
+library(MCMCpack)
+```
+
+```{r}
+lda_tidy <- function(data, k, matrix) {
+  tdm <- data %>% cast_dtm(title_chapter, word, n)
+  fit <- LDA(x = tdm, k = k)
+  tidy(fit, matrix = matrix)
+}
+
+topic_1_corpus <- c("democrat", "liberal", "left wing", "social services")
+topic_2_corpus <- c("republican", "gop", "right", "conservative", "taxes")
+
+design <-
+  declare_population(
+    document = add_level(
+      N = 50,
+      # sample proportion of the document that is drawn from topic 1 and topic 2
+      document_proportion_topic_1 = runif(N, 0, 1),
+      # documents are between 5 and 10 words
+      N_words = sample(5:10, N, replace = TRUE)
+    ),
+    topic = add_level(
+      N = 2, 
+      topic = c(1, 2), 
+      N_words_topic_1 = ceiling(document_proportion_topic_1 * N_words),
+      N_words_topic_2 = N_words - N_words_topic_1,
+      N_words_per_topic = if_else(topic == 1, N_words_topic_1, N_words_topic_2)
+
+      # N_words_per_topic = ceiling(document_proportion_topic_1 * N_words)
+      # c(floor(document_proportion_topic_1 * N_words),
+                            # N_words - floor(document_proportion_topic_1 * N_words))
+    ),
+    term = add_level(
+      N = N_words_per_topic,
+      terms =
+        if_else(topic == 1,
+                sample(topic_1_corpus, N, replace = TRUE),
+                sample(topic_2_corpus, N, replace = TRUE))
+    )
+  ) +
+  declare_estimator(
+    handler = tidy_estimator(lda_tidy), k = 2, matrix = "gamma",
+    label = "lda-topics")
+
+declare_diagnosands()
+
+draw_estimates(design)
+```
+
+
+This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+simulations_pilot <- simulate_design(design, sims = sims)
+```
+
+Right after you do simulations, you want to save the simulations rds. 
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("section_template"), "/simulations_pilot.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(simulations_pilot, path = rds_file_path)
+}
+simulations_pilot <- read_rds(rds_file_path)
+```
+
+Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
+
+```{r}
+kable(head(simulations_pilot))
+```
+
+# References
+
+
+
+
+
