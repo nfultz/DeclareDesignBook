@@ -160,7 +160,7 @@ reshape_diagnosis(diagnosis)[,c("Design Label", "Estimand Label", "Mean Estimand
 ```
 
 
-# References
+### References
 
 
 

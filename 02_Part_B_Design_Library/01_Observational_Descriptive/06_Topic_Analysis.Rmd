@@ -193,7 +193,7 @@ diagnosis <- read_rds(rds_file_path)
 kable(reshape_diagnosis(diagnosis))
 ```
 
-# References
+### References
 
 
 

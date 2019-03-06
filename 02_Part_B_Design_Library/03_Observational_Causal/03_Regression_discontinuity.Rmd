@@ -145,11 +145,6 @@ Geographic regression discontinuity designs use distance to a border as the runn
   
 4. Redefine the population function so that units with higher potential outcome are more likely to locate just above the cutoff than below it. Assess whether and how this affects the bias of the design.
 
-### Design Inspector
-
-<iframe src="https://graemeblair.shinyapps.io/inspect_design/?design=rd" style="border: none; width: 100%; height: 550px"></iframe>
-
-
-
+### References
 
 
