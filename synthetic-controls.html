@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>4.5 Measuring latent variables | Declaring and Diagnosing Research Designs</title>
+  <title>6.4 Synthetic controls | Declaring and Diagnosing Research Designs</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown  and GitBook 2.6.7" />
 
-  <meta property="og:title" content="4.5 Measuring latent variables | Declaring and Diagnosing Research Designs" />
+  <meta property="og:title" content="6.4 Synthetic controls | Declaring and Diagnosing Research Designs" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="4.5 Measuring latent variables | Declaring and Diagnosing Research Designs" />
+  <meta name="twitter:title" content="6.4 Synthetic controls | Declaring and Diagnosing Research Designs" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="sample-re-sample.html">
-<link rel="next" href="topic-analysis.html">
+<link rel="prev" href="regression-discontinuity.html">
+<link rel="next" href="cross-national-time-series.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -323,19 +323,137 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="measuring-latent-variables" class="section level2">
-<h2><span class="header-section-number">4.5</span> Measuring latent variables</h2>
+<div id="synthetic-controls" class="section level2">
+<h2><span class="header-section-number">6.4</span> Synthetic controls</h2>
+<!-- make sure to rename the section title below -->
+<!-- could adapt this cite to use synth (it current does an RD): Fitzpatrick, Maria Donovan. "Preschoolers enrolled and mothers at work? The effects of universal prekindergarten." Journal of Labor Economics 28.1 (2010): 51-85. -->
+<p>Modeled after the example here:</p>
+<p><a href="https://www.mitpressjournals.org/doi/abs/10.1162/REST_a_00429?casa_token=o-zWqCima50AAAAA:yiEERZfdhAUoHV0-xBYNjgdljvgfRXrriR8foG7X8nHSUAMFrLcw2vWY8e9pHzmRT24MMAIv9hvKpQ" class="uri">https://www.mitpressjournals.org/doi/abs/10.1162/REST_a_00429?casa_token=o-zWqCima50AAAAA:yiEERZfdhAUoHV0-xBYNjgdljvgfRXrriR8foG7X8nHSUAMFrLcw2vWY8e9pHzmRT24MMAIv9hvKpQ</a></p>
+<p>Did the 2007 Legal Arizona Workers Act Reduce the State’s Unauthorized Immigrant Population?
+Sarah Bohn, Magnus Lofstrom, and Steven Raphael
+The Review of Economics and Statistics 2014 96:2, 258-269</p>
+<ul>
+<li>set up states with time trends and levels that are correlated with a type</li>
+<li>try three estimators: (1) difference-in-difference; (2) difference in treated period; and (3) difference in treated period weighted by Synth weights</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># tidy function that takes data and just adds the synthetic control weights to it</span>
+synth_weights_tidy &lt;-<span class="st"> </span><span class="cf">function</span>(data) {
+  dataprep.out &lt;-<span class="st"> </span><span class="kw">dataprep</span>(
+    <span class="dt">foo =</span> data,
+    <span class="dt">predictors =</span> <span class="st">&quot;prop_non_hispanic_below_hs&quot;</span>,
+    <span class="dt">predictors.op =</span> <span class="st">&quot;mean&quot;</span>,
+    <span class="dt">time.predictors.prior =</span> <span class="dv">1998</span><span class="op">:</span><span class="dv">2006</span>,
+    <span class="dt">dependent =</span> <span class="st">&quot;prop_non_hispanic_below_hs&quot;</span>,
+    <span class="dt">unit.variable =</span> <span class="st">&quot;state_number&quot;</span>,
+    <span class="dt">time.variable =</span> <span class="st">&quot;year&quot;</span>,
+    <span class="dt">treatment.identifier =</span> <span class="dv">4</span>,
+    <span class="dt">controls.identifier =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">5</span><span class="op">:</span><span class="dv">50</span>), <span class="co"># states without Arizona</span>
+    <span class="dt">time.optimize.ssr =</span> <span class="dv">1998</span><span class="op">:</span><span class="dv">2006</span>,
+    <span class="dt">time.plot =</span> <span class="dv">1998</span><span class="op">:</span><span class="dv">2009</span>)
+  <span class="kw">capture.output</span>(fit &lt;-<span class="st"> </span><span class="kw">synth</span>(<span class="dt">data.prep.obj =</span> dataprep.out))
+  tab &lt;-<span class="st"> </span><span class="kw">synth.tab</span>(<span class="dt">dataprep.res =</span> dataprep.out, <span class="dt">synth.res =</span> fit) 
+  
+  data <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">left_join</span>(tab<span class="op">$</span>tab.w <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">synth_weights =</span> w.weights) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(synth_weights, unit.numbers), <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;state_number&quot;</span> =<span class="st"> &quot;unit.numbers&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">synth_weights =</span> <span class="kw">replace</span>(synth_weights, state_number <span class="op">==</span><span class="st"> </span><span class="dv">4</span>, <span class="dv">1</span>))
+}
 
-<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
-<!-- start post here, do not edit above -->
+<span class="co"># note need to clean up the range of the data, currently over 1</span>
+design &lt;-
+<span class="st">  </span><span class="kw">declare_population</span>(
+    <span class="dt">states =</span> <span class="kw">add_level</span>(
+      <span class="dt">N =</span> <span class="dv">50</span>, 
+      <span class="dt">state =</span> state.abb,
+      <span class="dt">state_number =</span> <span class="kw">as.numeric</span>(<span class="kw">as.factor</span>(state)),
+      <span class="dt">state_shock =</span> <span class="kw">runif</span>(N, <span class="fl">-.15</span>, <span class="fl">.15</span>),
+      <span class="dt">border_state =</span> state <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AZ&quot;</span>, <span class="st">&quot;CA&quot;</span>, <span class="st">&quot;NM&quot;</span>, <span class="st">&quot;TX&quot;</span>),
+      <span class="dt">state_shock =</span> <span class="kw">ifelse</span>(border_state, <span class="fl">.2</span>, state_shock)
+    ),
+    <span class="dt">years =</span> <span class="kw">add_level</span>(
+      <span class="dt">N =</span> <span class="dv">12</span>, <span class="dt">nest =</span> <span class="ot">FALSE</span>,
+      <span class="dt">year =</span> <span class="dv">1998</span><span class="op">:</span><span class="dv">2009</span>,
+      <span class="dt">post_treatment_period =</span> year <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2007</span>,
+      <span class="dt">year_shock =</span> <span class="kw">runif</span>(N, <span class="fl">-.01</span>, <span class="fl">.01</span>), 
+      <span class="dt">year_trend =</span> year <span class="op">-</span><span class="st"> </span><span class="dv">1998</span>
+    ),
+    <span class="dt">obs =</span> <span class="kw">cross_levels</span>(
+      <span class="dt">by =</span> <span class="kw">join</span>(states, years),
+      <span class="dt">legal_worker_act =</span> <span class="dv">1</span><span class="op">*</span>(post_treatment_period <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span> <span class="op">&amp;</span><span class="st"> </span>state <span class="op">==</span><span class="st"> &quot;AZ&quot;</span>),
+      <span class="dt">state_year_shock =</span> <span class="kw">runif</span>(N, <span class="fl">-.01</span>, <span class="fl">.01</span>),
+      <span class="dt">prop_non_hispanic_below_hs_baseline =</span> <span class="fl">0.4</span> <span class="op">+</span><span class="st"> </span>state_shock <span class="op">+</span><span class="st"> </span>year_shock <span class="op">+</span><span class="st"> </span>(.<span class="dv">01</span> <span class="op">+</span><span class="st"> </span><span class="fl">.05</span> <span class="op">*</span><span class="st"> </span>border_state) <span class="op">*</span><span class="st"> </span>year_trend <span class="op">+</span><span class="st"> </span>state_year_shock
+    )
+  ) <span class="op">+</span>
+<span class="st">  </span>
+<span class="st">  </span><span class="kw">declare_potential_outcomes</span>(
+    prop_non_hispanic_below_hs <span class="op">~</span><span class="st"> </span>prop_non_hispanic_below_hs_baseline <span class="op">+</span><span class="st"> </span><span class="fl">0.25</span> <span class="op">*</span><span class="st"> </span>legal_worker_act, <span class="dt">assignment_variable =</span> legal_worker_act) <span class="op">+</span>
+<span class="st">  </span>
+<span class="st">  </span><span class="kw">declare_estimand</span>(
+    <span class="dt">ATE_AZ =</span> <span class="kw">mean</span>(prop_non_hispanic_below_hs_legal_worker_act_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>prop_non_hispanic_below_hs_legal_worker_act_<span class="dv">0</span>), 
+    <span class="dt">subset =</span> legal_worker_act <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) <span class="op">+</span>
+<span class="st">  </span>
+<span class="st">  </span><span class="kw">declare_reveal</span>(prop_non_hispanic_below_hs, legal_worker_act) <span class="op">+</span>
+<span class="st">  </span>
+<span class="st">  </span><span class="kw">declare_step</span>(<span class="dt">handler =</span> synth_weights_tidy) <span class="op">+</span>
+<span class="st">  </span>
+<span class="st">  </span><span class="kw">declare_estimator</span>(prop_non_hispanic_below_hs <span class="op">~</span><span class="st"> </span>legal_worker_act, <span class="dt">subset =</span> year <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2007</span>, <span class="dt">weights =</span> synth_weights, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;synth&quot;</span>) <span class="op">+</span>
+
+<span class="st">  </span><span class="kw">declare_estimator</span>(prop_non_hispanic_below_hs <span class="op">~</span><span class="st"> </span>legal_worker_act, <span class="dt">subset =</span> year <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2007</span>, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;unweighted&quot;</span>) <span class="op">+</span>
+
+<span class="st">  </span><span class="kw">declare_estimator</span>(prop_non_hispanic_below_hs <span class="op">~</span><span class="st"> </span><span class="kw">I</span>(state <span class="op">==</span><span class="st"> &quot;AZ&quot;</span>) <span class="op">+</span><span class="st"> </span>post_treatment_period <span class="op">+</span><span class="st"> </span>legal_worker_act, <span class="dt">term =</span> <span class="st">&quot;legal_worker_act&quot;</span>, 
+                    <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;unweighted_did&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">state_data &lt;-<span class="st"> </span><span class="kw">draw_data</span>(design)
+
+state_data <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(state, synth_weights) <span class="op">%&gt;%</span><span class="st"> </span>distinct <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(<span class="op">-</span>synth_weights) <span class="op">%&gt;%</span><span class="st"> </span>head</code></pre>
+<pre><code>##   state synth_weights
+## 1    AZ         1.000
+## 2    TX         0.965
+## 3    NM         0.018
+## 4    CA         0.011
+## 5    AL         0.000
+## 6    AK         0.000</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">state_data <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(year, prop_non_hispanic_below_hs)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>state)</code></pre>
+<p><img src="book_files/figure-html/unnamed-chunk-106-1.png" width="672" /></p>
+<p>This chunk is set to <code>echo = TRUE</code> and <code>eval = do_diagnosis</code></p>
+<pre class="sourceCode r"><code class="sourceCode r">simulations &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(design, <span class="dt">sims =</span> sims)</code></pre>
+<p>Right after you do simulations, you want to save the simulations rds.</p>
+<p>Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.</p>
+<pre class="sourceCode r"><code class="sourceCode r">synth_diagnosands &lt;-<span class="st"> </span><span class="kw">declare_diagnosands</span>(<span class="dt">select =</span> <span class="st">&quot;bias&quot;</span>)
+
+diagnosis &lt;-<span class="st"> </span><span class="kw">diagnose_design</span>(simulations, <span class="dt">diagnosands =</span> synth_diagnosands, <span class="dt">bootstrap_sims =</span> b_sims)
+
+<span class="kw">reshape_diagnosis</span>(diagnosis)</code></pre>
+<pre><code>##   Design Label Estimand Label Estimator Label             Term N Sims
+## 1       design         ATE_AZ           synth legal_worker_act    100
+## 2                                                                    
+## 3       design         ATE_AZ      unweighted legal_worker_act    100
+## 4                                                                    
+## 5       design         ATE_AZ  unweighted_did legal_worker_act    100
+## 6                                                                    
+##     Bias
+## 1   0.00
+## 2 (0.00)
+## 3   0.66
+## 4 (0.00)
+## 5   0.28
+## 6 (0.00)</code></pre>
+<ul>
+<li>we see that Synth outperforms either method</li>
+</ul>
+<div id="references-5" class="section level3">
+<h3><span class="header-section-number">6.4.1</span> References</h3>
+
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="sample-re-sample.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="topic-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="regression-discontinuity.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="cross-national-time-series.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
