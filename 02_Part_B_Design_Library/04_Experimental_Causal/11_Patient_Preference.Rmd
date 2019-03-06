@@ -17,45 +17,91 @@ source("scripts/before_chapter_script.R")
 
 <!-- start post here, do not edit above -->
 
-## Patient Preference Trials
+## Selective trials
 
 <!-- make sure to rename the section title below -->
 
-This design:
-
-- takes as given we know how much "utility" a patient would derive from being treated and we've parameterized it from 0 to 1.
-- We can either assign people to treatment, using this utility as the probability of assignment
-- or we can assign with prob = 0.5
-- the "slider" is a weighted average between those two approaches.
-- The plot is supposed to show the precision / utility tradeoff.  the "expected total subject utility" is a diagnosand. The higher the utility, the worse the precision / power.
-- I've shown it in "precision", but could do in power.
-
-```{r section_title, echo = FALSE, output = FALSE, purl = FALSE}
+```{r selective_trials, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
 do_diagnosis <- FALSE
-sims <- 100
-b_sims <- 20
+sims <- 500
+b_sims <- 500
 ```
 
-```{r}
+The treatment in some randomized controlled trials is a benefit, opportunity, or other good. For example, researchers might allocate job training (cite), health products (cite, cite), or even cash, no strings attached. Experiments in which the treatment is such a benefit raise thorny ethical problems because random allocation by definition does not distribute the benefit to the most deserving. A class of experimental designs called patient preference trials (cite) or selective trials [@chassang2012selective] aim to mitigate these ethical concerns by preferentially treating subjects who want the treatment more with higher probability. 
 
-slider <- 0
+In addition to ethical concerns, selective trials may also shed light on the "external validity" of the study. In a standard experimental design, subjects are offered or not offered the treatment and the main target of inference is the average treatment effect. However, the average treatment effect might not be the most politically, economically, or socially relevant estimand. Imagine that in the "real world," certain types of people are more likely to select into treatment -- possibly because they are more deserving, but also possibly because they are more willing to pay or are otherwise advantaged. The "externally valid" estimand might be the effect of treatment among those who, in the real world, would end up taking the treatment. As we will see, estimating this estimand doesn't *require* a selective trial, but the design of selective trials does highlight this imporant characteristic of subjects.
+
+By using a selective trial, we can to try to solve two problems at once. First, we want to meet the ethical challenge of preferentially treating subjects who want, deserve, or need the treatment more than others. Second, we want to increase the external validity of the study by estimating effects among people who -- outside of the experimental context -- would be more likely to take treatment.
+
+### Design Declaration
+
+- **M**odel: 
+  
+  Our model needs to allow subjects to differ according to their utility from obtaining treatment. That is, the causal effect of the treatment on subject happiness varies from person to person. We also need to allow subjects to vary according to their probability of selecting into taking the treatment in the "real world." We also imagine that subjects' utility from treatment and their probability of selecting into the treatment are positively but not perfectly correlated. In the background of our model is the normative position that it is ethically preferable to give treatment to people who have the highest utility of treatment. This value has to be weighed against the value of the research study itself. This number is hard to known, so for simplicity, we imagine that the study is more valuable, the more precise its treatment effect estimates. 
+  
+  Our model also has to allow the effects of treatment on the main outcome of interest to vary from subject to subject and that this heterogeneity has to be correlated with the probability of selecting into the treatment. Without such treatment effect heterogeneity, there would be no external validity concern.
+  
+- **I**nquiry: 
+
+    We have two inquiries: the Average Treatment Effect for all subjects (the ATE) and the conditional average treatment effect (CATE) among those subjects who would take treatment in the real world.
+    
+- **D**ata strategy: 
+
+  The two most important features of the data strategy are the measurement of subject preferences and the random assignment procedure.
+  
+  Measuring subject preferences may or may not be straightforward. In some settings, one might imagine giving subjects a pre-treatment survey that asks them to report how much they want the treatment, or which of the many treatment options they would most prefer, or the intensity of their preferences. The measurement of these preferences may suffer from various forms of measuremnet error. TEPPEI and CO are concerned that these measures might be biased by social desirability bias. @chassang2012selective describe an incentive-compatible mechanism for eliciting subjects willingness-to-pay from the good, which provides some measure of the relative amount that subjects "want" the treatment. We ideally want measures of two latent variables: subject utility and subject probability of selecting in to the treatment in the real world. We assume that we have accomplished both measurement tasks well, though we fully grant that in any particular research scenario, the measurement of preferences has to be taken very seriously.
+  
+  The second important feature of the data strategy is the random assignment procedure. The standard approach is to use simple random assignment, i.e., we assign subjects to treatment with a constant probability $p$. Alternatively, we could assign subjects proportionally to their utility from treatment.
+  
+
+- **A**nswer strategy: 
+
+  Our answer strategy has to account for the fact that units can be assigned to treatment with different probabilities, so we'll employ inverse probability weighting. We'll just two estimators, one that targets the ATE and another that targets the CATE.
+  
+  We also want to estimate the total amount of utility from treatment that subjects received.
+    
+
+```{r}
+strategy_switch <- 0
 
 design <-
   
   # Model -------------------------------------------------------------------
   declare_population(
     N = 100,
+    
+    # Measure subject preferences
     utility_from_treatment = runif(N),
-    assignment_prob = 0.5 * slider + utility_from_treatment * (1 - slider),
+    
+    # Measure willingness-to-pay, determine who would take treatment in the "real world"
+    willingness_to_pay = correlate(given = utility_from_treatment, draw_handler = runif, rho = 0.75),
+    real_world = as.numeric(willingness_to_pay >= 0.5),
+    
+    # Idiosyncractic variation
     noise = rnorm(N)
   ) +
-  declare_potential_outcomes(Y ~ 0.5 * Z+-0.2 * utility_from_treatment * Z + utility_from_treatment + noise) +
+  
+  # treatment effects are correlated with willingness to pay
+  declare_potential_outcomes(Y ~ 0.5 * Z + 0.2 * willingness_to_pay * Z + willingness_to_pay + noise) +
   
   # Inquiry -----------------------------------------------------------------
-  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_estimands(
+    # Maximum possible subject utility, subject to budget constraint
+    MPU = sum(utility_from_treatment[which(utility_from_treatment >= quantile(utility_from_treatment, probs = 0.5))] ),
+    ATE = mean(Y_Z_1 - Y_Z_0),
+    CATE = mean(Y_Z_1[real_world == 1] - Y_Z_0[real_world == 1])
+    ) +
   
   # Data Strategy -----------------------------------------------------------
+
+  # first, figure out assignment probabilities. If switch = 0, do 50/50; otherwise proportional to utility
+  declare_step(
+    assignment_prob = 0.5 * (1 - strategy_switch) + utility_from_treatment * strategy_switch,
+    handler = fabricate
+  ) + 
+
+  # second, actually assign treatments
   declare_assignment(
     prob = assignment_prob,
     simple = TRUE,
@@ -64,23 +110,37 @@ design <-
   declare_reveal(Y, Z) +
   
   # Answer Strategy ---------------------------------------------------------
+
   declare_estimator(
     handler = tidy_estimator(function(data) {
       with(data, data.frame(estimate = sum(utility_from_treatment * Z)))
     }),
+    estimand = "MPU",
     label = "total utility"
   ) +
+  
   declare_estimator(
     Y ~ Z,
     model = lm_robust,
     weights = 1 / (assignment_prob * Z + (1 - assignment_prob) * (1 - Z)),
-    label = "IPW"
+    estimand = "ATE", 
+    label = "ATE"
+  ) +
+  
+  declare_estimator(
+    Y ~ Z,
+    model = lm_robust,
+    weights = 1 / (assignment_prob * Z + (1 - assignment_prob) * (1 - Z)),
+    estimand = "CATE", 
+    label = "CATE",
+    subset = real_world == 1
   )
 ```
 
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-designs <- redesign(design, slider = seq(0, 1, length.out = 5))
-simulations <- simulate_designs(designs, sims = sims)
+standard_trial <- redesign(design, strategy_switch = 0)
+selective_trial <- redesign(design, strategy_switch = 1)
+diagnosis <- diagnose_design(standard_trial, selective_trial, sims = sims, bootstrap_sims = b_sims)
 ```
 
 
@@ -88,41 +148,17 @@ simulations <- simulate_designs(designs, sims = sims)
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
 rds_file_path <- paste0(get_dropbox_path("Patient_Preference.Rmd"), "/simulations_patient_preference.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(simulations, path = rds_file_path)
+  write_rds(diagnosis, path = rds_file_path)
 }
-simulations <- read_rds(rds_file_path)
+diagnosis <- read_rds(rds_file_path)
 ```
 
-Two looks at graphs. need to visualize two series with respect to "slider" . Dont want a double y-axis.  I think I prefer the facetted.
+The diagnosis shows that under both designs, we obtain unbiased estimates of both the ATE and the CATE. The power for both these estimands is higher under the standard design and lower under the selective trial. If design choices are made without any accomodation for subject prefereces, the standard design strictly domindates the selective trial.  However, it's clear that the average total subject utility is higher under the selective trial than the standard design. It is up to researchers in each subject domain to determine the relative weights to give to subject utility and statistical power. In our view, giving zero weight to either of these diagnosands would be bad, but we don't know what the right weights are.  
 
 ```{r}
-summary_df <- 
-  simulations %>%
-  group_by(slider, estimator_label) %>%
-  summarise(var_estimate = var(estimate),
-            mean_estimate = mean(estimate)) %>%
-  group_by(slider) %>%
-  summarise(total_utility = mean_estimate[estimator_label == "total utility"],
-            precision = 1/var_estimate[estimator_label == "IPW"])
-
-
-g1 <-
-  summary_df %>%
-  ggplot(aes(precision, total_utility, color = slider)) +
-  geom_point() +
-  geom_line()
-
-g2 <-
-  summary_df %>%
-  gather(key, value, total_utility, precision) %>%
-  ggplot(aes(slider, value)) +
-  geom_point() +
-  geom_line() +
-  facet_wrap(vars(key), scales = "free")
-
-g1
-g2
+reshape_diagnosis(diagnosis)[,c("Design Label", "Estimand Label", "Mean Estimand", "Mean Estimate", "Bias", "Power")]
 ```
+
 
 # References
 
