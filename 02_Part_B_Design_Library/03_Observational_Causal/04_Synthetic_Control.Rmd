@@ -155,7 +155,7 @@ reshape_diagnosis(diagnosis)
 
 - we see that Synth outperforms either method
 
-# References
+### References
 
 
 
