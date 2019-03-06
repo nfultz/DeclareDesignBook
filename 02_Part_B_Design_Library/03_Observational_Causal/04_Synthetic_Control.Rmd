@@ -17,13 +17,13 @@ source("scripts/before_chapter_script.R")
 
 <!-- start post here, do not edit above -->
 
-## Section title in sentence case
+## Synthetic controls
 
 <!-- make sure to rename the section title below -->
 
 ```{r synthetic_control, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- FALSE
+do_diagnosis <- TRUE
 sims <- 100
 b_sims <- 20
 ```
@@ -117,6 +117,10 @@ design <-
 ```{r}
 state_data <- draw_data(design)
 
+state_data %>% dplyr::select(state, synth_weights) %>% distinct %>% arrange(-synth_weights) %>% head
+```
+
+```{r}
 state_data %>% 
   ggplot() +
   geom_line(aes(year, prop_non_hispanic_below_hs)) +
@@ -125,7 +129,7 @@ state_data %>%
 
 This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-simulations <- simulate_design(design, sims = 100)
+simulations <- simulate_design(design, sims = sims)
 ```
 
 Right after you do simulations, you want to save the simulations rds. 
@@ -144,7 +148,7 @@ Now all that simulating, saving, and loading is done, and we can use the simulat
 ```{r}
 synth_diagnosands <- declare_diagnosands(select = "bias")
 
-diagnosis <- diagnose_design(simulations, diagnosands = synth_diagnosands)
+diagnosis <- diagnose_design(simulations, diagnosands = synth_diagnosands, bootstrap_sims = b_sims)
 
 reshape_diagnosis(diagnosis)
 ```
