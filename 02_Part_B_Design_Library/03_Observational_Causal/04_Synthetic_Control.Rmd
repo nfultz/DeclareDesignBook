@@ -1,1 +1,159 @@
-## Synthetic control
+---
+title: "Synthetic controls"
+output: html_document
+bibliography: ../../bib/book.bib 
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+## Section title in sentence case
+
+<!-- make sure to rename the section title below -->
+
+```{r synthetic_control, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(Synth)
+```
+
+<!-- could adapt this cite to use synth (it current does an RD): Fitzpatrick, Maria Donovan. "Preschoolers enrolled and mothers at work? The effects of universal prekindergarten." Journal of Labor Economics 28.1 (2010): 51-85. -->
+
+Modeled after the example here: 
+
+https://www.mitpressjournals.org/doi/abs/10.1162/REST_a_00429?casa_token=o-zWqCima50AAAAA:yiEERZfdhAUoHV0-xBYNjgdljvgfRXrriR8foG7X8nHSUAMFrLcw2vWY8e9pHzmRT24MMAIv9hvKpQ
+
+Did the 2007 Legal Arizona Workers Act Reduce the State's Unauthorized Immigrant Population?
+Sarah Bohn, Magnus Lofstrom, and Steven Raphael
+The Review of Economics and Statistics 2014 96:2, 258-269 
+
+- set up states with time trends and levels that are correlated with a type
+- try three estimators: (1) difference-in-difference; (2) difference in treated period; and (3) difference in treated period weighted by Synth weights
+
+```{r}
+# tidy function that takes data and just adds the synthetic control weights to it
+synth_weights_tidy <- function(data) {
+  dataprep.out <- dataprep(
+    foo = data,
+    predictors = "prop_non_hispanic_below_hs",
+    predictors.op = "mean",
+    time.predictors.prior = 1998:2006,
+    dependent = "prop_non_hispanic_below_hs",
+    unit.variable = "state_number",
+    time.variable = "year",
+    treatment.identifier = 4,
+    controls.identifier = c(1:3, 5:50), # states without Arizona
+    time.optimize.ssr = 1998:2006,
+    time.plot = 1998:2009)
+  capture.output(fit <- synth(data.prep.obj = dataprep.out))
+  tab <- synth.tab(dataprep.res = dataprep.out, synth.res = fit) 
+  
+  data %>% 
+    left_join(tab$tab.w %>% mutate(synth_weights = w.weights) %>% dplyr::select(synth_weights, unit.numbers), by = c("state_number" = "unit.numbers")) %>% 
+    mutate(synth_weights = replace(synth_weights, state_number == 4, 1))
+}
+
+# note need to clean up the range of the data, currently over 1
+design <-
+  declare_population(
+    states = add_level(
+      N = 50, 
+      state = state.abb,
+      state_number = as.numeric(as.factor(state)),
+      state_shock = runif(N, -.15, .15),
+      border_state = state %in% c("AZ", "CA", "NM", "TX"),
+      state_shock = ifelse(border_state, .2, state_shock)
+    ),
+    years = add_level(
+      N = 12, nest = FALSE,
+      year = 1998:2009,
+      post_treatment_period = year >= 2007,
+      year_shock = runif(N, -.01, .01), 
+      year_trend = year - 1998
+    ),
+    obs = cross_levels(
+      by = join(states, years),
+      legal_worker_act = 1*(post_treatment_period == TRUE & state == "AZ"),
+      state_year_shock = runif(N, -.01, .01),
+      prop_non_hispanic_below_hs_baseline = 0.4 + state_shock + year_shock + (.01 + .05 * border_state) * year_trend + state_year_shock
+    )
+  ) +
+  
+  declare_potential_outcomes(
+    prop_non_hispanic_below_hs ~ prop_non_hispanic_below_hs_baseline + 0.25 * legal_worker_act, assignment_variable = legal_worker_act) +
+  
+  declare_estimand(
+    ATE_AZ = mean(prop_non_hispanic_below_hs_legal_worker_act_1 - prop_non_hispanic_below_hs_legal_worker_act_0), 
+    subset = legal_worker_act == TRUE) +
+  
+  declare_reveal(prop_non_hispanic_below_hs, legal_worker_act) +
+  
+  declare_step(handler = synth_weights_tidy) +
+  
+  declare_estimator(prop_non_hispanic_below_hs ~ legal_worker_act, subset = year >= 2007, weights = synth_weights, model = lm_robust, label = "synth") +
+
+  declare_estimator(prop_non_hispanic_below_hs ~ legal_worker_act, subset = year >= 2007, model = lm_robust, label = "unweighted") +
+
+  declare_estimator(prop_non_hispanic_below_hs ~ I(state == "AZ") + post_treatment_period + legal_worker_act, term = "legal_worker_act", 
+                    model = lm_robust, label = "unweighted_did")
+```
+
+```{r}
+state_data <- draw_data(design)
+
+state_data %>% 
+  ggplot() +
+  geom_line(aes(year, prop_non_hispanic_below_hs)) +
+  facet_wrap(~ state)
+```
+
+This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+simulations <- simulate_design(design, sims = 100)
+```
+
+Right after you do simulations, you want to save the simulations rds. 
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("synthetic_control"), "/simulations.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(simulations, path = rds_file_path)
+}
+simulations <- read_rds(rds_file_path)
+```
+
+Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
+
+```{r}
+synth_diagnosands <- declare_diagnosands(select = "bias")
+
+diagnosis <- diagnose_design(simulations, diagnosands = synth_diagnosands)
+
+reshape_diagnosis(diagnosis)
+```
+
+- we see that Synth outperforms either method
+
+# References
+
+
+
+
+
