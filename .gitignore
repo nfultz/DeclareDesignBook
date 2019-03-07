@@ -16,6 +16,7 @@
 
 # RStudio files
 .Rproj.user/
+.Rproj.user
 
 # produced vignettes
 vignettes/*.html
@@ -47,6 +48,11 @@ book.Rmd
 # ignore testing files - cache or HTML
 *.html
 **_cache**
-rfiles/**
-rfiles**
-.Rproj.user
+
+# temp files created by RMarkdown
+01_Part_A_Declaring_Diagnosing/**/*_files/*
+02_Part_B_Design_Library/**/*_files/*
+03_Part_C_Principles/**/*_files/*
+04_Part_D_Declarations_in_Use/**/*_files/*
+999_References/**/*_files/*
+

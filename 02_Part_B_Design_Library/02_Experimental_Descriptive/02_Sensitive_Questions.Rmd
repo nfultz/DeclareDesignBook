@@ -18,7 +18,9 @@ source("scripts/before_chapter_script.R")
 
 <!-- start post here, do not edit above -->
 
-## List Experiments
+## Experiments for sensitive questions
+
+### List experiments
 
 ```{r, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
@@ -46,7 +48,7 @@ The treatment group averaged 1.843 items while the control group averaged 1.548 
 
 The choice between list experiments and direct question is therefore a **bias-variance tradeoff**. List experiments may have less bias, but they are higher variance. Direct questions may be biased, but they have less variance.
 
-### List experiments
+#### Declaration
 
 - **M**odel: Our model includes subjects' true support for Donald Trump and whether or not they are "shy".  These two variables combine to determine how subjects will respond when asked directly about Trump support.
 
@@ -146,7 +148,7 @@ simulations_list %>%
 
 ### Randomized response technique
 
-## 	Randomized response
+#### Declaration
 
 ```{r}
 library(rr)
@@ -219,10 +221,4 @@ rr_design <- set_diagnosands(rr_design, diagnosands = declare_diagnosands(select
 <!-- ``` -->
 
 
-# References
-
-
-
-
-
-## 	List experiments
+### References

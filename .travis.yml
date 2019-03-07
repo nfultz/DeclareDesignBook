@@ -9,6 +9,9 @@ cache:
   packages: yes
   directories:
     - $HOME/bin
+    
+before_install:
+  - sudo apt-get install -y libgsl-dev
 
 r_packages:
   - bookdown

@@ -1,1 +1,201 @@
+---
+title: "Topic analysis"
+output: html_document
+bibliography: ../../bib/book.bib 
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
 ## Topic analysis
+
+```{r topic_analysis, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 20
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(tidytext)
+library(gutenbergr)
+library(tm)
+library(topicmodels)
+library(MCMCpack)
+```
+
+```{r}
+lda_tidy <- function(data, k, matrix) {
+  tdm <- data %>% 
+    mutate(word = as.character(word)) %>% 
+    group_by(document, word) %>% 
+    count %>% 
+    ungroup %>% 
+    cast_dtm(document, word, n)
+  fit <- LDA(x = tdm, k = k)
+  tidy(fit, matrix = matrix) %>% 
+    group_by(topic) %>% 
+    top_n(10, beta) %>%
+    arrange(-beta) %>% 
+    mutate(word_num = 1:n()) %>% 
+    ungroup %>% 
+    arrange(topic, -beta) %>% 
+    dplyr::select(-beta) %>% 
+    spread(word_num, term) %>% 
+    unite(top_10_words, `1`:`10`) %>% 
+    spread(topic, top_10_words) %>% 
+    rename(topic_1_top_10_words = `1`, topic_2_top_10_words = `2`)
+}
+
+laws <- gutenberg_download(c(2, 17150)) %>% 
+  group_by(gutenberg_id) %>% 
+  slice(-c(1:10)) %>% 
+  ungroup %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+topic_probs <- laws %>% 
+  group_by(gutenberg_id) %>% 
+  mutate(topic_n = n()) %>%
+  group_by(gutenberg_id, word) %>% 
+  summarize(topic_n = unique(topic_n), word_count = n(),
+            word_prob = word_count / topic_n) %>% 
+  ungroup
+  
+topic_probs <- topic_probs %>% 
+  expand(gutenberg_id, word) %>% 
+  left_join(topic_probs) %>% 
+  dplyr::select(gutenberg_id, word, word_prob) %>% 
+  spread(gutenberg_id, word_prob) %>% 
+  rename(pr_topic_1 = `2`,
+         pr_topic_2 = `17150`) %>% 
+  mutate(pr_topic_1 = replace_na(pr_topic_1, 0),
+         pr_topic_2 = replace_na(pr_topic_2, 0))
+
+corpus <- topic_probs %>% pull(word)
+topic_1_prob <- topic_probs %>% pull(pr_topic_1)
+topic_2_prob <- topic_probs %>% pull(pr_topic_2)
+```
+
+
+```{r}
+N_documents <- 50
+N_topics    <- 2
+
+design <-
+  declare_population(
+    document = add_level(
+      N = 200,
+      
+      # document length is drawn from a Poisson distribution
+      N_words_per_document = rpois(N, lambda = 500),
+      
+      # draw topic proportion for each document from Dirichlet; save pr(topic1)
+      theta_topic2 =  rdirichlet(N, alpha = rep(1, N_topics))[, 2]
+    ),
+    
+    words = add_level(
+      N = N_words_per_document,
+      
+      # draw topic (1 or 2) based on theta probabilities for the document
+      topic = simple_ra(N, prob = theta_topic2, conditions = 1:2),
+      
+      word = case_when(
+        topic == 1 ~ simple_ra(N, prob_each = topic_1_prob, conditions = corpus),
+        topic == 2 ~ simple_ra(N, prob_each = topic_2_prob, conditions = corpus)
+      )
+    )
+  ) +
+  
+  declare_estimator(
+    handler = tidy_estimator(lda_tidy), k = 2, matrix = "beta",
+    label = "lda-topics")
+```
+
+```{r}
+dat <- draw_data(design)
+
+document1 <- dat %>% dplyr::filter(document == "001") %>% pull(word) %>% paste0(collapse = " ")
+document2 <- dat %>% dplyr::filter(document == "002") %>% pull(word) %>% paste0(collapse = " ")
+
+kable(cbind(document1, document2), col.names = c("Document 1", "Document 2"))
+```
+
+
+```{r}
+# diagnosis
+
+compare_word_lists <- function(list1, list2){
+  list1 <- str_split(list1, "_")
+  list2 <- str_split(list2, "_")[[1]]
+  sapply(list1, function(x) sum(x %in% list2) == length(list2))
+}
+
+topic_1_words <- topic_probs %>% top_n(3, pr_topic_1) %>% arrange(-pr_topic_1) %>% slice(1:3) %>% pull(word) %>% paste0(collapse = "_")
+topic_2_words <- topic_probs %>% top_n(3, pr_topic_2) %>% arrange(-pr_topic_2) %>% slice(1:3) %>% pull(word) %>% paste0(collapse = "_")
+
+diag <- declare_diagnosands(in_topic_1 = 
+                              mean(compare_word_lists(topic_1_top_10_words, topic_1_words) |
+                                     compare_word_lists(topic_2_top_10_words, topic_1_words)),
+                            in_topic_2 = 
+                              mean(compare_word_lists(topic_1_top_10_words, topic_2_words) |
+                                     compare_word_lists(topic_2_top_10_words, topic_2_words)),
+                            in_either_topic = 
+                              mean(compare_word_lists(topic_1_top_10_words, topic_1_words) |
+                                     compare_word_lists(topic_2_top_10_words, topic_1_words) |
+                                     compare_word_lists(topic_1_top_10_words, topic_2_words) |
+                                     compare_word_lists(topic_2_top_10_words, topic_2_words )),
+                            in_both_topic = 
+                              mean( (compare_word_lists(topic_1_top_10_words, topic_1_words) |
+                                     compare_word_lists(topic_1_top_10_words, topic_2_words)) &
+                                     compare_word_lists(topic_2_top_10_words, topic_1_words) |
+                                     compare_word_lists(topic_2_top_10_words, topic_2_words )),
+                            keep_defaults = FALSE)
+```
+
+
+
+
+
+
+
+<!-- This chunk is set to `echo = TRUE` and `eval = do_diagnosis` -->
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+diagnosis <- 
+  diagnose_design(design, diagnosands = diag, sims = 10, bootstrap_sims = 10)
+```
+
+<!-- Right after you do simulations, you want to save the simulations rds.  -->
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("topic_analysis"), "/simulations.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis, path = rds_file_path)
+}
+diagnosis <- read_rds(rds_file_path)
+```
+
+<!-- Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want. -->
+
+```{r}
+kable(reshape_diagnosis(diagnosis))
+```
+
+### References
+
+
+
+
+
