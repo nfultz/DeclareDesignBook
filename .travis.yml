@@ -13,8 +13,9 @@ cache:
 before_install:
   - sudo apt-get install -y libgsl-dev
   - mkdir ~/.R
-  - echo "CXX14 = g++" > ~/.R/Makevars
-  - echo "CXX14FLAGS = -O3" >> ~/.R/Makevars
+  - echo "CXX_STD = CXX14" > ~/.R/Makevars
+  - echo "CXX14 = g++" >> ~/.R/Makevars
+  - echo "CXX14FLAGS = -O3 -fPIC -Wno-unused-variable -Wno-unused-function -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION" >> ~/.R/Makevars
 
 r_packages:
   - bookdown
