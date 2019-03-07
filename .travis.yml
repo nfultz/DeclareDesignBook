@@ -12,7 +12,7 @@ cache:
     
 before_install:
   - sudo apt-get install -y libgsl-dev
-  - echo "CXX14 = g++" >> ~/.R/Makevars
+  - echo "CXX14 = g++" > ~/.R/Makevars
   - echo "CXX14FLAGS = -O3" >> ~/.R/Makevars
 
 r_packages:
