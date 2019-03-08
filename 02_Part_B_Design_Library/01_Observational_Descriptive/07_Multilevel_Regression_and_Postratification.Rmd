@@ -1,1 +1,165 @@
+---
+title: "Multilevel regression and poststratification"
+output: html_document
+bibliography: ../../bib/book.bib 
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
 ## Multilevel regression and poststratification
+
+<!-- make sure to rename the section title below -->
+
+```{r mrp, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(brms)
+```
+
+You can use the global bib file via rmarkdown cites like this: @imai2008
+
+```{r}
+# demographic summary statistics by state
+us_state_demographics_2000 <- fabricate(
+  state = add_level(
+    N = 50,
+    state_name        = state.abb,
+    state_population  = sample(8000:10000, N, replace = TRUE),
+    proportion_female = runif(N, min = .45, max = .55),
+    proportion_old    = runif(N, min = .25, max = .65))
+)
+
+# US population
+us_population_2000 <- fabricate(
+  data = us_state_demographics_2000,
+  individuals = add_level(
+    N = state_population,
+    female = draw_binary(N = N, prob = proportion_female),
+    old    = draw_binary(N = N, prob = proportion_old)
+  )
+) 
+
+us_population_2000 <- us_population_2000 %>% 
+  select(-state_population, -proportion_female, -proportion_old)
+
+# population weights for MRP
+mrp_weights <- us_population_2000 %>%
+  select(state, state_name, individuals, female, old) %>% 
+  group_by(state, female, old) %>% 
+  summarize(n_cell = n()) %>% 
+  group_by(state) %>% 
+  mutate(proportion_cell = n_cell/sum(n_cell)) %>% 
+  select(-n_cell)
+
+us_population_2000 <- us_population_2000 %>% 
+  left_join(mrp_weights)
+
+# Lax and Philips APSR 2009
+# Policies are coded dichotomously, 1 for the progay policy and 0 otherwise: Adoption (9 states allow second-parent adoption in all jurisdictions)
+
+design <-
+  declare_population(data = us_population_2000) +
+  
+  declare_potential_outcomes(
+    policy_support = draw_binary(latent = 1 + .2 * female - .5 * old, link = "probit")) +
+  
+  declare_estimand(handler = function(data) {
+    data %>% 
+      group_by(state) %>% 
+      summarize(estimand = mean(policy_support)) %>% 
+      ungroup %>% 
+      transmute(estimand_label = paste0("state", state, sep = ""), estimand)}) +
+  
+  declare_sampling(n = 500) +
+  
+  declare_estimator(policy_support ~ 1, model = lm_robust)
+  # declare_estimator(handler = mrp)
+
+# need to figure out how to write the mrp function
+# 1. write my own stan model
+# 2. compile it (using model())
+# 3. draw samples from it
+# 4. get out samples using tidybayes and post-stratify using dplyr
+
+# mrp <- function(data){
+#   brm_fit <- brm(
+#     policy_support ~ (1 | female) + (1 | old) + (1 | state),
+#     data = data,
+#     family = bernoulli(),
+#     prior = c(
+#       set_prior("normal(0, 0.2)", class = 'sd', group = "old"),
+#       set_prior("normal(0, 0.2)", class = 'sd', group = "female"),
+#       set_prior("normal(0, 0.2)", class = 'sd', group = "state")
+#     )
+#   )
+#   
+#   brm_fit %>%
+#     spread_draws(~state) %>%
+#     summarize_at(
+#       vars(female, old),
+#       funs(mean, sd, low, high, equivprop)
+#     ) 
+#   
+#   # %>% 
+#     # gather(coefficient, value) %>%
+#     # rename(Stat = coefficient) %>%
+#     # separate(Stat, c("coefficient", "Stat"), "_") %>% 
+#     # spread(Stat, value)
+# 
+#   
+# }
+# 
+# 
+# library(rstan)
+# 
+# dat <- draw_data(design)
+# 
+# draw_estimates(design)
+```
+
+
+This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+simulations_pilot <- simulate_design(design, sims = sims)
+```
+
+Right after you do simulations, you want to save the simulations rds. 
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("section_template"), "/simulations_pilot.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(simulations_pilot, path = rds_file_path)
+}
+simulations_pilot <- read_rds(rds_file_path)
+```
+
+Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
+
+```{r}
+kable(head(simulations_pilot))
+```
+
+# References
+
+
+
+
+
