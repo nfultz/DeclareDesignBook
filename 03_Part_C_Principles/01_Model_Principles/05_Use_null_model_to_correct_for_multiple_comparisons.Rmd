@@ -1,0 +1,107 @@
+---
+title: "Multiple Comparisons"
+output: html_document
+bibliography: ../../bib/book.bib
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+## Use a null model to correct for multiple comparisons easily and exactly 
+
+```{r, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 500
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+```
+
+### The problem of confidence in multiple tests
+
+Using $p$-values to make inferences about effects is essentially an exercise in risk management: when we stipulate a "confidence level" below which we consider a $p$-value statistically significant -- often referred to as $\alpha$ (alpha) -- we are saying how comfortable we are inferring that there's an effect when there actually isn't one. Thus, a researcher who tells you that her confidence level is .05 is telling you that, in a world where there's no effect, she's willing to accept a 5% chance of wrongly inferring that there is. The problem is that, often, the level of risk we say we're willing to take on in principle doesn't actually correspond to the level of risk we take on in practice. We're often at a higher risk of false inference than we realize.
+
+To see this point, let's a design based on a null model with two variables that are possibly correlated by `rho`.
+
+```{r}
+rho <- 0
+design <- declare_population(N = 100, 
+                             Y1 = rnorm(N), 
+                             Y2 = rnorm(n = N,mean = Y1 * rho, 
+                                        sd = sqrt(1^2 - rho^2))) +
+  declare_assignment(prob = .5) +
+  declare_estimator(Y1 ~ Z, label = "Y1") +
+  declare_estimator(Y2 ~ Z, label = "Y2") 
+```
+
+We specify that we're willing to falsely infer that there's an effect 5% of the time, and simulate the design hundreds of times. Every time we see that the $p$-value from one of our tests falls below $\alpha$, we infer (falsely) that there's an effect.  
+
+```{r}
+test_alpha <- .05
+simulations <- simulate_design(design) %>% 
+  mutate(test_rejection = p.value <= test_alpha) 
+```
+
+And guess what, we do that about 5% of the time!
+
+```{r}
+with(simulations,mean(test_rejection))  
+```
+
+So far so good, right? Not so fast. While the probability that any test in our study falsely rejects the null corresponds to the $\alpha$ we specified, the probability that our study rejects *a* null might not. Let's take a look at how often the design rejects any null among the two tests:
+
+```{r}
+simulations %>% 
+    group_by(sim_ID) %>% 
+    summarize(family_rejection = any(test_rejection)) %>% 
+    with(., mean(family_rejection))
+```
+
+Whoa -- we're finding erroneous significant effects at twice the rate we said we were comfortable with! That's because we took two independent shots at finding a significant effect, each of which had a 5% chance of success. This is what we call the "family-wise error rate," for family $\alpha$. 
+If, instead, we had run   
+
+
+### References
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
