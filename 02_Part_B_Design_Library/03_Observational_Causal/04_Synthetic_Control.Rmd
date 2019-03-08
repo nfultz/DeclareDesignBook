@@ -31,6 +31,7 @@ b_sims <- 20
 ```{r, echo = FALSE}
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 library(Synth)
+library(augsynth) # remotes::install_github("ebenmichael/augsynth")
 ```
 
 <!-- could adapt this cite to use synth (it current does an RD): Fitzpatrick, Maria Donovan. "Preschoolers enrolled and mothers at work? The effects of universal prekindergarten." Journal of Labor Economics 28.1 (2010): 51-85. -->
@@ -67,6 +68,15 @@ synth_weights_tidy <- function(data) {
   data %>% 
     left_join(tab$tab.w %>% mutate(synth_weights = w.weights) %>% dplyr::select(synth_weights, unit.numbers), by = c("state_number" = "unit.numbers")) %>% 
     mutate(synth_weights = replace(synth_weights, state_number == 4, 1))
+}
+
+augsynth_tidy <- function(data) {
+  fit <- augsynth(prop_non_hispanic_below_hs ~ legal_worker_act, state, year, t_int = 2007, data = data)
+  res <- summary(asyn)$att %>% filter(Time == 2007) %>% select(Estimate, Std.Error)
+  names(res) <- c("estimate", "std.error")
+  res$conf.low <- res$estimate - 1.96 * res$std.error
+  res$conf.high <- res$estimate + 1.96 * res$std.error
+  res
 }
 
 # note need to clean up the range of the data, currently over 1
@@ -111,7 +121,9 @@ design <-
   declare_estimator(prop_non_hispanic_below_hs ~ legal_worker_act, subset = year >= 2007, model = lm_robust, label = "unweighted") +
 
   declare_estimator(prop_non_hispanic_below_hs ~ I(state == "AZ") + post_treatment_period + legal_worker_act, term = "legal_worker_act", 
-                    model = lm_robust, label = "unweighted_did")
+                    model = lm_robust, label = "unweighted_did") +
+  
+  declare_estimator(handler = tidy_estimator(augsynth_tidy), label = "augsynth")
 ```
 
 ```{r}
@@ -146,7 +158,7 @@ simulations <- read_rds(rds_file_path)
 Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
 
 ```{r}
-synth_diagnosands <- declare_diagnosands(select = "bias")
+synth_diagnosands <- declare_diagnosands(select = c("bias", "coverage"))
 
 diagnosis <- diagnose_design(simulations, diagnosands = synth_diagnosands, bootstrap_sims = b_sims)
 
