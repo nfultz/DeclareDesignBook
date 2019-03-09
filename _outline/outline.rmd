@@ -13,20 +13,32 @@ This section is only in words, not in code (until the software primer)
 - Preamble
 - Explain MIDA
 - Diagnosands and diagnosis
+- Explain declaration -> diagnosis -> redesign process (graphic?)
+- How to use this book
 - Software primer
+
+
+
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
-- What is your research question?
+## Starting a new research project
+
+- What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
+- research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
+
+## Kinds of research projects that there are
 - Do you want to answer a causal or descriptive question?
 - Types of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable
 - What is your inquiry if you don’t know the question in advance? (Discovery)
-- Is the answer to your question known? How would you know? 
-- Meta-analysis, systematic review, disagreement in literature
-- Is your question important? (Change decisions; change answer in a literature)
 
-## How to select M
+## Is your research question good?
+- Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
+- Is your question important? (Change decisions; change answer in a literature)
+- Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
+
+## Specifying the model
 - Introduce DAGs and potential outcomes
 - What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)?
 - What parts of background variables must be specified, and how can you specify them (existing data, substantive bounds on variables)
@@ -37,7 +49,7 @@ This section is only in words, not in code (until the software primer)
 - Attrition is a potential outcome
 - Measurements are potential outcomes
 
-## How to select I
+## Defining the Inquiry
 - When would a null finding be interesting?
 - Is the answer defined?
 - What is the set of units which you want to learn the answer about? (since we can't learn about an individual unit)
@@ -48,13 +60,14 @@ This section is only in words, not in code (until the software primer)
 - Make your models vulnerable (something like falsification)
 - Relative value of killing bad ideas vs. giving life to good ones
 
-## How to select D
+## Crafting a Data Strategy
 - Need to figure out how to say, how do you go about *selecting* D
 - Reducing variance via sampling and assignment procedures
 - There is no causation without manipulation
 - Studying many questions can be costly
+- The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how.
 
-## How to select A
+## Choosing an Answer Strategy
 - Analyze as you randomize when you can (not just for experiments!)
 - Reducing variance via estimation choices
 - Answer strategy procedures (if this then that). Deal with fishing.
@@ -76,7 +89,12 @@ This section is only in words, not in code (until the software primer)
 
 - Conduct subject to constraints: budget, ethical, logistical
 
-## How to diagnose, iterate, and improve (diagnosis as a process)
+## Redesign
+
+- When the diagnosis says the design is weak, improve it!
+- Resist the urge to change M and I to suit a diagnosis -- focus on D and A
+- Sometimes, you might need to collect new information in order to make a declaration specific enough.
+- Sometimes, designs have to be abandoned
 
 # Part D: Design Library
 
@@ -131,3 +149,29 @@ This section is only in words, not in code (until the software primer)
 - Publication bias (journal of null results)
 - Knowledge accumulation
 - Post-hoc learning about designs
+- where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
+- is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
+
+
+
+# Designs brainstorm:
+
+- geographic RD
+- spatial processes
+- IRT
+- country-year FE
+- EITM
+- computational evolutional models
+- mapping social networks
+- an ANES study
+- interrupted time series
+- time series (uninterrupted)
+- selection on observables
+- mediation
+- structural estimation
+- "is this a good predictor"
+- inquiries about "regimes" (i.e., vote share at the precinct level.)
+- need to but the handbook of lab experiments
+
+
+
