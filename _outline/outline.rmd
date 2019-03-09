@@ -30,8 +30,9 @@ This section is only in words, not in code (until the software primer)
 
 ## Kinds of research projects that there are
 - Do you want to answer a causal or descriptive question?
-- Types of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable
+- Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; 
 - What is your inquiry if you don’t know the question in advance? (Discovery)
+
 
 ## Is your research question good?
 - Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
@@ -51,7 +52,7 @@ This section is only in words, not in code (until the software primer)
 
 ## Defining the Inquiry
 - When would a null finding be interesting?
-- Is the answer defined?
+- Is the answer defined? (include not only missingness, but ATE for categorical outcomes)
 - What is the set of units which you want to learn the answer about? (since we can't learn about an individual unit)
 - Know what ATE averages over
 - Know what is local in a LATE
@@ -63,9 +64,10 @@ This section is only in words, not in code (until the software primer)
 ## Crafting a Data Strategy
 - Need to figure out how to say, how do you go about *selecting* D
 - Reducing variance via sampling and assignment procedures
+- Reducing bias via sampling and assignment procedures
 - There is no causation without manipulation
 - Studying many questions can be costly
-- The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how.
+- The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how. Includes also question of identifying through dataset merges.
 
 ## Choosing an Answer Strategy
 - Analyze as you randomize when you can (not just for experiments!)
@@ -82,7 +84,7 @@ This section is only in words, not in code (until the software primer)
 ## What should you diagnose your design against?
 - Hold inquiry constant!
 - Compare performance of the design according to choices the researcher makes
-    - D: Sample size, fraction randomly assigned, parameters of the randomized response
+    - D: Sample size, fraction randomly assigned, parameters of the randomized response, coding choices (e.g., binary vs. continuous, index vs. multiple, etc.)
     - A: Possible estimators, priors(???)
 - And against the researcher's beliefs
     - M: ICC, null model, alternative DAGs, heterogeneity
@@ -172,6 +174,6 @@ This section is only in words, not in code (until the software primer)
 - "is this a good predictor"
 - inquiries about "regimes" (i.e., vote share at the precinct level.)
 - need to but the handbook of lab experiments
-
+- weighting to get PATEs and SATEs under non-compliance and non-response when you have a baseline
 
 
