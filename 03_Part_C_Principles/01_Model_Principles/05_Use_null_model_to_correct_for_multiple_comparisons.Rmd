@@ -70,7 +70,7 @@ simulations %>%
     with(., mean(family_rejection))
 ```
 
-Whoa -- we're finding erroneous significant effects at twice the rate we said we were comfortable with! That's because we took two independent shots at finding a significant effect, each of which had a 5% chance of success. This is what we call the "family-wise error rate," for family $\alpha$. 
+Whoa -- we're finding erroneous significant effects at twice the rate we said we were comfortable with! That's because we took two independent shots at finding a significant effect, each of which had a 5% chance of success. This is what we call the "family-wise error rate:" it's the probability  
 If, instead, we had run   
 
 
