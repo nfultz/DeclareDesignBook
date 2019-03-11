@@ -72,7 +72,7 @@ synth_weights_tidy <- function(data) {
 
 augsynth_tidy <- function(data) {
   fit <- augsynth(prop_non_hispanic_below_hs ~ legal_worker_act, state, year, t_int = 2007, data = data)
-  res <- summary(asyn)$att %>% filter(Time == 2007) %>% select(Estimate, Std.Error)
+  res <- summary(fit)$att %>% filter(Time == 2007) %>% select(Estimate, Std.Error)
   names(res) <- c("estimate", "std.error")
   res$conf.low <- res$estimate - 1.96 * res$std.error
   res$conf.high <- res$estimate + 1.96 * res$std.error
