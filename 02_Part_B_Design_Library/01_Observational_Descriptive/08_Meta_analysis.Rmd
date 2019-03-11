@@ -72,7 +72,7 @@ meta_study_design <-
   declare_estimand(mu = .25, tau_sq = .1^2) +
   declare_estimator(handler = rma_tidy)
 
-diagnose_design(design = meta_study_design, sims = 100, bootstrap_sims = FALSE)
+#diagnose_design(design = meta_study_design, sims = 100, bootstrap_sims = FALSE)
 ```
 
 
