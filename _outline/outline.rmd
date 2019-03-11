@@ -1,0 +1,179 @@
+---
+title: "Research Design: Declaration, Diagnosis, Redesign"
+output: 
+  html_document:
+    number_sections: true
+---
+
+
+# Part A: Introduction to Design Declaration and Diagnosis
+
+This section is only in words, not in code (until the software primer)
+
+- Preamble
+- Explain MIDA
+- Diagnosands and diagnosis
+- Explain declaration -> diagnosis -> redesign process (graphic?)
+- How to use this book
+- Software primer
+
+
+
+
+# Part B: A Guide to Declaration and Diagnosis in Practice
+
+## Starting a new research project
+
+- What is your research question?  
+- Topics vs. questions; how to come up with a question - lit review, hunch, data
+- research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
+
+## Kinds of research projects that there are
+- Do you want to answer a causal or descriptive question?
+- Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; 
+- What is your inquiry if you don’t know the question in advance? (Discovery)
+
+
+## Is your research question good?
+- Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
+- Is your question important? (Change decisions; change answer in a literature)
+- Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
+
+## Specifying the model
+- Introduce DAGs and potential outcomes
+- What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)?
+- What parts of background variables must be specified, and how can you specify them (existing data, substantive bounds on variables)
+- Isn't defining the effect size for potential outcomes begging the question?
+- Pilot studies
+- Spillovers are potential outcomes
+- Compliance is a potential outcome
+- Attrition is a potential outcome
+- Measurements are potential outcomes
+
+## Defining the Inquiry
+- When would a null finding be interesting?
+- Is the answer defined? (include not only missingness, but ATE for categorical outcomes)
+- What is the set of units which you want to learn the answer about? (since we can't learn about an individual unit)
+- Know what ATE averages over
+- Know what is local in a LATE
+- Know when SATEs are informative for PATEs
+- Choice of inquiry is not valueless
+- Make your models vulnerable (something like falsification)
+- Relative value of killing bad ideas vs. giving life to good ones
+
+## Crafting a Data Strategy
+- Need to figure out how to say, how do you go about *selecting* D
+- Reducing variance via sampling and assignment procedures
+- Reducing bias via sampling and assignment procedures
+- There is no causation without manipulation
+- Studying many questions can be costly
+- The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how. Includes also question of identifying through dataset merges.
+
+## Choosing an Answer Strategy
+- Analyze as you randomize when you can (not just for experiments!)
+- Reducing variance via estimation choices
+- Answer strategy procedures (if this then that). Deal with fishing.
+- The role of robustness checks
+- PAPs as answer strategies (writing, reconciliation)
+
+# Part C: Diagnosis
+
+- Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae)
+- How to select diagnosands
+
+## What should you diagnose your design against?
+- Hold inquiry constant!
+- Compare performance of the design according to choices the researcher makes
+    - D: Sample size, fraction randomly assigned, parameters of the randomized response, coding choices (e.g., binary vs. continuous, index vs. multiple, etc.)
+    - A: Possible estimators, priors(???)
+- And against the researcher's beliefs
+    - M: ICC, null model, alternative DAGs, heterogeneity
+
+- Conduct subject to constraints: budget, ethical, logistical
+
+## Redesign
+
+- When the diagnosis says the design is weak, improve it!
+- Resist the urge to change M and I to suit a diagnosis -- focus on D and A
+- Sometimes, you might need to collect new information in order to make a declaration specific enough.
+- Sometimes, designs have to be abandoned
+
+# Part D: Design Library
+
+## Observational designs for descriptive inference
+- Simple random sampling
+- Stratified clustered random sampling
+- Measuring latent variables
+- Topic analysis
+- Respondent driven sampling
+- Multilevel regression and poststratification
+- Meta-analysis
+	
+## Experimental designs for descriptive inference
+- Audit experiments
+- Experiments for sensitive questions
+- Conjoint experiments
+- Experimental games
+	
+## Experimental designs for causal inference
+- Multiarm designs
+- Experiments with blocks and clusters
+- Experiments where blocks and clusters are also sampled from populations of blocks/clusters
+- Factorial designs
+- Encouragement designs 
+- Stepped-wedge designs
+- Crossover designs
+- Parallel design for mediation effects
+- Partial population design for spillover analysis
+- Selective trials
+- Adaptive trials 
+- Multi-site designs (could be descriptive too; hard part is I)
+
+## Observational designs for causal inference
+- Difference in differences
+- Matching
+- Regression discontinuity designs
+- Synthetic control
+- Process tracing
+- Nested designs
+- Qualitative comparative analysis
+- Cross national time series
+
+# Part E: Design Criticism
+
+- Peers: Better scholarly critique
+- Funders: Evaluating and supporting research
+
+
+# IDEAs we don't know if to cut or integrate or what
+
+- How to designing multi-study projects and research agendas
+- Publication bias (journal of null results)
+- Knowledge accumulation
+- Post-hoc learning about designs
+- where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
+- is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
+
+
+
+# Designs brainstorm:
+
+- geographic RD
+- spatial processes
+- IRT
+- country-year FE
+- EITM
+- computational evolutional models
+- mapping social networks
+- an ANES study
+- interrupted time series
+- time series (uninterrupted)
+- selection on observables
+- mediation
+- structural estimation
+- "is this a good predictor"
+- inquiries about "regimes" (i.e., vote share at the precinct level.)
+- need to but the handbook of lab experiments
+- weighting to get PATEs and SATEs under non-compliance and non-response when you have a baseline
+
+

@@ -15,4 +15,3 @@ LaTeX: pdfLaTeX
 BuildType: Website
 
 QuitChildProcessesOnExit: Yes
-DisableExecuteRprofile: Yes

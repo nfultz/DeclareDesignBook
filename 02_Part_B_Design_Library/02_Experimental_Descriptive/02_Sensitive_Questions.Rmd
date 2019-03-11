@@ -221,10 +221,4 @@ rr_design <- set_diagnosands(rr_design, diagnosands = declare_diagnosands(select
 <!-- ``` -->
 
 
-# References
-
-
-
-
-
-## 	List experiments
+### References
