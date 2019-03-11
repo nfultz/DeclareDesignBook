@@ -84,13 +84,13 @@ design <-
       N = 12, nest = FALSE,
       year = 1998:2009,
       post_treatment_period = year >= 2007,
-      year_shock = runif(N, -.01, .01), 
+      year_shock = runif(N, -.025, .025), 
       year_trend = year - 1998
     ),
     obs = cross_levels(
       by = join(states, years),
       legal_worker_act = 1*(post_treatment_period == TRUE & state == "AZ"),
-      state_year_shock = runif(N, -.01, .01),
+      state_year_shock = runif(N, -.025, .025),
       prop_non_hispanic_below_hs_baseline = 0.4 + state_shock + year_shock + (.01 + .05 * border_state) * year_trend + state_year_shock
     )
   ) +
