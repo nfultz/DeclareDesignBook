@@ -1,1 +1,260 @@
+---
+title: "Process tracing"
+output: html_document
+bibliography: ../../bib/book.bib 
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
 ## Process tracing
+
+<!-- make sure to rename the section title below -->
+
+```{r process_tracing, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 50
+b_sims <- 20
+```
+
+Scholars sometimes employ explicitly Bayesian procedures to evaluate "cause of effects" claims using qualitative data: how probable is the hypothesis that $X$ *did in fact* cause $Y$? @fairfield2017explicit, for example, estimate the probability that the right-wing changed position on tax reform during the 2005 Chilean presidential election ($Y$) *because* of anti-inequality campaigns ($X$) by examining whether the case study narrative bears evidence that you would only expect to see if this were true.^[For example: "the former President [said] that the tax subsidy 'never would have been eliminated if I had not taken [the opposition candidate] at his word' when the latter publicly professed concern over inequality." (@fairfield2017explicit)]
+
+In this design, a researcher evaluates a specific hypothesis, $H$, according to which $Y$ only happened *because* $X$ happened. They look for "clues" or evidence, $E$, in a case narrative or other qualitative data, which would be more or less surprising to see depending on whether $H$ is true. In our example we'll imagine they choose one country in which there was a civil war ($Y$) and natural resources ($X$), and look for evidence ($E$) that helps update beliefs about $Pr(H)$---the probability that the civil war happened *because* natural resources were present. 
+
+### Design Declaration
+
+- **M**odel: 
+
+    Logically, there are four possible causal relationships between $X$ and $Y$: 
+
+    1. Natural resources could cause civil war when present, resulting in the absence of civil war when natural resources are absent ($X$ causes $Y$). 
+
+    2. The presence of natural resources could be the only thing preventing war, so that their absence causes civil war ($\neg X$ causes $Y$). 
+  
+    3. Civil war might happen irrespective of whether natural resources are present ($Y$ irrespective of $X$).
+  
+    4. Civil war might not happen irrespective of whether natural resources are present ($\neg Y$ irrespective of $X$) 
+
+    Our model of the world specifies the probability that a given country has natural resources as well as the (independent) proportion of countries that have one of the causal pathways 1-4.
+
+- **I**nquiry: 
+
+    We want to figure out if, in the case we chose, the civil war happened *because of* the natural resources ($H$) or would have happened regardless of natural resources ($\neg H$). 
+
+- **D**ata strategy: 
+
+    We pick one case in which $X$ and $Y$ are both true (a country with natural resources where a civil war happened).
+
+- **A**nswer strategy: 
+
+    We'll evaluate the likelihood of our causal hypothesis, $H$, by looking for evidence, $E$, that would be more or less surprising to see if $X$ truly did cause $Y$. Specifically, we'll use Bayes' rule to figure out $Pr(H \mid E)$: the posterior probability that $X$ caused $Y$ in the case we chose, given the evidence we found. We make a function that calculates $Pr(H \mid E) = \frac{Pr(H) Pr(E|H)}{Pr(H)Pr(E\mid(H)) + Pr(\neg H)Pr(E\mid\neg H)}$. 
+    
+    To use Bayes' rule in conjunction with our evidence, we need to specify a few things. First, a prior $Pr(H)$ that the hypothesis is true. Second and third, we need to state the probabilities with which we would observe a piece of evidence if our hypothesis is true ($Pr(E|H)$) or false ($Pr(E|\neg H)$). 
+    
+     Let's say, for example, that $E_1$ is the national army taking control over natural resources during a civil war. That's very likely to happen if the natural resources caused the war. We might say $Pr(E_1 \mid H) = .8$. But even if the natural resources didn't cause the war, the national army might still take over natural resources for other reasons, say $Pr(E_1 \mid \neg H) = .2$. This type of clue is often called a "straw-in-the-wind" (SIW): you expect to see it if $H$ is true, but it's not completely surprising to see it if $H$ is false.
+
+    We might look for a second clue: just prior to the civil war, was an armed group  created whose main name, aims, and ideology were centered around the capture and control natural resources, and were they also one of the main antagonists? Observing such a clue is really unlikely overall, even if $H$ is true. But it's very informative if it is observed, since it's so unlikely to happen if $H$ is not true: that would make the second clue a "smoking gun" (SMG). Let's say $Pr(E_2 \mid H) = .3, Pr(E_2 \mid \neg H) = 0$. 
+    
+    We'll compare approaches in which a researcher doesn't look for any evidence, only looks for a SIW, and only looks for a SMG. In practice, researchers seldom pre-commit to updating from a single piece of evidence, but search for multiple clues and updating about their cause of effects hypotheses jointly. Doing so in fact requires that we specify the joint distribution of the clues. There is often good reason to think clues could be correlated, conditional on the hypothesis being true or false: for example, the fact that an armed group formed in order to take resources ($E_2$) might convince the government to take over the natural resource ($E_1$), or dissuade them! 
+    
+```{r}
+# Probability of observing straw-in-wind 
+# when H is TRUE vs. FALSE
+pr_SIW_H <- .75
+pr_SIW_not_H <- .25
+# Probability of observing smoking gun
+# when H is TRUE vs. FALSE
+pr_SMG_H <- .30
+pr_SMG_not_H <- .05
+# Correlation in clues
+rho_H <- 0
+rho_not_H <- 0
+
+# Calculate posterior given evidence
+calculate_posterior <- function(data, p_H, p_clue_found_H, p_clue_found_not_H, 
+                                test, label) {
+  clue_found <- data[, test]
+  p_E_H <- ifelse(clue_found, p_clue_found_H, 1 - p_clue_found_H)
+  p_E_not_H <- ifelse(clue_found, p_clue_found_not_H, 1 - p_clue_found_not_H)
+  data.frame(posterior_H = p_E_H * p_H / (p_E_H * p_H + p_E_not_H * (1 - p_H)), 
+             clue_found = clue_found)}
+
+# Calculate bivariate probabilities given correlation
+joint_prob <- function(p1, p2, rho) {
+  r <- rho * (p1 * p2 * (1 - p1) * (1 - p2)) ^ .5
+  c(`00` = (1 - p1) * (1 - p2) + r,
+    `01` = p2 * (1 - p1) - r,
+    `10` = p1 * (1 - p2) - r,
+    `11` = p1 * p2 + r)}
+
+# Calculate posterior given correlated evidence
+calculate_posterior_joint <- function(data, p_H, p_clue_1_found_H, 
+                                      p_clue_1_found_not_H, p_clue_2_found_H, 
+                                      p_clue_2_found_not_H, rho_H, rho_not_H, 
+                                      test){
+  clue_found <- data[, test]
+  p_E_H <- joint_prob(p1 = p_clue_1_found_H, 
+                      p2 = p_clue_2_found_H, 
+                      rho = rho_H)[clue_found]
+  p_E_not_H <- joint_prob(p1 = p_clue_1_found_not_H, 
+                          p2 = p_clue_2_found_not_H, 
+                          rho = rho_not_H)[clue_found]
+  data.frame(posterior_H = p_E_H * p_H / (p_E_H * p_H + p_E_not_H * (1 - p_H)), 
+             clue_found = clue_found)
+}
+```
+
+The design itself makes use of the helper functions above in the `declare_estimator` steps.
+
+```{r}
+process_tracing_design <- 
+  # Model -------------------------------------------------------------------
+
+  declare_population(
+    N = 195, 
+    X = rbinom(N, 1, .3) == 1,
+    causal_process = sample(c('X_causes_Y', 'X_causes_not_Y', 'Y_regardless', 'not_Y_regardless'), 
+                            N, replace = TRUE, prob = c(.2, .1, .2, .5)),
+    Y = (X & causal_process == "X_causes_Y") |     
+      (!X & causal_process == "X_causes_not_Y") |
+      (causal_process == "Y_regardless"))  +
+  
+  # Data Strategy -----------------------------------------------------------
+  declare_sampling(strata = (X == 1 & Y == 1), 
+                   strata_n = c("FALSE" = 0, "TRUE" = 1)) +
+  
+  # Inquiry -----------------------------------------------------------------
+  # Sometimes Inquiries are defined *after* the data strategy.
+  # Here the inquiry is defined after sampling.
+  declare_estimand(did_X_cause_Y = causal_process == 'X_causes_Y') +
+  
+  # Answer Strategy ---------------------------------------------------------
+  declare_step(
+    SIW_SMG = sample(c("00", "01", "10", "11"),1, 
+                     prob = {
+                       if(causal_process == "X_causes_Y") 
+                         joint_prob(pr_SIW_H, pr_SMG_H, rho_H) 
+                       else 
+                         joint_prob(pr_SIW_not_H, pr_SMG_not_H, rho_not_H)
+                     }),
+  SIW_observed = SIW_SMG == "10" | SIW_SMG == "11",
+  SMG_observed = SIW_SMG == "01" | SIW_SMG == "11",
+  handler = fabricate,
+  label = "Correlated Clues") +
+  
+  declare_estimator(
+    test               = "SIW_observed", 
+    p_H                = .5, 
+    p_clue_found_H     = pr_SIW_H,
+    p_clue_found_not_H = pr_SIW_not_H,
+    label              = "Straw in Wind",
+    estimand           = "did_X_cause_Y",
+    handler            = tidy_estimator(calculate_posterior)) +
+  
+  declare_estimator(
+    test               = "SMG_observed", 
+    p_H                = .5, 
+    p_clue_found_H     = pr_SMG_H,
+    p_clue_found_not_H = pr_SMG_not_H,
+    label              = "Smoking gun",
+    estimand           = "did_X_cause_Y",
+    handler            = tidy_estimator(calculate_posterior)) +
+  
+  declare_estimator(
+    test                 = "SIW_SMG", 
+    p_H                  = .5, 
+    p_clue_1_found_H     = pr_SIW_H,
+    p_clue_1_found_not_H = pr_SIW_not_H,
+    p_clue_2_found_H     = pr_SMG_H,
+    p_clue_2_found_not_H = pr_SMG_not_H,
+    rho_H                = rho_H,
+    rho_not_H            = rho_not_H,
+    label                = "Update from both clues",
+    estimand             = "did_X_cause_Y",
+    handler              = tidy_estimator(calculate_posterior_joint)) 
+  
+# Diagnosands
+process_tracing_design <- set_diagnosands(
+  process_tracing_design,
+  diagnosands = declare_diagnosands(
+    bias = mean(posterior_H - estimand),
+    rmse = sqrt(mean((posterior_H - estimand) ^ 2)),
+    mean_estimand = mean(estimand),
+    mean_posterior = mean(posterior_H),
+    sd_posterior = sd(posterior_H),
+    keep_defaults = FALSE
+  ))
+```
+
+### Takeaways
+
+First, how do the different inferential strategies perform when we assume that the clues arise independently of one another, given the underlying causal process?
+
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+diagnosis <- diagnose_designs(process_tracing_design, sims = sims)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("process_tracing"), "/process_tracing_diagnoses.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis, path = rds_file_path)
+}
+diagnoses <- read_rds(rds_file_path)
+```
+
+
+We'll look at how the four approaches (no tests, SIW only, SMG only, SIW + SMG) perform in terms of RMSE across different levels of correlation in clues when $H$ is true.
+
+```{r,eval=FALSE}
+designs <- expand_design(designer = process_tracing_designer,cor_E1E2_H = c(-.32, 0, .32))
+```
+
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+# diagnoses <- diagnose_designs(designs, sims = sims)
+```
+
+```{r, echo = FALSE, purl = FALSE,eval=FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("process_tracing"), "/process_tracing_diagnoses.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis, path = rds_file_path)
+}
+diagnoses <- read_rds(rds_file_path)
+```
+
+```{r,eval=FALSE}
+diagnoses %>% 
+  get_diagnosands() %>% 
+  ggplot(aes(cor_E1E2_H, rmse, color = estimator_label, group = estimator_label)) +
+  geom_point() + geom_line() + dd_theme()
+```
+
+
+
+
+  - As expected, using more data gets you better answers on average: the RMSE is highest with no process-tracing, lowest when both clues are used, and middling when only one clue is used.
+  
+  - Against conventional wisdom,^[E.g. @collier2011understanding: of the four process-tracing tests, straws-in-the-wind are ``the weakest and place the least demand on the researcher's knowledge and assumptions.'' (826)] however, the straw-in-the-wind outperforms the smoking gun. That's somewhat surprising, since the smoking gun is perfectly informative when observed, whereas observing the straw-in-the-wind leaves open the possibility that the hypothesis is false. While the researcher is still making mistakes with the straw-in-the-wind, they're observing it more frequently, and so have more opportunities to update in the right direction. By contrast, the smoking gun is rare: many times it is not observed, and so the researcher downweights the posterior probability of $H$. Compared to the gun, the straw is less wrong more often.
+
+  - Notice that the gains from a joint approach are much greater when the clues are negatively correlated than when they are positively correlated. This feature arises because the pieces of evidence carry less independent information when they are positively correlated. To see this, suppose they were perfectly correlated, so that seeing one guaranteed the other would also be present. In this case, there is no additional information gleaned from the observation of one clue once the other has been observed: they are effectively equivalent tests. 
+
+
+
+### References
+
+
+
+
+
