@@ -11,14 +11,11 @@ output:
 This section is only in words, not in code (until the software primer)
 
 - Preamble
-- Explain MIDA
-- Diagnosands and diagnosis
+- Explain MIDA [AC]
+- Diagnosands and diagnosis [AC]
 - Explain declaration -> diagnosis -> redesign process (graphic?)
 - How to use this book
 - Software primer
-
-
-
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
@@ -28,9 +25,9 @@ This section is only in words, not in code (until the software primer)
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
 - research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
 
-## Kinds of research projects that there are
+## Kinds of research projects that there are [AC]
 - Do you want to answer a causal or descriptive question?
-- Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; 
+- Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable;
 - What is your inquiry if you don’t know the question in advance? (Discovery)
 
 
@@ -61,7 +58,7 @@ This section is only in words, not in code (until the software primer)
 - Make your models vulnerable (something like falsification)
 - Relative value of killing bad ideas vs. giving life to good ones
 
-## Crafting a Data Strategy
+## Crafting a Data Strategy [AC]
 - Need to figure out how to say, how do you go about *selecting* D
 - Reducing variance via sampling and assignment procedures
 - Reducing bias via sampling and assignment procedures
@@ -101,18 +98,18 @@ This section is only in words, not in code (until the software primer)
 # Part D: Design Library
 
 ## Observational designs for descriptive inference
-- Simple random sampling
+- Simple random sampling [AC]
 - Stratified clustered random sampling
-- Measuring latent variables
+- Measuring latent variables [AC]
 - Topic analysis
 - Respondent driven sampling
 - Multilevel regression and poststratification
 - Meta-analysis
 	
 ## Experimental designs for descriptive inference
-- Audit experiments
+- Audit experiments [AC]
 - Experiments for sensitive questions
-- Conjoint experiments
+- Conjoint experiments [AC]
 - Experimental games
 	
 ## Experimental designs for causal inference
@@ -126,12 +123,12 @@ This section is only in words, not in code (until the software primer)
 - Parallel design for mediation effects
 - Partial population design for spillover analysis
 - Selective trials
-- Adaptive trials 
+- Adaptive trials [AC]
 - Multi-site designs (could be descriptive too; hard part is I)
 
 ## Observational designs for causal inference
 - Difference in differences
-- Matching
+- Matching [AC]
 - Regression discontinuity designs
 - Synthetic control
 - Process tracing
@@ -154,6 +151,8 @@ This section is only in words, not in code (until the software primer)
 - where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
 - is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
 
+- PAPs, Registered Reports, SOPs
+
 
 
 # Designs brainstorm:
@@ -172,7 +171,7 @@ This section is only in words, not in code (until the software primer)
 - mediation
 - structural estimation
 - "is this a good predictor"
-- inquiries about "regimes" (i.e., vote share at the precinct level.)
+- inquiries about "regimes" (i.e., vote share at the precinct level.)  Related to a problem I (ac) have about persistence
 - need to but the handbook of lab experiments
 - weighting to get PATEs and SATEs under non-compliance and non-response when you have a baseline
 
