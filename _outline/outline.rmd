@@ -1,5 +1,5 @@
 ---
-title: "Research Design: Declaration, Diagnosis, Redesign"
+title: "Research Design: Declare, Diagnose, Redesign"
 output: 
   html_document:
     number_sections: true
@@ -18,6 +18,9 @@ This section is only in words, not in code (until the software primer)
 - Software primer [GB]
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
+
+<!-- a script for each subsection -->
+<!-- two buttons: copy/paste and download full code for that subsection -->
 
 ## Starting a new research project [**Do we need this section?** -- JC]
 
@@ -38,6 +41,10 @@ This section is only in words, not in code (until the software primer)
 - Is your question important? (Change decisions; change answer in a literature)
 - Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
 
+<!-- next four sections -->
+<!-- subsection 1: walk through of how you specify a model, using a binary exposure variable with binary outcome (primary) -->
+<!-- subsection 2: issues specific to other designs that talk through the general principles listed in each section -->
+
 ## Specifying the model [JC]
 - Introduce DAGs and potential outcomes
 - What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)? [MH]
@@ -46,7 +53,7 @@ This section is only in words, not in code (until the software primer)
 - Pilot studies
 - Spillovers are potential outcomes
 - Compliance is a potential outcome
-- Attrition is a potential outcome
+- Attrition is a potential outcome 
 - Measurements are potential outcomes
 
 ## Defining the Inquiry
@@ -74,6 +81,8 @@ This section is only in words, not in code (until the software primer)
 - Answer strategy procedures (if this then that). Deal with fishing.
 - The role of robustness checks
 - PAPs as answer strategies (writing, reconciliation)
+- Multiple comparisons 
+- Missing data (outcomes, covariates)
 
 
 # Part C: Diagnosis
@@ -89,6 +98,7 @@ This section is only in words, not in code (until the software primer)
 - Multiple estimates / inquiries [JC]
 - How to think about uncertainty about model parameters (multiple designs?)
 - Diagnosands that are a function of "multiple designs" like MDE
+- Conditional diagnosands different?
 
 ## What parameters should you vary to learn about designs [GB]
 - Hold inquiry constant!
@@ -114,6 +124,9 @@ This section is only in words, not in code (until the software primer)
 - Replication
 - Peers: Better scholarly critique [MH]
 - Funders: Evaluating and supporting research [MH]
+- Publication bias (journal of null results)
+- Knowledge accumulation
+- PAPs, Registered Reports, SOPs
 
 # Part E: Design Library
 
@@ -159,16 +172,10 @@ This section is only in words, not in code (until the software primer)
 
 # IDEAs we don't know if to cut or integrate or what
 
-- How to designing multi-study projects and research agendas
-- Publication bias (journal of null results)
-- Knowledge accumulation
 - Post-hoc learning about designs
 - where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
 - is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
-- PAPs, Registered Reports, SOPs
-- Multiple comparisons 
 - Missing data 
-
 
 
 # Designs brainstorm:
