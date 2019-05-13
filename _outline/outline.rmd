@@ -19,7 +19,7 @@ This section is only in words, not in code (until the software primer)
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
-## Starting a new research project 
+## Starting a new research project [**Do we need this section?** -- JC]
 
 - What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
@@ -73,10 +73,18 @@ This section is only in words, not in code (until the software primer)
 - The role of robustness checks
 - PAPs as answer strategies (writing, reconciliation)
 
+[**Do we need a "putting it all together" section? Preview the fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?** -- JC]
+
+
 # Part C: Diagnosis
 
-- Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae)
-- How to select diagnosands
+- Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae) [JC]
+
+## Kinds of diagnosands that there are [JC]
+- Beyond power (MDE, bias, coverage)
+- Ways of getting answers to a question wrong
+- Diagnosing inferential statistics (SE bias vs. coverage, error rates for ps, Bayes?)
+- How to select diagnosands (some sort of decision tree?)
 
 ## What should you diagnose your design against? [GB]
 - Hold inquiry constant!
@@ -104,7 +112,7 @@ This section is only in words, not in code (until the software primer)
 - Topic analysis [GB]
 - Respondent driven sampling
 - Multilevel regression and poststratification [GB]
-- Meta-analysis [GB]
+- Meta-analysis [GB] [JC]
 	
 ## Experimental designs for descriptive inference
 - Audit experiments [AC]
