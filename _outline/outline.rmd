@@ -33,7 +33,8 @@ NOTE: an R script for each subsection. For code snippets, two buttons: copy/past
 - Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; [MH]
 - What is your inquiry if you don’t know the question in advance? (Discovery)
 
-## Types of steps, not components [JC]
+## Types of steps, not components [JC 1p]
+
 - The fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?
 
 ## Is your research question good? [GB]
@@ -43,7 +44,8 @@ NOTE: an R script for each subsection. For code snippets, two buttons: copy/past
 
 NOTE: for next four sections, four subsections: 1) walk through of how you specify this step, using a probit exposure variable with binary outcome (primary); 2) common choices you have to make about this step; 3) illustrations how these choices have to make for other designs; 4) anticipating cross-MIDA problems from this step. LOTS of pointers to the design library.
 
-## Specifying the model [JC]
+## Specifying the model [JC 10p]
+
 - Introduce DAGs and potential outcomes
 - What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)? [MH]
 - What parts of background variables must be specified, and how can you specify them (existing data, substantive bounds on variables)
@@ -92,7 +94,7 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 ## Diagnosing a single design (single design, single diagnosand)
 - Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae) [JC]
 
-## Kinds of diagnosands that there are [JC]
+## Kinds of diagnosands that there are [JC 8p]
 - Standard diagnosands (paragraph on each of the diagnosands in our defaults)
 - Ways of getting answers to a question wrong
 - Diagnosing inferential statistics (SE bias vs. coverage, error rates for ps, Bayes?)
@@ -133,11 +135,11 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
   - Peers: Better scholarly critique [MH]
 
 - Combining designs 
-  - Job market papers with multiple studies / three paper paradigm in psych (is it one design      targeting same inquiry?) [JC]
+  - Job market papers with multiple studies / three paper paradigm in psych (is it one design      targeting same inquiry?) [JC 1p]
   - Multi-site studies -- take a design from another study and use it for another one
   - Knowledge accumulation
   
-- A collection of designs-as-objects [JC]
+- A collection of designs-as-objects [JC 1/2p]
 
 # Part E: Design Library
 
