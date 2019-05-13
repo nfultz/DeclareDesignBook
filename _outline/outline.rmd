@@ -63,6 +63,8 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - Choice of inquiry is not valueless
 - Make your models vulnerable (something like falsification)
 - Relative value of killing bad ideas vs. giving life to good ones
+- The many flavors of external validity
+- Inquiries for discovery
 
 ## Crafting a Data Strategy [AC]
 - Need to figure out how to say, how do you go about *selecting* D
@@ -71,6 +73,7 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - There is no causation without manipulation
 - Studying many questions can be costly
 - The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how. Includes also question of identifying through dataset merges.
+- Big discussion of measurement
 
 ## Choosing an Answer Strategy [GB]
 - Analyze as you randomize when you can (not just for experiments!)
@@ -134,6 +137,7 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - Topic analysis [GB]
 - Respondent driven sampling
 - Multilevel regression and poststratification [GB]
+- Forecasting (predicting in future)
 	
 ## Experimental designs for descriptive inference
 - Audit experiments [AC]
@@ -165,14 +169,6 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - Qualitative comparative analysis [MH]
 - Cross national time series
 - Meta-analysis [GB] [JC]
-
-
-# IDEAs we don't know if to cut or integrate or what
-
-- Post-hoc learning about designs
-- where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
-- is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
-- Missing data 
 
 
 # Designs brainstorm:
