@@ -25,11 +25,13 @@ This section is only in words, not in code (until the software primer)
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
 - research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
 
+## Types of steps, not components [JC]
+- The fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?
+
 ## Kinds of research projects that there are [AC] [JC]
 - Do you want to answer a causal or descriptive question? [MH]
 - Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; [MH]
 - What is your inquiry if you don’t know the question in advance? (Discovery)
-
 
 ## Is your research question good? [GB]
 - Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
@@ -73,27 +75,28 @@ This section is only in words, not in code (until the software primer)
 - The role of robustness checks
 - PAPs as answer strategies (writing, reconciliation)
 
-[**Do we need a "putting it all together" section? Preview the fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?** -- JC]
-
 
 # Part C: Diagnosis
 
+## Diagnosing a single design (single design, single diagnosand)
 - Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae) [JC]
 
 ## Kinds of diagnosands that there are [JC]
-- Beyond power (MDE, bias, coverage)
+- Standard diagnosands (paragraph on each of the diagnosands in our defaults)
 - Ways of getting answers to a question wrong
 - Diagnosing inferential statistics (SE bias vs. coverage, error rates for ps, Bayes?)
 - How to select diagnosands (some sort of decision tree?)
+- Multiple estimates / inquiries [JC]
+- How to think about uncertainty about model parameters (multiple designs?)
+- Diagnosands that are a function of "multiple designs" like MDE
 
-## What should you diagnose your design against? [GB]
+## What parameters should you vary to learn about designs [GB]
 - Hold inquiry constant!
 - Compare performance of the design according to choices the researcher makes
     - D: Sample size, fraction randomly assigned, parameters of the randomized response, coding choices (e.g., binary vs. continuous, index vs. multiple, etc.)
     - A: Possible estimators, priors(???)
 - And against the researcher's beliefs
     - M: ICC, null model, alternative DAGs, heterogeneity
-
 - Conduct subject to constraints: budget, ethical, logistical
 
 ## Redesign [MH]
@@ -103,7 +106,16 @@ This section is only in words, not in code (until the software primer)
 - Sometimes, you might need to collect new information in order to make a declaration specific enough.
 - Sometimes, designs have to be abandoned
 
-# Part D: Design Library
+# Part D: Putting Designs to Use
+
+- PAPs
+- Job market papers with multiple studies / three paper paradigm in psych (is it one design targeting same inquiry?) [JC]
+- Multi-site studies -- take a design from another study and use it for another one
+- Replication
+- Peers: Better scholarly critique [MH]
+- Funders: Evaluating and supporting research [MH]
+
+# Part E: Design Library
 
 ## Observational designs for descriptive inference
 - Simple random sampling [AC]
@@ -112,7 +124,6 @@ This section is only in words, not in code (until the software primer)
 - Topic analysis [GB]
 - Respondent driven sampling
 - Multilevel regression and poststratification [GB]
-- Meta-analysis [GB] [JC]
 	
 ## Experimental designs for descriptive inference
 - Audit experiments [AC]
@@ -143,11 +154,7 @@ This section is only in words, not in code (until the software primer)
 - Nested designs [MH]
 - Qualitative comparative analysis [MH]
 - Cross national time series
-
-# Part E: Design Criticism
-
-- Peers: Better scholarly critique [MH]
-- Funders: Evaluating and supporting research [MH]
+- Meta-analysis [GB] [JC]
 
 
 # IDEAs we don't know if to cut or integrate or what
