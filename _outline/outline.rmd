@@ -19,8 +19,7 @@ This section is only in words, not in code (until the software primer)
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
-<!-- a script for each subsection -->
-<!-- two buttons: copy/paste and download full code for that subsection -->
+NOTE: an R script for each subsection. For code snippets, two buttons: copy/paste and download full code for that subsection
 
 ## Starting a new research project [**Do we need this section?** -- JC]
 
@@ -41,9 +40,7 @@ This section is only in words, not in code (until the software primer)
 - Is your question important? (Change decisions; change answer in a literature)
 - Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
 
-<!-- next four sections -->
-<!-- subsection 1: walk through of how you specify a model, using a binary exposure variable with binary outcome (primary) -->
-<!-- subsection 2: issues specific to other designs that talk through the general principles listed in each section -->
+NOTE: for next four sections, two subsections: subsection 1: walk through of how you specify a model, using a binary exposure variable with binary outcome (primary); subsection 2: issues specific to other designs that talk through the general principles listed in each section. LOTS of pointers to the design library.
 
 ## Specifying the model [JC]
 - Introduce DAGs and potential outcomes
