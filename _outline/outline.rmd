@@ -40,7 +40,7 @@ NOTE: an R script for each subsection. For code snippets, two buttons: copy/past
 - Is your question important? (Change decisions; change answer in a literature)
 - Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
 
-NOTE: for next four sections, two subsections: subsection 1: walk through of how you specify a model, using a binary exposure variable with binary outcome (primary); subsection 2: issues specific to other designs that talk through the general principles listed in each section. LOTS of pointers to the design library.
+NOTE: for next four sections, four subsections: 1) walk through of how you specify this step, using a probit exposure variable with binary outcome (primary); 2) common choices you have to make about this step; 3) illustrations how these choices have to make for other designs; 4) anticipating cross-MIDA problems from this step. LOTS of pointers to the design library.
 
 ## Specifying the model [JC]
 - Introduce DAGs and potential outcomes
@@ -53,7 +53,7 @@ NOTE: for next four sections, two subsections: subsection 1: walk through of how
 - Attrition is a potential outcome 
 - Measurements are potential outcomes
 
-## Defining the Inquiry
+## Defining the Inquiry [MH]
 - When would a null finding be interesting? [MH]
 - Is the answer defined? (include not only missingness, but ATE for categorical outcomes) [MH]
 - What is the set of units which you want to learn the answer about? (since we can't learn about an individual unit) [MH]
@@ -72,7 +72,7 @@ NOTE: for next four sections, two subsections: subsection 1: walk through of how
 - Studying many questions can be costly
 - The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how. Includes also question of identifying through dataset merges.
 
-## Choosing an Answer Strategy [JC]
+## Choosing an Answer Strategy [GB]
 - Analyze as you randomize when you can (not just for experiments!)
 - Reducing variance via estimation choices
 - Answer strategy procedures (if this then that). Deal with fishing.
