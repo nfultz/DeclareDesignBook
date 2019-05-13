@@ -5,6 +5,9 @@ output:
     number_sections: true
 ---
 
+NOTE: Put in exercises as placeholders.
+
+Second reader assigned to all of them.
 
 # Part A: Introduction to Design Declaration and Diagnosis
 
@@ -21,19 +24,17 @@ This section is only in words, not in code (until the software primer)
 
 NOTE: an R script for each subsection. For code snippets, two buttons: copy/paste and download full code for that subsection
 
-## Starting a new research project [**Do we need this section?** -- JC]
+## What is your research question [AC] [JC]
 
 - What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
 - research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
-
-## Types of steps, not components [JC]
-- The fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?
-
-## Kinds of research projects that there are [AC] [JC]
 - Do you want to answer a causal or descriptive question? [MH]
 - Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; [MH]
 - What is your inquiry if you don’t know the question in advance? (Discovery)
+
+## Types of steps, not components [JC]
+- The fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?
 
 ## Is your research question good? [GB]
 - Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
@@ -65,6 +66,7 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - Relative value of killing bad ideas vs. giving life to good ones
 - The many flavors of external validity
 - Inquiries for discovery
+- Complex counterfactuals
 
 ## Crafting a Data Strategy [AC]
 - Need to figure out how to say, how do you go about *selecting* D
@@ -130,6 +132,8 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 
 # Part E: Design Library
 
+NOTE: include links to declared designs for each study
+
 ## Observational designs for descriptive inference
 - Simple random sampling [AC]
 - Stratified clustered random sampling
@@ -169,9 +173,11 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - Qualitative comparative analysis [MH]
 - Cross national time series
 - Meta-analysis [GB] [JC]
+- Mediation [GB]
+- Structural estimation
 
 
-# Designs brainstorm:
+# Designs brainstorm
 
 - geographic RD
 - spatial processes
@@ -184,8 +190,6 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - interrupted time series
 - time series (uninterrupted)
 - selection on observables
-- mediation
-- structural estimation
 - "is this a good predictor"
 - inquiries about "regimes" (i.e., vote share at the precinct level.)  Related to a problem I (ac) have about persistence
 - need to but the handbook of lab experiments
