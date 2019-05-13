@@ -19,13 +19,13 @@ This section is only in words, not in code (until the software primer)
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
-## Starting a new research project
+## Starting a new research project 
 
 - What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
 - research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
 
-## Kinds of research projects that there are [AC]
+## Kinds of research projects that there are [AC] [JC]
 - Do you want to answer a causal or descriptive question?
 - Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable;
 - What is your inquiry if you don’t know the question in advance? (Discovery)
@@ -36,7 +36,7 @@ This section is only in words, not in code (until the software primer)
 - Is your question important? (Change decisions; change answer in a literature)
 - Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
 
-## Specifying the model
+## Specifying the model [JC]
 - Introduce DAGs and potential outcomes
 - What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)?
 - What parts of background variables must be specified, and how can you specify them (existing data, substantive bounds on variables)
@@ -66,7 +66,7 @@ This section is only in words, not in code (until the software primer)
 - Studying many questions can be costly
 - The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how. Includes also question of identifying through dataset merges.
 
-## Choosing an Answer Strategy
+## Choosing an Answer Strategy [JC]
 - Analyze as you randomize when you can (not just for experiments!)
 - Reducing variance via estimation choices
 - Answer strategy procedures (if this then that). Deal with fishing.
@@ -115,23 +115,23 @@ This section is only in words, not in code (until the software primer)
 ## Experimental designs for causal inference
 - Multiarm designs
 - Experiments with blocks and clusters
-- Experiments where blocks and clusters are also sampled from populations of blocks/clusters
+- Experiments where blocks and clusters are also sampled from populations of blocks/clusters [JC]
 - Factorial designs
-- Encouragement designs 
-- Stepped-wedge designs 
-- Crossover designs
+- Encouragement designs [JC]
+- Stepped-wedge designs [JC]
+- Crossover designs 
 - Parallel design for mediation effects [GB]
-- Partial population design for spillover analysis
-- Selective trials
+- Partial population design for spillover analysis [JC]
+- Selective trials [JC]
 - Adaptive trials [AC]
 - Multi-site designs (could be descriptive too; hard part is I) [GB]
 
 ## Observational designs for causal inference
 - Difference in differences [GB]
 - Matching [AC]
-- Regression discontinuity designs
+- Regression discontinuity designs [JC]
 - Synthetic control [GB]
-- Process tracing
+- Process tracing [JC]
 - Nested designs
 - Qualitative comparative analysis
 - Cross national time series
@@ -151,6 +151,8 @@ This section is only in words, not in code (until the software primer)
 - where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
 - is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
 - PAPs, Registered Reports, SOPs
+- Multiple comparisons 
+- Missing data 
 
 
 
