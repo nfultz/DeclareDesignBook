@@ -24,7 +24,7 @@ This section is only in words, not in code (until the software primer)
 
 NOTE: an R script for each subsection. For code snippets, two buttons: copy/paste and download full code for that subsection
 
-## What is your research question [AC] [JC]
+## What is your research question [AC] 
 
 - What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
@@ -120,15 +120,24 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 
 # Part D: Putting Designs to Use
 
-- PAPs
-- Job market papers with multiple studies / three paper paradigm in psych (is it one design targeting same inquiry?) [JC]
-- Multi-site studies -- take a design from another study and use it for another one
-- Replication
-- Peers: Better scholarly critique [MH]
-- Funders: Evaluating and supporting research [MH]
 - Publication bias (journal of null results)
-- Knowledge accumulation
+
+## Before the study
+
 - PAPs, Registered Reports, SOPs
+- Funders: Evaluating and supporting research [MH]
+
+## After the study
+
+- Replication
+  - Peers: Better scholarly critique [MH]
+
+- Combining designs 
+  - Job market papers with multiple studies / three paper paradigm in psych (is it one design      targeting same inquiry?) [JC]
+  - Multi-site studies -- take a design from another study and use it for another one
+  - Knowledge accumulation
+  
+- A collection of designs-as-objects [JC]
 
 # Part E: Design Library
 
@@ -139,9 +148,9 @@ NOTE: include links to declared designs for each study
 - Stratified clustered random sampling
 - Measuring latent variables [AC]
 - Topic analysis [GB]
-- Respondent driven sampling
+- Respondent driven sampling 
 - Multilevel regression and poststratification [GB]
-- Forecasting (predicting in future)
+- Forecasting (predicting in future) [JC]
 	
 ## Experimental designs for descriptive inference
 - Audit experiments [AC]
@@ -171,11 +180,10 @@ NOTE: include links to declared designs for each study
 - Process tracing [JC]
 - Nested designs [MH]
 - Qualitative comparative analysis [MH]
-- Cross national time series
-- Meta-analysis [GB] [JC]
+- Cross national time series [JC]
+- Meta-analysis [GB] 
 - Mediation [GB]
 - Structural estimation
-
 
 # Designs brainstorm
 
