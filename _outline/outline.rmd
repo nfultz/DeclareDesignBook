@@ -13,9 +13,9 @@ This section is only in words, not in code (until the software primer)
 - Preamble
 - Explain MIDA [AC]
 - Diagnosands and diagnosis [AC]
-- Explain declaration -> diagnosis -> redesign process (graphic?)
+- Explain declaration -> diagnosis -> redesign process (graphic?) [GB]
 - How to use this book
-- Software primer
+- Software primer [GB]
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
@@ -31,7 +31,7 @@ This section is only in words, not in code (until the software primer)
 - What is your inquiry if you don’t know the question in advance? (Discovery)
 
 
-## Is your research question good?
+## Is your research question good? [GB]
 - Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
 - Is your question important? (Change decisions; change answer in a literature)
 - Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
@@ -78,7 +78,7 @@ This section is only in words, not in code (until the software primer)
 - Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae)
 - How to select diagnosands
 
-## What should you diagnose your design against?
+## What should you diagnose your design against? [GB]
 - Hold inquiry constant!
 - Compare performance of the design according to choices the researcher makes
     - D: Sample size, fraction randomly assigned, parameters of the randomized response, coding choices (e.g., binary vs. continuous, index vs. multiple, etc.)
@@ -88,7 +88,7 @@ This section is only in words, not in code (until the software primer)
 
 - Conduct subject to constraints: budget, ethical, logistical
 
-## Redesign
+## Redesign 
 
 - When the diagnosis says the design is weak, improve it!
 - Resist the urge to change M and I to suit a diagnosis -- focus on D and A
@@ -101,14 +101,14 @@ This section is only in words, not in code (until the software primer)
 - Simple random sampling [AC]
 - Stratified clustered random sampling
 - Measuring latent variables [AC]
-- Topic analysis
+- Topic analysis [GB]
 - Respondent driven sampling
-- Multilevel regression and poststratification
-- Meta-analysis
+- Multilevel regression and poststratification [GB]
+- Meta-analysis [GB]
 	
 ## Experimental designs for descriptive inference
 - Audit experiments [AC]
-- Experiments for sensitive questions
+- Experiments for sensitive questions [GB]
 - Conjoint experiments [AC]
 - Experimental games
 	
@@ -118,19 +118,19 @@ This section is only in words, not in code (until the software primer)
 - Experiments where blocks and clusters are also sampled from populations of blocks/clusters
 - Factorial designs
 - Encouragement designs 
-- Stepped-wedge designs
+- Stepped-wedge designs 
 - Crossover designs
-- Parallel design for mediation effects
+- Parallel design for mediation effects [GB]
 - Partial population design for spillover analysis
 - Selective trials
 - Adaptive trials [AC]
-- Multi-site designs (could be descriptive too; hard part is I)
+- Multi-site designs (could be descriptive too; hard part is I) [GB]
 
 ## Observational designs for causal inference
-- Difference in differences
+- Difference in differences [GB]
 - Matching [AC]
 - Regression discontinuity designs
-- Synthetic control
+- Synthetic control [GB]
 - Process tracing
 - Nested designs
 - Qualitative comparative analysis
@@ -150,7 +150,6 @@ This section is only in words, not in code (until the software primer)
 - Post-hoc learning about designs
 - where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
 - is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
-
 - PAPs, Registered Reports, SOPs
 
 
