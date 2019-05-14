@@ -109,7 +109,7 @@ design <-
       N = N_words_per_document,
       
       # draw topic (1 or 2) based on theta probabilities for the document
-      topic = simple_ra(N, prob = theta_topic2, conditions = 1:2),
+      topic = simple_ra(N, prob_unit = theta_topic2, conditions = 1:2),
       
       word = case_when(
         topic == 1 ~ simple_ra(N, prob_each = topic_1_prob, conditions = corpus),
