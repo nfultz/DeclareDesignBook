@@ -1,5 +1,5 @@
-Package: placeholder
-Title: Declaring and Diagnosing Research Designs
+Package: ddbook
+Title: Research Design: Declare, Diagnose, Redesign
 Version: 0.0.1
 Imports: bookdown
 Remotes: rstudio/bookdown

@@ -1,162 +1,193 @@
 ---
-title: "Research Design: Declaration, Diagnosis, Redesign"
+title: "Research Design: Declare, Diagnose, Redesign"
 output: 
   html_document:
     number_sections: true
 ---
 
+NOTE: Put in exercises as placeholders.
+
+Second reader assigned to all of them.
 
 # Part A: Introduction to Design Declaration and Diagnosis
 
 This section is only in words, not in code (until the software primer)
 
 - Preamble
-- Explain MIDA
-- Diagnosands and diagnosis
-- Explain declaration -> diagnosis -> redesign process (graphic?)
+- Explain MIDA [AC]
+- Diagnosands and diagnosis [AC]
+- Explain declaration -> diagnosis -> redesign process (graphic?) [GB]
 - How to use this book
-- Software primer
-
-
-
+- Software primer [GB]
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
-## Starting a new research project
+NOTE: an R script for each subsection. For code snippets, two buttons: copy/paste and download full code for that subsection
+
+## What is your research question [AC] 
 
 - What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
 - research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
-
-## Kinds of research projects that there are
-- Do you want to answer a causal or descriptive question?
-- Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; 
+- Do you want to answer a causal or descriptive question? [MH]
+- Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; [MH]
 - What is your inquiry if you don’t know the question in advance? (Discovery)
 
+## Types of steps, not components [JC 1p]
 
-## Is your research question good?
+- The fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?
+
+## Is your research question good? [GB]
 - Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
 - Is your question important? (Change decisions; change answer in a literature)
 - Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
 
-## Specifying the model
+NOTE: for next four sections, four subsections: 1) walk through of how you specify this step, using a probit exposure variable with binary outcome (primary); 2) common choices you have to make about this step; 3) illustrations how these choices have to make for other designs; 4) anticipating cross-MIDA problems from this step. LOTS of pointers to the design library.
+
+## Specifying the model [JC 10p]
+
 - Introduce DAGs and potential outcomes
-- What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)?
+- What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)? [MH]
 - What parts of background variables must be specified, and how can you specify them (existing data, substantive bounds on variables)
 - Isn't defining the effect size for potential outcomes begging the question?
 - Pilot studies
 - Spillovers are potential outcomes
 - Compliance is a potential outcome
-- Attrition is a potential outcome
+- Attrition is a potential outcome 
 - Measurements are potential outcomes
 
-## Defining the Inquiry
-- When would a null finding be interesting?
-- Is the answer defined? (include not only missingness, but ATE for categorical outcomes)
-- What is the set of units which you want to learn the answer about? (since we can't learn about an individual unit)
+## Defining the Inquiry [MH]
+- When would a null finding be interesting? [MH]
+- Is the answer defined? (include not only missingness, but ATE for categorical outcomes) [MH]
+- What is the set of units which you want to learn the answer about? (since we can't learn about an individual unit) [MH]
 - Know what ATE averages over
 - Know what is local in a LATE
 - Know when SATEs are informative for PATEs
 - Choice of inquiry is not valueless
 - Make your models vulnerable (something like falsification)
 - Relative value of killing bad ideas vs. giving life to good ones
+- The many flavors of external validity
+- Inquiries for discovery
+- Complex counterfactuals
 
-## Crafting a Data Strategy
+## Crafting a Data Strategy [AC]
 - Need to figure out how to say, how do you go about *selecting* D
 - Reducing variance via sampling and assignment procedures
 - Reducing bias via sampling and assignment procedures
 - There is no causation without manipulation
 - Studying many questions can be costly
 - The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how. Includes also question of identifying through dataset merges.
+- Big discussion of measurement
 
-## Choosing an Answer Strategy
+## Choosing an Answer Strategy [GB]
 - Analyze as you randomize when you can (not just for experiments!)
 - Reducing variance via estimation choices
 - Answer strategy procedures (if this then that). Deal with fishing.
 - The role of robustness checks
 - PAPs as answer strategies (writing, reconciliation)
+- Multiple comparisons 
+- Missing data (outcomes, covariates)
+
 
 # Part C: Diagnosis
 
-- Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae)
-- How to select diagnosands
+## Diagnosing a single design (single design, single diagnosand)
+- Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae) [JC]
 
-## What should you diagnose your design against?
+## Kinds of diagnosands that there are [JC 8p]
+- Standard diagnosands (paragraph on each of the diagnosands in our defaults)
+- Ways of getting answers to a question wrong
+- Diagnosing inferential statistics (SE bias vs. coverage, error rates for ps, Bayes?)
+- How to select diagnosands (some sort of decision tree?)
+- Multiple estimates / inquiries [JC]
+- How to think about uncertainty about model parameters (multiple designs?)
+- Diagnosands that are a function of "multiple designs" like MDE
+- Conditional diagnosands different?
+
+## What parameters should you vary to learn about designs [GB]
 - Hold inquiry constant!
 - Compare performance of the design according to choices the researcher makes
     - D: Sample size, fraction randomly assigned, parameters of the randomized response, coding choices (e.g., binary vs. continuous, index vs. multiple, etc.)
     - A: Possible estimators, priors(???)
 - And against the researcher's beliefs
     - M: ICC, null model, alternative DAGs, heterogeneity
-
 - Conduct subject to constraints: budget, ethical, logistical
 
-## Redesign
+## Redesign [MH]
 
 - When the diagnosis says the design is weak, improve it!
 - Resist the urge to change M and I to suit a diagnosis -- focus on D and A
 - Sometimes, you might need to collect new information in order to make a declaration specific enough.
 - Sometimes, designs have to be abandoned
 
-# Part D: Design Library
+# Part D: Putting Designs to Use
+
+- Publication bias (journal of null results)
+
+## Before the study
+
+- PAPs, Registered Reports, SOPs
+- Funders: Evaluating and supporting research [MH]
+
+## After the study
+
+- Replication
+  - Peers: Better scholarly critique [MH]
+
+- Combining designs 
+  - Job market papers with multiple studies / three paper paradigm in psych (is it one design      targeting same inquiry?) [JC 1p]
+  - Multi-site studies -- take a design from another study and use it for another one
+  - Knowledge accumulation
+  
+- A collection of designs-as-objects [JC 1/2p]
+
+# Part E: Design Library
+
+NOTE: include links to declared designs for each study
 
 ## Observational designs for descriptive inference
-- Simple random sampling
+- Simple random sampling [AC]
 - Stratified clustered random sampling
-- Measuring latent variables
-- Topic analysis
-- Respondent driven sampling
-- Multilevel regression and poststratification
-- Meta-analysis
+- Measuring latent variables [AC]
+- Topic analysis [GB]
+- Respondent driven sampling 
+- Multilevel regression and poststratification [GB]
+- Forecasting (predicting in future) [JC]
 	
 ## Experimental designs for descriptive inference
-- Audit experiments
-- Experiments for sensitive questions
-- Conjoint experiments
-- Experimental games
+- Audit experiments [AC]
+- Experiments for sensitive questions [GB]
+- Conjoint experiments [AC]
+- Experimental games [MH]
 	
 ## Experimental designs for causal inference
-- Multiarm designs
-- Experiments with blocks and clusters
-- Experiments where blocks and clusters are also sampled from populations of blocks/clusters
-- Factorial designs
-- Encouragement designs 
-- Stepped-wedge designs
-- Crossover designs
-- Parallel design for mediation effects
-- Partial population design for spillover analysis
-- Selective trials
-- Adaptive trials 
-- Multi-site designs (could be descriptive too; hard part is I)
+- Multiarm designs [MH]
+- Experiments with blocks and clusters [MH]
+- Experiments where blocks and clusters are also sampled from populations of blocks/clusters [JC]
+- Factorial designs [MH]
+- Encouragement designs [JC]
+- Stepped-wedge designs [JC]
+- Crossover designs 
+- Parallel design for mediation effects [GB]
+- Partial population design for spillover analysis [JC]
+- Selective trials [JC]
+- Adaptive trials [AC]
+- Multi-site designs (could be descriptive too; hard part is I) [GB]
 
 ## Observational designs for causal inference
-- Difference in differences
-- Matching
-- Regression discontinuity designs
-- Synthetic control
-- Process tracing
-- Nested designs
-- Qualitative comparative analysis
-- Cross national time series
+- Difference in differences [GB]
+- Matching [AC]
+- Regression discontinuity designs [JC]
+- Synthetic control [GB]
+- Process tracing [JC]
+- Nested designs [MH]
+- Qualitative comparative analysis [MH]
+- Cross national time series [JC]
+- Meta-analysis [GB] 
+- Mediation [GB]
+- Structural estimation
 
-# Part E: Design Criticism
-
-- Peers: Better scholarly critique
-- Funders: Evaluating and supporting research
-
-
-# IDEAs we don't know if to cut or integrate or what
-
-- How to designing multi-study projects and research agendas
-- Publication bias (journal of null results)
-- Knowledge accumulation
-- Post-hoc learning about designs
-- where does "prediction" belong. When an election forcaster comes up with a model, the inquiry is "what's gonna happen," not "what is the truth about the units I have"
-- is "discovery" a separate class of designs, or can you have "observational designs for causal inferences that are about discovery"
-
-
-
-# Designs brainstorm:
+# Designs brainstorm
 
 - geographic RD
 - spatial processes
@@ -169,10 +200,8 @@ This section is only in words, not in code (until the software primer)
 - interrupted time series
 - time series (uninterrupted)
 - selection on observables
-- mediation
-- structural estimation
 - "is this a good predictor"
-- inquiries about "regimes" (i.e., vote share at the precinct level.)
+- inquiries about "regimes" (i.e., vote share at the precinct level.)  Related to a problem I (ac) have about persistence
 - need to but the handbook of lab experiments
 - weighting to get PATEs and SATEs under non-compliance and non-response when you have a baseline
 

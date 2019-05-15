@@ -1,5 +1,5 @@
 --- 
-title: "Declaring and Diagnosing Research Designs"
+title: "Research Design: Declare, Diagnose, Redesign"
 author: "Graeme Blair, Jasper Cooper, Alexander Coppock, and Macartan Humphreys"
 site: bookdown::bookdown_site
 documentclass: book
