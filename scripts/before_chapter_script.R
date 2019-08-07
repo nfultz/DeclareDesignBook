@@ -13,7 +13,7 @@ pro_con_colors <- c("#C67800", "#205C8A")
 
 source("scripts/ggplot_dd_theme.R")
 
-source("scripts/custom_functions.R")
+source("scripts/custom_scripts.R")
 
 theme_set(dd_theme())
 
@@ -31,3 +31,4 @@ get_dropbox_path <- function(section){
   dir.create(path, showWarnings = FALSE)
   return(path)
 }
+
