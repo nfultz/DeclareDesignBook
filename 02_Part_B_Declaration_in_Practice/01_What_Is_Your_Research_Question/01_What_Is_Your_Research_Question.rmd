@@ -1,4 +1,10 @@
-# What is your research question 
+# What is your research question?
+
+## Topics versus Questions
+
+## Causal versus Descriptive Questions
+
+## Types of Causal Questions
 
 <!-- - What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
@@ -6,3 +12,12 @@
 - Do you want to answer a causal or descriptive question? [MH]
 - Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; [MH]
 - What is your inquiry if you don’t know the question in advance? (Discovery) -->
+
+
+## Is your research question good? 
+
+<!-- - Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
+- Is your question important? (Change decisions; change answer in a literature)
+- Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
+
+NOTE: for next four sections, four subsections: 1) walk through of how you specify this step, using a probit exposure variable with binary outcome (primary); 2) common choices you have to make about this step; 3) illustrations how these choices have to make for other designs; 4) anticipating cross-MIDA problems from this step. LOTS of pointers to the design library. -->
