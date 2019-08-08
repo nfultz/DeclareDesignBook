@@ -32,6 +32,7 @@ b_sims <- 20
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 library(Synth)
 library(augsynth) # remotes::install_github("ebenmichael/augsynth")
+library(glmnet)
 ```
 
 <!-- could adapt this cite to use synth (it current does an RD): Fitzpatrick, Maria Donovan. "Preschoolers enrolled and mothers at work? The effects of universal prekindergarten." Journal of Labor Economics 28.1 (2010): 51-85. -->

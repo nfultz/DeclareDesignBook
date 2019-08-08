@@ -21,6 +21,12 @@ r_packages:
   - bookdown
   - checkpoint
 
+r_github_packages: 
+  - r-lib/remotes#340
+  - ebenmichael/augsynth
+  - malcolmbarrett/tidymeta
+
+
 before_script:
   - mkdir ~/Dropbox
   - mkdir ~/Dropbox/DeclareDesign_book_rfiles
