@@ -1,0 +1,12 @@
+# Preface
+
+<!-- This section is only in words, not in code (until the software primer) -->
+
+<!-- Preamble -->
+
+<!-- Explain MIDA -->
+
+<!-- Diagnosands and diagnosis -->
+
+<!-- Software primer -->
+

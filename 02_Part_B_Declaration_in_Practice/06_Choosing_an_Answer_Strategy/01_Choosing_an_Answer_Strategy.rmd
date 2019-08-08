@@ -1,0 +1,10 @@
+# Choosing an Answer Strategy
+
+<!-- - Analyze as you randomize when you can (not just for experiments!)
+- Reducing variance via estimation choices
+- Answer strategy procedures (if this then that). Deal with fishing.
+- The role of robustness checks
+- PAPs as answer strategies (writing, reconciliation)
+- Multiple comparisons 
+- Missing data (outcomes, covariates)
+ -->

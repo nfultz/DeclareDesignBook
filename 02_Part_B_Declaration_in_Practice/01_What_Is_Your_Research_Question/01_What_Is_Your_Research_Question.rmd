@@ -1,0 +1,8 @@
+# What is your research question 
+
+<!-- - What is your research question?  
+- Topics vs. questions; how to come up with a question - lit review, hunch, data
+- research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
+- Do you want to answer a causal or descriptive question? [MH]
+- Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; [MH]
+- What is your inquiry if you don’t know the question in advance? (Discovery) -->
