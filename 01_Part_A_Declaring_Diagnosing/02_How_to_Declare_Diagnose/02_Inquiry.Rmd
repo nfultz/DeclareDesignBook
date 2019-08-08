@@ -1,8 +1,0 @@
-
-## Inquiry steps
-
-### Potential outcomes metadata
-
-### Potential outcomes functions
-
-Creating metadata is either implausible or insufficient for designs with contunuous outcome data or with complex spillovers.
