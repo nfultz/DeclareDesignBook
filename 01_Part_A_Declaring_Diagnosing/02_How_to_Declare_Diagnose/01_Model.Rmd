@@ -1,6 +1,0 @@
-## Model steps
-
-### Simple data
-### Hierarchical data
-### Time series data
-### Panel data

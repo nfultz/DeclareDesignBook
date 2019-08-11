@@ -1,0 +1,8 @@
+# Redesign
+
+<!-- 
+- When the diagnosis says the design is weak, improve it!
+- Resist the urge to change M and I to suit a diagnosis -- focus on D and A
+- Sometimes, you might need to collect new information in order to make a declaration specific enough.
+- Sometimes, designs have to be abandoned 
+-->

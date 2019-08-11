@@ -1,1 +1,0 @@
-## Balance tests tests the null of randomization, not the null of balance

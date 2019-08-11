@@ -1,1 +1,0 @@
-## Neyman variance is conservative for sample variance

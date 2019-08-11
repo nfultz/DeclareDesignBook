@@ -1,0 +1,9 @@
+# Crafting a Data Strategy
+
+<!-- - Need to figure out how to say, how do you go about *selecting* D
+- Reducing variance via sampling and assignment procedures
+- Reducing bias via sampling and assignment procedures
+- There is no causation without manipulation
+- Studying many questions can be costly
+- The ethical questions surrounding a design often come up in the data strategy -- who will be treated and measured, and how. Includes also question of identifying through dataset merges.
+- Big discussion of measurement -->

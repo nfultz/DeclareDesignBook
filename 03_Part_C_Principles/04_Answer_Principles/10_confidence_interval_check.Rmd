@@ -1,1 +1,0 @@
-## You can check whether confidence intervals are correct, given the model 

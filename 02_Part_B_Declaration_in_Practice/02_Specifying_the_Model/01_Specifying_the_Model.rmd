@@ -1,0 +1,12 @@
+# Specifying the model
+
+<!-- - Introduce DAGs and potential outcomes
+- What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)? [MH]
+- What parts of background variables must be specified, and how can you specify them (existing data, substantive bounds on variables)
+- Isn't defining the effect size for potential outcomes begging the question?
+- Pilot studies
+- Spillovers are potential outcomes
+- Compliance is a potential outcome
+- Attrition is a potential outcome 
+- Measurements are potential outcomes
+ -->

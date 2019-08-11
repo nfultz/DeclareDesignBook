@@ -1,0 +1,10 @@
+# What parameters should you vary to learn about designs 
+
+<!-- - Hold inquiry constant!
+- Compare performance of the design according to choices the researcher makes
+    - D: Sample size, fraction randomly assigned, parameters of the randomized response, coding choices (e.g., binary vs. continuous, index vs. multiple, etc.)
+    - A: Possible estimators, priors(???)
+- And against the researcher's beliefs
+    - M: ICC, null model, alternative DAGs, heterogeneity
+- Conduct subject to constraints: budget, ethical, logistical
+ -->

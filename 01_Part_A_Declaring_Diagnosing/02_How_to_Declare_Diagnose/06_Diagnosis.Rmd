@@ -1,5 +1,0 @@
-## Diagnsosis
-
-### Standard diagnosands
-### Custom diagnosands
-### Is a diagnosand part of a design? 
