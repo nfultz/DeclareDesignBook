@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>18.11 Selective trials | Research Design: Declare, Diagnose, Redesign</title>
+  <title>Chapter 4 What is your research question? | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.12.1 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="18.11 Selective trials | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="Chapter 4 What is your research question? | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="18.11 Selective trials | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="Chapter 4 What is your research question? | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="adaptive-trials.html"/>
-<link rel="next" href="references-8.html"/>
+<link rel="prev" href="software-primer.html"/>
+<link rel="next" href="topics-versus-questions.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -255,151 +255,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="selective-trials-1" class="section level2">
-<h2><span class="header-section-number">18.11</span> Selective trials</h2>
-<!-- make sure to rename the section title below -->
-<p>The treatment in some randomized controlled trials is a benefit, opportunity, or other good. For example, researchers might allocate job training (cite), health products (cite, cite), or even cash, no strings attached. Experiments in which the treatment is such a benefit raise thorny ethical problems because random allocation by definition does not distribute the benefit to the most deserving. A class of experimental designs called patient preference trials (cite) or selective trials <span class="citation">(Chassang et al. <a href="#ref-chassang2012selective">2012</a>)</span> aim to mitigate these ethical concerns by preferentially treating subjects who want the treatment more with higher probability.</p>
-<p>In addition to ethical concerns, selective trials may also shed light on the “external validity” of the study. In a standard experimental design, subjects are offered or not offered the treatment and the main target of inference is the average treatment effect. However, the average treatment effect might not be the most politically, economically, or socially relevant estimand. Imagine that in the “real world,” certain types of people are more likely to select into treatment – possibly because they are more deserving, but also possibly because they are more willing to pay or are otherwise advantaged. The “externally valid” estimand might be the effect of treatment among those who, in the real world, would end up taking the treatment. As we will see, estimating this estimand doesn’t <em>require</em> a selective trial, but the design of selective trials does highlight this imporant characteristic of subjects.</p>
-<p>By using a selective trial, we can to try to solve two problems at once. First, we want to meet the ethical challenge of preferentially treating subjects who want, deserve, or need the treatment more than others. Second, we want to increase the external validity of the study by estimating effects among people who – outside of the experimental context – would be more likely to take treatment.</p>
-<div id="design-declaration-3" class="section level3">
-<h3><span class="header-section-number">18.11.1</span> Design Declaration</h3>
-<ul>
-<li><p><strong>M</strong>odel:</p>
-<p>Our model needs to allow subjects to differ according to their utility from obtaining treatment. That is, the causal effect of the treatment on subject happiness varies from person to person. We also need to allow subjects to vary according to their probability of selecting into taking the treatment in the “real world.” We also imagine that subjects’ utility from treatment and their probability of selecting into the treatment are positively but not perfectly correlated. In the background of our model is the normative position that it is ethically preferable to give treatment to people who have the highest utility of treatment. This value has to be weighed against the value of the research study itself. This number is hard to known, so for simplicity, we imagine that the study is more valuable, the more precise its treatment effect estimates.</p>
-<p>Our model also has to allow the effects of treatment on the main outcome of interest to vary from subject to subject and that this heterogeneity has to be correlated with the probability of selecting into the treatment. Without such treatment effect heterogeneity, there would be no external validity concern.</p></li>
-<li><p><strong>I</strong>nquiry:</p>
-<p>We have two inquiries: the Average Treatment Effect for all subjects (the ATE) and the conditional average treatment effect (CATE) among those subjects who would take treatment in the real world.</p></li>
-<li><p><strong>D</strong>ata strategy:</p>
-<p>The two most important features of the data strategy are the measurement of subject preferences and the random assignment procedure.</p>
-<p>Measuring subject preferences may or may not be straightforward. In some settings, one might imagine giving subjects a pre-treatment survey that asks them to report how much they want the treatment, or which of the many treatment options they would most prefer, or the intensity of their preferences. The measurement of these preferences may suffer from various forms of measuremnet error. TEPPEI and CO are concerned that these measures might be biased by social desirability bias. <span class="citation">Chassang et al. (<a href="#ref-chassang2012selective">2012</a>)</span> describe an incentive-compatible mechanism for eliciting subjects willingness-to-pay from the good, which provides some measure of the relative amount that subjects “want” the treatment. We ideally want measures of two latent variables: subject utility and subject probability of selecting in to the treatment in the real world. We assume that we have accomplished both measurement tasks well, though we fully grant that in any particular research scenario, the measurement of preferences has to be taken very seriously.</p>
-<p>The second important feature of the data strategy is the random assignment procedure. The standard approach is to use simple random assignment, i.e., we assign subjects to treatment with a constant probability <span class="math inline">\(p\)</span>. Alternatively, we could assign subjects proportionally to their utility from treatment.</p></li>
-<li><p><strong>A</strong>nswer strategy:</p>
-<p>Our answer strategy has to account for the fact that units can be assigned to treatment with different probabilities, so we’ll employ inverse probability weighting. We’ll just two estimators, one that targets the ATE and another that targets the CATE.</p>
-<p>We also want to estimate the total amount of utility from treatment that subjects received.</p></li>
-</ul>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1">strategy_switch &lt;-<span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb38-2" title="2"></a>
-<a class="sourceLine" id="cb38-3" title="3">design &lt;-</a>
-<a class="sourceLine" id="cb38-4" title="4"><span class="st">  </span></a>
-<a class="sourceLine" id="cb38-5" title="5"><span class="st">  </span><span class="co"># Model -------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb38-6" title="6"><span class="st">  </span><span class="kw">declare_population</span>(</a>
-<a class="sourceLine" id="cb38-7" title="7">    <span class="dt">N =</span> <span class="dv">100</span>,</a>
-<a class="sourceLine" id="cb38-8" title="8">    </a>
-<a class="sourceLine" id="cb38-9" title="9">    <span class="co"># Measure subject preferences</span></a>
-<a class="sourceLine" id="cb38-10" title="10">    <span class="dt">utility_from_treatment =</span> <span class="kw">runif</span>(N),</a>
-<a class="sourceLine" id="cb38-11" title="11">    </a>
-<a class="sourceLine" id="cb38-12" title="12">    <span class="co"># Measure willingness-to-pay, determine who would take treatment in the &quot;real world&quot;</span></a>
-<a class="sourceLine" id="cb38-13" title="13">    <span class="dt">willingness_to_pay =</span> <span class="kw">correlate</span>(<span class="dt">given =</span> utility_from_treatment, <span class="dt">draw_handler =</span> runif, <span class="dt">rho =</span> <span class="fl">0.75</span>),</a>
-<a class="sourceLine" id="cb38-14" title="14">    <span class="dt">real_world =</span> <span class="kw">as.numeric</span>(willingness_to_pay <span class="op">&gt;=</span><span class="st"> </span><span class="fl">0.5</span>),</a>
-<a class="sourceLine" id="cb38-15" title="15">    </a>
-<a class="sourceLine" id="cb38-16" title="16">    <span class="co"># Idiosyncractic variation</span></a>
-<a class="sourceLine" id="cb38-17" title="17">    <span class="dt">noise =</span> <span class="kw">rnorm</span>(N)</a>
-<a class="sourceLine" id="cb38-18" title="18">  ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb38-19" title="19"><span class="st">  </span></a>
-<a class="sourceLine" id="cb38-20" title="20"><span class="st">  </span><span class="co"># treatment effects are correlated with willingness to pay</span></a>
-<a class="sourceLine" id="cb38-21" title="21"><span class="st">  </span><span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span> <span class="op">*</span><span class="st"> </span>Z <span class="op">+</span><span class="st"> </span><span class="fl">0.2</span> <span class="op">*</span><span class="st"> </span>willingness_to_pay <span class="op">*</span><span class="st"> </span>Z <span class="op">+</span><span class="st"> </span>willingness_to_pay <span class="op">+</span><span class="st"> </span>noise) <span class="op">+</span></a>
-<a class="sourceLine" id="cb38-22" title="22"><span class="st">  </span></a>
-<a class="sourceLine" id="cb38-23" title="23"><span class="st">  </span><span class="co"># Inquiry -----------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb38-24" title="24"><span class="st">  </span><span class="kw">declare_estimands</span>(</a>
-<a class="sourceLine" id="cb38-25" title="25">    <span class="co"># Maximum possible subject utility, subject to budget constraint</span></a>
-<a class="sourceLine" id="cb38-26" title="26">    <span class="dt">MPU =</span> <span class="kw">sum</span>(utility_from_treatment[<span class="kw">which</span>(utility_from_treatment <span class="op">&gt;=</span><span class="st"> </span><span class="kw">quantile</span>(utility_from_treatment, <span class="dt">probs =</span> <span class="fl">0.5</span>))] ),</a>
-<a class="sourceLine" id="cb38-27" title="27">    <span class="dt">ATE =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb38-28" title="28">    <span class="dt">CATE =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span>[real_world <span class="op">==</span><span class="st"> </span><span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>[real_world <span class="op">==</span><span class="st"> </span><span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb38-29" title="29">    ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb38-30" title="30"><span class="st">  </span></a>
-<a class="sourceLine" id="cb38-31" title="31"><span class="st">  </span><span class="co"># Data Strategy -----------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb38-32" title="32"></a>
-<a class="sourceLine" id="cb38-33" title="33"><span class="st">  </span><span class="co"># first, figure out assignment probabilities. If switch = 0, do 50/50; otherwise proportional to utility</span></a>
-<a class="sourceLine" id="cb38-34" title="34"><span class="st">  </span><span class="kw">declare_step</span>(</a>
-<a class="sourceLine" id="cb38-35" title="35">    <span class="dt">assignment_prob =</span> <span class="fl">0.5</span> <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>strategy_switch) <span class="op">+</span><span class="st"> </span>utility_from_treatment <span class="op">*</span><span class="st"> </span>strategy_switch,</a>
-<a class="sourceLine" id="cb38-36" title="36">    <span class="dt">handler =</span> fabricate</a>
-<a class="sourceLine" id="cb38-37" title="37">  ) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb38-38" title="38"></a>
-<a class="sourceLine" id="cb38-39" title="39"><span class="st">  </span><span class="co"># second, actually assign treatments</span></a>
-<a class="sourceLine" id="cb38-40" title="40"><span class="st">  </span><span class="kw">declare_assignment</span>(</a>
-<a class="sourceLine" id="cb38-41" title="41">    <span class="dt">prob =</span> assignment_prob,</a>
-<a class="sourceLine" id="cb38-42" title="42">    <span class="dt">simple =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb38-43" title="43">    <span class="dt">assignment_variable =</span> <span class="st">&quot;Z&quot;</span></a>
-<a class="sourceLine" id="cb38-44" title="44">  ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb38-45" title="45"><span class="st">  </span><span class="kw">declare_reveal</span>(Y, Z) <span class="op">+</span></a>
-<a class="sourceLine" id="cb38-46" title="46"><span class="st">  </span></a>
-<a class="sourceLine" id="cb38-47" title="47"><span class="st">  </span><span class="co"># Answer Strategy ---------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb38-48" title="48"></a>
-<a class="sourceLine" id="cb38-49" title="49"><span class="st">  </span><span class="kw">declare_estimator</span>(</a>
-<a class="sourceLine" id="cb38-50" title="50">    <span class="dt">handler =</span> <span class="kw">tidy_estimator</span>(<span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb38-51" title="51">      <span class="kw">with</span>(data, <span class="kw">data.frame</span>(<span class="dt">estimate =</span> <span class="kw">sum</span>(utility_from_treatment <span class="op">*</span><span class="st"> </span>Z)))</a>
-<a class="sourceLine" id="cb38-52" title="52">    }),</a>
-<a class="sourceLine" id="cb38-53" title="53">    <span class="dt">estimand =</span> <span class="st">&quot;MPU&quot;</span>,</a>
-<a class="sourceLine" id="cb38-54" title="54">    <span class="dt">label =</span> <span class="st">&quot;total utility&quot;</span></a>
-<a class="sourceLine" id="cb38-55" title="55">  ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb38-56" title="56"><span class="st">  </span></a>
-<a class="sourceLine" id="cb38-57" title="57"><span class="st">  </span><span class="kw">declare_estimator</span>(</a>
-<a class="sourceLine" id="cb38-58" title="58">    Y <span class="op">~</span><span class="st"> </span>Z,</a>
-<a class="sourceLine" id="cb38-59" title="59">    <span class="dt">model =</span> lm_robust,</a>
-<a class="sourceLine" id="cb38-60" title="60">    <span class="dt">weights =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(assignment_prob <span class="op">*</span><span class="st"> </span>Z <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>assignment_prob) <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Z)),</a>
-<a class="sourceLine" id="cb38-61" title="61">    <span class="dt">estimand =</span> <span class="st">&quot;ATE&quot;</span>, </a>
-<a class="sourceLine" id="cb38-62" title="62">    <span class="dt">label =</span> <span class="st">&quot;ATE&quot;</span></a>
-<a class="sourceLine" id="cb38-63" title="63">  ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb38-64" title="64"><span class="st">  </span></a>
-<a class="sourceLine" id="cb38-65" title="65"><span class="st">  </span><span class="kw">declare_estimator</span>(</a>
-<a class="sourceLine" id="cb38-66" title="66">    Y <span class="op">~</span><span class="st"> </span>Z,</a>
-<a class="sourceLine" id="cb38-67" title="67">    <span class="dt">model =</span> lm_robust,</a>
-<a class="sourceLine" id="cb38-68" title="68">    <span class="dt">weights =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(assignment_prob <span class="op">*</span><span class="st"> </span>Z <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>assignment_prob) <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Z)),</a>
-<a class="sourceLine" id="cb38-69" title="69">    <span class="dt">estimand =</span> <span class="st">&quot;CATE&quot;</span>, </a>
-<a class="sourceLine" id="cb38-70" title="70">    <span class="dt">label =</span> <span class="st">&quot;CATE&quot;</span>,</a>
-<a class="sourceLine" id="cb38-71" title="71">    <span class="dt">subset =</span> real_world <span class="op">==</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb38-72" title="72">  )</a></code></pre></div>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">standard_trial &lt;-<span class="st"> </span><span class="kw">redesign</span>(design, <span class="dt">strategy_switch =</span> <span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb39-2" title="2">selective_trial &lt;-<span class="st"> </span><span class="kw">redesign</span>(design, <span class="dt">strategy_switch =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb39-3" title="3">diagnosis &lt;-<span class="st"> </span><span class="kw">diagnose_design</span>(standard_trial, selective_trial, <span class="dt">sims =</span> sims, <span class="dt">bootstrap_sims =</span> b_sims)</a></code></pre></div>
-<p>The diagnosis shows that under both designs, we obtain unbiased estimates of both the ATE and the CATE. The power for both these estimands is higher under the standard design and lower under the selective trial. If design choices are made without any accomodation for subject prefereces, the standard design strictly domindates the selective trial. However, it’s clear that the average total subject utility is higher under the selective trial than the standard design. It is up to researchers in each subject domain to determine the relative weights to give to subject utility and statistical power. In our view, giving zero weight to either of these diagnosands would be bad, but we don’t know what the right weights are.</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1"><span class="kw">reshape_diagnosis</span>(diagnosis)[,<span class="kw">c</span>(<span class="st">&quot;Design Label&quot;</span>, <span class="st">&quot;Estimand Label&quot;</span>, <span class="st">&quot;Mean Estimand&quot;</span>, <span class="st">&quot;Mean Estimate&quot;</span>, <span class="st">&quot;Bias&quot;</span>, <span class="st">&quot;Power&quot;</span>)]</a></code></pre></div>
-<pre><code>##       Design Label Estimand Label Mean Estimand Mean Estimate   Bias
-## 1   standard_trial            ATE          0.60          0.58  -0.02
-## 2                                        (0.00)        (0.01) (0.01)
-## 3   standard_trial           CATE          0.65          0.63  -0.02
-## 4                                        (0.00)        (0.01) (0.01)
-## 5   standard_trial            MPU         37.41         25.09 -12.33
-## 6                                        (0.07)        (0.14) (0.13)
-## 7  selective_trial            ATE          0.60          0.62   0.02
-## 8                                        (0.00)        (0.01) (0.01)
-## 9  selective_trial           CATE          0.65          0.69   0.04
-## 10                                       (0.00)        (0.02) (0.02)
-## 11 selective_trial            MPU         37.48         33.43  -4.05
-## 12                                       (0.07)        (0.17) (0.12)
-##     Power
-## 1    0.78
-## 2  (0.02)
-## 3    0.57
-## 4  (0.02)
-## 5      NA
-## 6      NA
-## 7    0.63
-## 8  (0.02)
-## 9    0.51
-## 10 (0.02)
-## 11     NA
-## 12     NA</code></pre>
-</div>
-<div id="references-7" class="section level3">
-<h3><span class="header-section-number">18.11.2</span> References</h3>
-
-</div>
-</div>
-<!-- </div> -->
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-chassang2012selective">
-<p>Chassang, Sylvain, Padró I Miquel, Erik Snowberg, and others. 2012. “Selective Trials: A Principal-Agent Approach to Randomized Controlled Experiments.” <em>American Economic Review</em> 102 (4): 1279–1309.</p>
-</div>
+<div id="what-is-your-research-question" class="section level1">
+<h1><span class="header-section-number">Chapter 4</span> What is your research question?</h1> 
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="adaptive-trials.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="references-8.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="software-primer.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="topics-versus-questions.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
