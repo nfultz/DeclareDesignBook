@@ -31,10 +31,16 @@ sims <- 100
 b_sims <- 20
 ```
 
-```{r}
-library(DeclareDesign)
-library(tidyverse)
+Plan with this vignette:
 
+- Show why you would want to do stepped wedge (power. estimands?)
+- Show conditions under which FE give you wrong answer, draw connection to two-way FE papers in econ
+- Show how to get answer right under hetfx
+- Show additional tradeoffs in sample allocation
+
+
+
+```{r}
 # tau is treatment effect
 tau <- 1
 
@@ -57,35 +63,32 @@ design <-
   declare_estimator(Y ~ Z + t, model = lm_robust, label = "period FE") +
   declare_estimator(Y ~ Z + t + i, model = lm_robust, label = "two-way FE") 
 
-# Diagnose design
-diagnose_design(design)
-
 # Suppose effects are correlated with period
-# Potential outcomes
-pos_corr <- declare_potential_outcomes(
-  Y_Z_0 = u_i + u_t + u_ti,
-  Y_Z_1 = u_i + u_t + u_ti + tau * u_t
-)
-design_corr_period <- pop + pos_corr + assignment_to_wave + get_assignment_in_t +
-  reveal_Y + estimand + estimator 
-
-diagnose_design(design, design_corr_period)
-
-
+design_period_het_fx <- replace_step(
+  design = design, step = "potential_outcomes",
+  new_step = declare_potential_outcomes(
+    Y_Z_0 = u_i + u_t + u_ti,
+    Y_Z_1 = u_i + u_t + u_ti + as.numeric(t)/5))
 ```
 
 
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-
+# Diagnose design
+diagnoses <- diagnose_design(design, design_period_het_fx)
 ```
 
 ```{r, echo = FALSE, purl = FALSE}
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("05_Stepped_Wedge_Designs.Rmd"), "/simulations.RDS")
+rds_file_path <- paste0(get_dropbox_path("05_Stepped_Wedge_Designs.Rmd"), "/diagnoses.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(simulations, path = rds_file_path)
+  write_rds(diagnoses, path = rds_file_path)
 }
-simulations <- read_rds(rds_file_path)
+diagnoses <- read_rds(rds_file_path)
+```
+
+
+```{r}
+reshape_diagnosis(diagnoses) %>% kable()
 ```
 
 
