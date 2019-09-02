@@ -183,27 +183,27 @@ Three assignment strategies and how you select among them (complete, blocked, cl
 NOTE: include links to declared designs for each study
 
 ## Observational designs for descriptive inference
-- Random sampling (simple and stratified clustered) [AC]
-- Multilevel regression and poststratification [GB]
-- Inference about unobserved variables (systematic and nonsystematic measurement error) [AC]
-- Structural estimation
+### Random sampling (simple and stratified clustered) [AC]
+### Multilevel regression and poststratification [GB]
+### Inference about unobserved variables (systematic and nonsystematic measurement error) [AC]
+### Structural estimation
 
 - x Topic analysis [GB]
 - x Respondent driven sampling 
 - x Forecasting (predicting in future) [JC]
 
 ## Experimental designs for descriptive inference
-- Audit experiments [AC]
-- Experiments for sensitive questions [GB]
-- Conjoint experiments [AC]
-- Experimental games (controlling setting not a treatment) [MH]
+### Audit experiments [AC]
+### Experiments for sensitive questions [GB]
+### Conjoint experiments [AC]
+### Experimental games (controlling setting not a treatment) [MH]
 	
 ## Experimental designs for causal inference
-- Two-arm and blocks and clusters [MH]
-- Multi-arm designs and factorial designs [MH]
-- Encouragement designs [JC]
-- Stepped-wedge designs [JC]
-- Partial population design for spillover analysis [JC]
+### Two-arm and blocks and clusters [MH]
+### Multi-arm designs and factorial designs [MH]
+### Encouragement designs [JC]
+### Stepped-wedge designs [JC]
+### Partial population design for spillover analysis [JC]
 
 - x Parallel design for mediation effects [GB]
 - x Crossover designs
@@ -213,12 +213,12 @@ NOTE: include links to declared designs for each study
 - x Experiments where blocks and clusters are also sampled from populations of blocks/clusters [JC]
 
 ## Observational designs for causal inference
-- Selection on observables (matching and regression etc.) [AC]
-- Instrumental variables for continuous instruments
-- Difference in differences [GB]
-- Regression discontinuity designs [JC]
-- Process tracing [JC]
-- Synthetic control [GB]
+### Selection on observables (matching and regression etc.) [AC]
+### Instrumental variables for continuous instruments
+### Difference in differences [GB]
+### Regression discontinuity designs [JC]
+### Process tracing [JC]
+### Synthetic control [GB]
 
 - x Cross national time series [JC]
 - x Mediation [GB]
