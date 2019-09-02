@@ -1,0 +1,30 @@
+# Diagnosis
+
+## Diagnosing a single design
+
+- Definition and practical details of Monte Carlo and diagnosands (and discussion of formulae) [JC]
+- Graphic of simulations (of multiple runs)
+
+## How do you select diagnosands?
+
+- Diagnose given the purposes of the study
+- Single shot vs repeated designs (MSE vs bias)
+- Moral questions (Type 1 vs Type 2 errors)
+- Power for biased designs
+- Standard diagnosands (paragraph on each of the diagnosands in our defaults)
+- Ways of getting answers to a question wrong
+- Diagnosing inferential statistics (SE bias vs. coverage, error rates for ps, Bayes?)
+- How to select diagnosands (some sort of decision tree?)
+- Multiple estimates / inquiries [JC]
+- How to think about uncertainty about model parameters (multiple designs?)
+- Diagnosands that are a function of “multiple designs” like MDE
+- Conditional diagnosands different?
+- Uncertainty of diagnosands (bootstrapping etc.)
+
+## Diagnosis to assess the robustness of designs to models [GB]
+
+- Hold inquiry constant! (read Richard Crump “Moving the Goalposts”)
+- Hold three constant, vary one of MIDA at a time
+- M: ICC, null model, alternative DAGs, heterogeneity
+- I:
+

@@ -1,0 +1,224 @@
+---
+title: "Experiments for sensitive questions"
+output: html_document
+# bibliography: ../bib/book.bib 
+bibliography: ../../bib/book.bib # use this line comment the above
+---
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+## Experiments for sensitive questions
+
+### List experiments
+
+```{r, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 500
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+```
+
+Sometimes, subjects might not tell the truth when \textit{directly} asked about certain attitudes or behaviors. Responses may be affected by sensitivity bias, or the tendancy of survey subjects to dissemble for fear of negative repercussions if some reference group learns their true response [@blair2018list]. In such cases, standard survey estimates based on direct questions will be biased. One class of solutions to this problem is to obscure individual responses, providing protection from social or legal pressures. When we obscure responses systematically through an experiment, we can often still identify average quantities of interest. One such design is the list experiment (introduced by @miller1984new), which asks respondents for the count of the number of `yes' responses to a series of questions including the sensitive item, rather than for a yes or no answer on the sensitive item itself. List experiments give subjects cover by aggregating their answer to the sensitive item with responses to other questions.
+
+During the 2016 Presidential Election in the U.S., some observers were concerned that pre-election estimates of support for Donald Trump might have been downwardly biased by "Shy Trump Supporters" -- survey respondents who supported Trump in their hearts, but were embarrased to admit it to pollsters. To assess this possibility, @coppock2017did obtained estimates of Trump support that were free of social desirability bias using a list experiment. Subjects in the control and treatment groups were asked: "Here is a list of [three/four] things that some people would do and some people would not. Please tell me HOW MANY of them you would do. We do not want to know which ones of these you would do, just how many. Here are the [three/four] things:"
+
+| Control                                                                                           | Treatment                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| If it were up for a vote, I would vote to raise the minimum wage to 15 dollars an hour            | If it were up for a vote, I would vote to raise the minimum wage to 15 dollars an hour                                                                                   |
+| If it were up for a vote, I would vote to repeal the Affordable Care Act, also known as Obamacare | If it were up for a vote, I would vote to repeal the Affordable Care Act, also known as Obamacare                                                                        |
+| If it were up for a vote, I would vote to ban assault weapons                                     | If it were up for a vote, I would vote to ban assault weapons                                                                                                            |
+|                                                                                                   | If the 2016 presidential election were being held today and the candidates were Hillary Clinton (Democrat) and Donald Trump (Republican), I would vote for Donald Trump. |
+
+The treatment group averaged 1.843 items while the control group averaged 1.548 items, for a difference-in-means estimate of support for Donald Trump of 29.6\% (note that this estimate is representative of US adults and not of US adults who would actually vote). The trouble with this estimate is that, while it's plausibly free from social desirability bias, it's also much higher variance. The 95\% confidence interval for the list experiment estimate is nearly 14 percentage points wide, whereas the the 95\% confidence interval for the (possibly biased!) direct question asked of the same sample is closer to 4 percentage points.
+
+The choice between list experiments and direct question is therefore a **bias-variance tradeoff**. List experiments may have less bias, but they are higher variance. Direct questions may be biased, but they have less variance.
+
+#### Declaration
+
+- **M**odel: Our model includes subjects' true support for Donald Trump and whether or not they are "shy".  These two variables combine to determine how subjects will respond when asked directly about Trump support.
+
+    The potential outcomes model combines three types of information to determine how subjects will respond to the list experiment: their responses to the three nonsensitive control items, their true support for Trump, and whether they are assigned to see the treatment or the control list. Notice that our definition of the potential outcomes embeds the "No Liars" and "No Design Effects" assumptions required for the list experiment design (see Blair and Imai 2012 for more on these assumptions).
+
+    We also have a global parameter that reflects our expectations about the proportion of Trump supporters who are shy. It's set at 6%, which is large enough to make a difference for polling, but not so large as to be implausible.
+
+- **I**nquiry: Our estimand is the proportion of voters who actually plan to vote for Trump. 
+
+- **D**ata strategy: First we sample 500 respondents from the U.S. population at random, then we randomly assign 250 of the 500 to treatment and the remainder to control. In the survey, we ask subjects both the direct question and the list experiment question.
+
+- **A**nswer strategy: We estimate the proportion of truthful Trump voters in two ways. First, we take the mean of answers to the direct question. Second, we take the difference in means in the responses to the list experiment question.
+
+
+```{r}
+# Model -------------------------------------------------------------------
+proportion_shy <- .06
+
+list_design <-
+  
+  # Model
+  declare_population(
+    N = 5000,
+    # true trump vote (unobservable)
+    truthful_trump_vote = draw_binary(.45, N),
+    
+    # shy voter (unobservable)
+    shy = draw_binary(proportion_shy, N),
+    
+    # Direct question response (1 if Trump supporter and not shy, 0 otherwise)
+    Y_direct = as.numeric(truthful_trump_vote == 1 & shy == 0),
+    
+    # Nonsensitive list experiment items
+    raise_minimum_wage = draw_binary(.8, N),
+    repeal_obamacare = draw_binary(.6, N),
+    ban_assault_weapons = draw_binary(.5, N)
+  ) +
+  
+  declare_potential_outcomes(
+    Y_list_Z_0 = raise_minimum_wage + repeal_obamacare + ban_assault_weapons,
+    Y_list_Z_1 = Y_list_Z_0 + truthful_trump_vote
+  ) +
+  
+  # Inquiry
+  declare_estimand(proportion_truthful_trump_vote = mean(truthful_trump_vote)) +
+  
+  # Data Strategy
+  declare_sampling(n = 500) +
+  declare_assignment(prob = .5) +
+  declare_reveal(Y_list) +
+  
+  # Answer Strategy
+  declare_estimator(
+    Y_direct ~ 1,
+    model = lm_robust,
+    term = "(Intercept)",
+    estimand = "proportion_truthful_trump_vote",
+    label = "direct"
+  ) +
+  declare_estimator(
+    Y_list ~ Z,
+    model = difference_in_means,
+    estimand = "proportion_truthful_trump_vote",
+    label = "list")
+
+```
+
+
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+simulations_list <- simulate_design(list_design, sims = sims)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("list_experiments"), "/simulations_list.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(simulations_list, path = rds_file_path)
+}
+simulations_list <- read_rds(rds_file_path)
+```
+
+The plot shows the sampling distribution of the direct and list experimetn estimators. The sampling distribution of the direct question is tight but biased; the list experiment (if the requisite assumptions hold) is unbiased, but higher variance. The choice between these two estimators of the prevalence rate depends on which -- bias or variance -- is more important in a particular setting. See @blair2018list for an extended discussion of how the choice of research design depends deeply on the purpose of the project. 
+
+```{r, echo=FALSE}
+summary_df <- 
+  simulations_list %>%
+  gather(key, value, estimand, estimate) %>%
+  group_by(estimator_label, key) %>%
+  summarize(average_value = mean(value))
+
+simulations_list %>%
+  ggplot(aes(estimate)) +
+  geom_histogram(bins = 30) +
+  geom_vline(data = summary_df, aes(xintercept = average_value, color = key, linetype = key)) +
+  facet_wrap(~estimator_label)
+```
+
+### Randomized response technique
+
+#### Declaration
+
+```{r}
+library(rr)
+
+rr_forced_known_tidy <- function(data) {
+  fit  <- rrreg(Y_forced_known ~ 1, data = data, p = 2/3, p0 = 1/6, p1 = 1/6, design = "forced-known")
+  pred <- as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE))
+  names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
+  pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+  pred
+}
+
+rr_mirrored_tidy <- function(data) {
+  fit  <- rrreg(Y_mirrored ~ 1, data = data, p = 2/3, design = "mirrored")
+  pred <- as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE))
+  names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
+  pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+  pred
+}
+
+proportion_shy <- .06
+
+rr_design <-
+  declare_population(
+    N = 100, 
+    
+    # true trump vote (unobservable)
+    truthful_trump_vote = draw_binary(.45, N),
+    
+    # shy voter (unobservable)
+    shy = draw_binary(proportion_shy, N),
+    
+    # Direct question response (1 if Trump supporter and not shy, 0 otherwise)
+    Y_direct = as.numeric(truthful_trump_vote == 1 & shy == 0)) +
+  
+  declare_estimand(sensitive_item_proportion = mean(truthful_trump_vote)) +
+  
+  declare_potential_outcomes(Y_forced_known ~ (dice == 1) * 0 + (dice %in% 2:5) * truthful_trump_vote + (dice == 6) * 1, conditions = 1:6, assignment_variable = "dice") +
+  declare_potential_outcomes(Y_mirrored ~ (coin == "heads") * truthful_trump_vote + (coin == "tails") * (1 - truthful_trump_vote), conditions = c("heads", "tails"), assignment_variable = "coin") +
+  
+  declare_assignment(prob_each = rep(1/6, 6), conditions = 1:6, assignment_variable = "dice") +
+  declare_assignment(prob_each = c(2/3, 1/3), conditions = c("heads", "tails"), assignment_variable = "coin") +
+  
+  declare_reveal(Y_forced_known, dice) +
+  declare_reveal(Y_mirrored, coin) +
+  
+  declare_estimator(handler = tidy_estimator(rr_forced_known_tidy), label = "forced_known", estimand = "sensitive_item_proportion") +
+  declare_estimator(handler = tidy_estimator(rr_mirrored_tidy), label = "mirrored", estimand = "sensitive_item_proportion") +
+  declare_estimator(Y_direct ~ 1, model = lm_robust, term = "(Intercept)", label = "direct", estimand = "sensitive_item_proportion")
+
+rr_design <- set_diagnosands(rr_design, diagnosands = declare_diagnosands(select = c(mean_estimate, bias, rmse, power)))
+```
+
+<!-- # commented it out due to intermittent errors in RR -->
+<!-- ```{r, eval = do_diagnosis} -->
+<!-- rr_diagnosis <- diagnose_design(rr_design, sims = sims, bootstrap_sims = b_sims) -->
+<!-- ``` -->
+
+<!-- ```{r, echo = FALSE, purl = FALSE} -->
+<!-- # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file -->
+<!-- rds_file_path <- paste0(get_dropbox_path("list_experiments"), "/rr_diagnosis.RDS") -->
+<!-- if (do_diagnosis & !exists("do_bookdown")) { -->
+<!--   write_rds(rr_diagnosis, path = rds_file_path) -->
+<!-- } -->
+<!-- rr_diagnosis <- read_rds(rds_file_path) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- kable(reshape_diagnosis(rr_diagnosis)) -->
+<!-- ``` -->
+
+
+### References
