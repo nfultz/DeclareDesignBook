@@ -1,0 +1,141 @@
+---
+title: "pipe graph"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(jpeg)
+library(dplyr)
+library(DeclareDesign)
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r, include = FALSE}
+my_round <- function(df, digits = 2, exclude = 1){df[,-exclude] <- round(df[,-exclude], digits); df }
+
+dag <- function(x,
+                   y,
+                   names,
+                   arcs = cbind(0,0),
+                   solids = rep(1, length(x)),
+                   title = "",
+                   contraction = .24,
+                   add_functions = 0,
+                   add_functions_text = NULL,
+                   text_shift = 0,
+                   padding = .5,
+                   length = 0.2,
+                   cex = 1,
+                   box = TRUE, add = TRUE) {
+  if(!add) plot(x, y, type = "n", cex = 2, axes = FALSE, xlab = "", ylab = "",
+                       xlim = c(min(x)-padding, max(x)+padding),
+                       ylim = c(min(y)-padding-add_functions, max(y)+padding),
+                       main = title)
+
+  arrows(x[arcs[,1]]*(1-contraction) + x[arcs[,2]]*contraction,
+         y[arcs[,1]]*(1-contraction) + y[arcs[,2]]*contraction,
+         x[arcs[,2]]*(1-contraction) + x[arcs[,1]]*contraction,
+         y[arcs[,2]]*(1-contraction) + y[arcs[,1]]*contraction, length = length)
+  text(x, y + text_shift, names, cex = cex)
+  if(!is.null(add_functions_text)) text(((min(x)+max(x))/2), min(y)-1, add_functions_text)
+  if(box) box()
+}
+
+
+```
+
+# Design
+
+```{r}
+# M -- Model
+
+population         <- declare_population(N = 5, u = rnorm(N))
+potential_outcomes <- declare_potential_outcomes(Y_Z_0 = 0,
+                                                 Y_Z_1 = 1 + u)
+# I -- Inquiries: A query defined in terms of potential outcomes
+estimand_1 <- declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0))
+estimand_2 <- declare_estimand(SATE = mean(Y_Z_1 - Y_Z_0))
+
+# D -- Data Strategy: Researcher interventions on the world
+sampling   <- declare_sampling(n = 4)
+assignment <- declare_assignment()
+reveal_Y   <- declare_reveal(Y,Z)
+
+# A -- Answer steps
+estimate   <- declare_estimator(Y~Z, estimand = c("PATE", "SATE"))
+
+design <- population + potential_outcomes + estimand_2 +
+  sampling + estimand_1 + assignment + reveal_Y+ estimate
+```
+
+# Generate dataframe images
+
+```{r}
+set.seed(1)
+df1 <- population() %>% my_round()
+df2 <- potential_outcomes(df1) %>% my_round()
+df3 <- estimand_1(df2) %>% my_round()
+df4 <- sampling(df2)[,1:4] %>% my_round()
+df5 <- estimand_2(df4) %>% my_round()
+df6 <- assignment(df4)[,1:5] %>% my_round()
+df7 <- reveal_Y(df6) %>% my_round()
+df8 <- estimate(df7)[, c(11, 3:4)] %>% my_round()
+
+set.seed(1)
+df9 <- simulate_design(design, sims = 1)[, c(2,3,4,7)] %>% my_round(exclude = 2)
+
+dfs <- list(df1, df2, df3, df4, df5, df6, df7, df8, df9)
+
+for(j in 1:9) {
+  jpeg(paste0("figs/df", j, ".jpeg"))
+  grid.arrange(tableGrob(dfs[[j]]))
+  dev.off()
+}
+```
+
+
+# Generate graph
+
+```{r, fig.width=22, fig.height=8}
+
+
+pdf("pipedreams.pdf", 22, 8)
+  
+plot(c(.5, 6.5), c(-.5, 2.75), type = "n", axes = "FALSE", xlab = "", ylab = "")
+
+
+dag(
+  x = c(1, 2, 2, 3, 3, 4, 5, 5, 6),
+  y = c(1, 1, 2, 1, 2, 1, 1, 0, 1),
+  names = c('population', "potential_outcomes", "estimand_1", "sampling", "estimand_2", 
+             "assignment", "reveal_Y", "estimate", "diagnosis"),
+  arcs = cbind(c(1, 2, 2, 4, 4, 6, 7, 8, 5, 3),
+               c(2, 3, 4, 5, 6, 7, 8, 9, 9, 5))
+)
+ rasterImage(readJPEG("figs/df1.jpeg"), .5, -.25, 1.5, 1.45)
+ rasterImage(readJPEG("figs/df2.jpeg"), 1.5, -.25, 2.5, 1.45)
+ rasterImage(readJPEG("figs/df3.jpeg"), 1.5, 1.7+-.25, 2.5,  1.7+1.45)
+ rasterImage(readJPEG("figs/df4.jpeg"), 2.5, -.25, 3.5, 1.45)
+ rasterImage(readJPEG("figs/df5.jpeg"), 2.5, 1.7+-.25, 3.5, 1.7+1.45)
+ rasterImage(readJPEG("figs/df6.jpeg"), 3.5, -.25, 4.5, 1.45)
+ rasterImage(readJPEG("figs/df8.jpeg"), 4.5, -.25-.9, 5.5, 1.45-.9)
+ rasterImage(readJPEG("figs/df9.jpeg"), 5.5, -.25,    6.5, 1.45)
+ 
+dag(
+  x = c(1, 2, 2, 3, 3, 4, 5, 5, 6),
+  y = c(1, 1, 2, 1, 2, 1, 1, 0, 1),
+  names = c('population', "potential_outcomes", "estimand_1", "sampling", "estimand_2", 
+            "assignment", "reveal_Y", "estimate", "diagnosis"),
+  arcs = cbind(c(1, 2, 2, 4, 4, 6, 7, 8, 5, 3),
+               c(2, 3, 4, 5, 6, 7, 8, 9, 9, 5))
+  
+)
+  dev.off()
+
+```
+
+
+
+
