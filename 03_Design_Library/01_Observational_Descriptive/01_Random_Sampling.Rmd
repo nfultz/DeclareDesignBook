@@ -19,7 +19,7 @@ source("scripts/before_chapter_script.R")
 
 ## Simple Random Sampling and Stratified-and-Clustered Random Sampling
 
-## Simple Random Sampling
+### Simple Random Sampling
 
 Often we are interested in features of a population, but data on the entire population is prohibitively expensive to collect. Instead, researchers obtain data on a small fraction of the population and use measurements taken on that sample to draw inferences about the population.
 
@@ -88,7 +88,7 @@ Things work well here it seems. In the exercises we suggest some small modificat
 3. Modify the estimation function to use this formula for the standard error: $\widehat{se} \equiv \frac{\widehat\sigma}{\sqrt{n}}$. This equation differs from the one used in our declaration (it ignores the total population size $N$). Check that the coverage of this new design is incorrect when $N=n$. Assess how large $N$ has to be for the difference between these procedures not to matter. 
 
 
-### now Stratified clustered random sampling
+### Stratified-clustered random sampling
 
 <!-- make sure to rename the section title below -->
 

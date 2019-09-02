@@ -149,7 +149,6 @@ simple_designs <- replace_step(simple_design, "potential_outcomes", null_potenti
 ```
 
 
-# References
 
 
 
