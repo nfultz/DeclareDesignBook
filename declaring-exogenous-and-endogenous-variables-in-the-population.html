@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>2.3 What is a Complete Design Declaration? | Research Design: Declare, Diagnose, Redesign</title>
+  <title>6.3 Declaring exogenous and endogenous variables in the population | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="2.3 What is a Complete Design Declaration? | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="6.3 Declaring exogenous and endogenous variables in the population | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="2.3 What is a Complete Design Declaration? | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="6.3 Declaring exogenous and endogenous variables in the population | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="diagnosands-and-diagnosis.html"/>
-<link rel="next" href="declaration-diagnosis-redesign.html"/>
+<link rel="prev" href="without-a-model-you-can-get-the-answer-pretty-wrong.html"/>
+<link rel="next" href="declaring-potential-outcomes.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -272,20 +272,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="what-is-a-complete-design-declaration" class="section level2">
-<h2><span class="header-section-number">2.3</span> What is a <em>Complete</em> Design Declaration?</h2>
-<p>A declaration of a research design that is in some sense complete is required in order to implement it, communicate its essential features, and to assess its properties. Yet existing definitions make clear that there is no single conception of a complete research design: the <a href="http://www.consort-statement.org">Consolidated Standards of Reporting Trials (CONSORT) Statement</a> widely used in medicine includes 22 features and other proposals range from nine to 60 components.</p>
-<p>We propose a conditional notion of completeness: we say a design is ``diagnosand-complete’’ for a given diagnosand if that diagnosand can be calculated from the declared design. Thus a design that is diagnosand complete for one diagnosand may not be for another. Consider for example the diagnosand statistical power. Power is the probability that a <em>p</em>-value is lower than a critical value. Thus, power-completeness requires that the answer strategy return a <em>p</em> value. It does not, however, require a well-defined estimand. In contrast, Bias- or RMSE-completeness does not require a hypothesis test, but does require the specification of an estimand.</p>
-<p>Diagnosand-completeness is a desirable property to the extent that it means a diagnosand can be calculated. How useful this is depends however on how useful the diagnosand is for decision making. Thus evaluating completeness should focus first on whether diagnosands for which completeness holds are indeed useful ones.</p>
-<p>This usefulness depends in part on whether the information on which diagnoses are made is <em>believable</em>. A design may be bias-complete for instance under the assumptions of a particular spillover structure, for example. Readers may disagree with these assumptions but there are still gains from the declaration as the grounds for claims for unbiasedness are clear and the effects of deviations from model assumptions can be assessed. In practice, different research communities set different standards for what constitutes sufficient information to make such conjectures about the world plausible.</p>
+<div id="declaring-exogenous-and-endogenous-variables-in-the-population" class="section level2">
+<h2><span class="header-section-number">6.3</span> Declaring exogenous and endogenous variables in the population</h2>
+<p>Remember from Chapter X that declaring a <span class="math inline">\(M\)</span>odel means specifying exogenous and endogenous variables, how they are related to one another, and the probability distributions that determine which values the variables take. Further below, we’ll talk about how to use pre-existing data to build a <span class="math inline">\(M\)</span>odel, but suppose for now that we must build it entirely from scratch.</p>
+<p>An exogenous variable is one whose values do not depend on the values of any other variable in the <span class="math inline">\(M\)</span>odel. By contrast, an endogenous variable is one whose values <em>can</em> depend on another variable. We use the term “parent” to describe the variables that endogenous variables depend on directly. The following line of code, taken and modified from the <span class="math inline">\(M\)</span>odel from our [A simple design declaration][simple design declaration], contains a fully specified model:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">population &lt;-<span class="st"> </span><span class="kw">declare_population</span>(<span class="dt">N =</span> <span class="dv">8</span>, <span class="dt">e =</span> <span class="kw">runif</span>(N), <span class="dt">X =</span> <span class="kw">rnorm</span>(N, e, <span class="dv">1</span>)) </a></code></pre></div>
+<p>Here, <code>e</code> is an exogenous variable: it is simply a random draw from the uniform distribution between 0 and 1, inclusive. So long as <span class="math inline">\(N\)</span> stays fixed, no other variables influence the values that <code>e</code> takes on. By contrast, <code>X</code> is defined as a function of the value that <code>e</code> takes, so it is endogenous. The code says that the value that <code>X</code> takes for a given individual is equal to a random draw from a normal distribution whose mean is equal to their value of <code>e</code> and whose standard deviation is equal to 1. Say, for example, that <code>e</code> took the value .35 for the fifth individual in the study. In that case, the fifth individual will get a value of <code>X</code> that should be close to, but not exactly, .35. Our model has two variables, one of which is uniformly distributed and the other of which is normally distributed, with the mean of <code>X</code> depending on the value of <code>e</code>. We refer to <code>e</code> as a parent of <code>X</code> because it appears in the expression for <code>X</code>.</p>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="diagnosands-and-diagnosis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="declaration-diagnosis-redesign.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="without-a-model-you-can-get-the-answer-pretty-wrong.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="declaring-potential-outcomes.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

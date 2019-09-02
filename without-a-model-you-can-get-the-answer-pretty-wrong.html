@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>2.3 What is a Complete Design Declaration? | Research Design: Declare, Diagnose, Redesign</title>
+  <title>6.2 Without a model you can get the answer pretty wrong | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="2.3 What is a Complete Design Declaration? | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="6.2 Without a model you can get the answer pretty wrong | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="2.3 What is a Complete Design Declaration? | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="6.2 Without a model you can get the answer pretty wrong | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="diagnosands-and-diagnosis.html"/>
-<link rel="next" href="declaration-diagnosis-redesign.html"/>
+<link rel="prev" href="models-versus-modelling.html"/>
+<link rel="next" href="declaring-exogenous-and-endogenous-variables-in-the-population.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -272,20 +272,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="what-is-a-complete-design-declaration" class="section level2">
-<h2><span class="header-section-number">2.3</span> What is a <em>Complete</em> Design Declaration?</h2>
-<p>A declaration of a research design that is in some sense complete is required in order to implement it, communicate its essential features, and to assess its properties. Yet existing definitions make clear that there is no single conception of a complete research design: the <a href="http://www.consort-statement.org">Consolidated Standards of Reporting Trials (CONSORT) Statement</a> widely used in medicine includes 22 features and other proposals range from nine to 60 components.</p>
-<p>We propose a conditional notion of completeness: we say a design is ``diagnosand-complete’’ for a given diagnosand if that diagnosand can be calculated from the declared design. Thus a design that is diagnosand complete for one diagnosand may not be for another. Consider for example the diagnosand statistical power. Power is the probability that a <em>p</em>-value is lower than a critical value. Thus, power-completeness requires that the answer strategy return a <em>p</em> value. It does not, however, require a well-defined estimand. In contrast, Bias- or RMSE-completeness does not require a hypothesis test, but does require the specification of an estimand.</p>
-<p>Diagnosand-completeness is a desirable property to the extent that it means a diagnosand can be calculated. How useful this is depends however on how useful the diagnosand is for decision making. Thus evaluating completeness should focus first on whether diagnosands for which completeness holds are indeed useful ones.</p>
-<p>This usefulness depends in part on whether the information on which diagnoses are made is <em>believable</em>. A design may be bias-complete for instance under the assumptions of a particular spillover structure, for example. Readers may disagree with these assumptions but there are still gains from the declaration as the grounds for claims for unbiasedness are clear and the effects of deviations from model assumptions can be assessed. In practice, different research communities set different standards for what constitutes sufficient information to make such conjectures about the world plausible.</p>
+<div id="without-a-model-you-can-get-the-answer-pretty-wrong" class="section level2">
+<h2><span class="header-section-number">6.2</span> Without a model you can get the answer pretty wrong</h2>
+<p>Most of our causal and descriptive inferences are based on the plausibility of an implicit <span class="math inline">\(M\)</span>odel—in fact, <span class="math inline">\(M\)</span>odels often lurk where you might not expect them. For example, many experimental designs appear not to rely on <span class="math inline">\(M\)</span>odels in order to generate plausible inferences, because their <em>answer strategies</em> don’t engage in any modelling of variables. The linearity of expectations implies that <span class="math inline">\(E[Y_i(Z_i = 1) - Y_i(Z_i = 0)]\)</span> is equal to <span class="math inline">\(E[Y_i(Z_i = 1)] - E[Y_i(Z_i = 0)]\)</span>—in English, the average difference in potential outcomes is equal to the difference in average potential outcomes. Many researchers take this to mean that they can simply compare the average observed outcome in the treatment group, <span class="math inline">\(E[Y_i |Z_i = 1]\)</span> to the average observed outcome in the control group, <span class="math inline">\(E[Y_i |Z_i = 0]\)</span>, in order to get an unbiased estimate of the average treatment effect.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> Since this comparison requires no statistical modelling of the distributions of the observed variables, it seems as though such strategies are completely agnostic as to how the world works.</p>
+<p>Implicit in the very definition of the estimand here, however, is a <span class="math inline">\(M\)</span>odel: specifically, one in which any particular draw of the random assignment is able to reveal no more than two potential outcomes for any given individual—this is sometimes referred to as the Stable Unit Treatment Value Assumption (SUTVA). But many social processes violate this assumption. If I do something differently every time you get treated and I don’t, then I have at least three potential outcomes: one in which I’m treated, one in which neither of us are treated, and one in which you’re treated but I’m not. The average observed difference-in-means across random assignments might diverge quite substantially from the true average effect of putting just one person in treatment and the rest in control, for example. (Callout to section on spillovers). So even the simplest, most agnostic research design is relying on the plausibility of an implicit model in order for to generate insights that are correct on average.</p>
+<p>Of course, some research designs require much more <span class="math inline">\(M\)</span>odel than others. In an experiment, we typically worry about everything that happens post-assignment when we draw up a <span class="math inline">\(M\)</span>odel: attrition, compliance, and so forth. But in observational studies, in addition to those issues, the <span class="math inline">\(M\)</span>odel for pretreatment variables can matter a lot.</p>
+<p>Take the simplest possible design, in which we want to know the effect of a non-randomly assigned treatment, <span class="math inline">\(Z\)</span>, on <span class="math inline">\(Y\)</span>. Say you have a pretreatment covariate, <span class="math inline">\(X\)</span>, that is correlated with both <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span>. Should you control for <span class="math inline">\(X\)</span>?</p>
+<p>Some authors might argue that, because the values of <span class="math inline">\(X\)</span> are realized prior to the values of <span class="math inline">\(Z\)</span> and time can’t flow backwards, <span class="math inline">\(X\)</span> is causally antecedent to <span class="math inline">\(Z\)</span> and so it follows you can’t do worse by including it. <span class="citation">Rosenbaum (<a href="#ref-rosenbaum2002observational">2002</a>)</span>, for instance, argues that “there is little to no reason to avoid adjustment for a true covariate, a variable describing subjects before treatment.” However, as <span class="citation">(<span class="citeproc-not-found" data-reference-id="greenland1999causal"><strong>???</strong></span>)</span> have shown, it turns out that if <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span> are not confounded but <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are, then controlling for <span class="math inline">\(X\)</span> introduces additional spurious dependency between <span class="math inline">\(Z\)</span> and <span class="math inline">\(Y\)</span> that can create considerable bias. If the question is “should you control for <span class="math inline">\(X\)</span>?” the answer is always “it depends on your <span class="math inline">\(M\)</span>odel.”</p>
+<p>So, you really need to specify a <span class="math inline">\(M\)</span>odel: doing so helps determine the conditions under which your answers are credible. Without knowing the conditions under which we can believe your answers, it’s hard to know whether to believe your answer. <span class="math inline">\(M\)</span>odels play a second and equally important role: they define the ‘’potential outcomes’’ of the individuals in your study. Those are critical, because they form the basis of both your inquiry—what you want to know—and your answer strategy—what you can observe.</p>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-rosenbaum2002observational">
+<p>Rosenbaum, Paul R. 2002. <em>Observational Studies</em>. New York: Springer.</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="1">
+<li id="fn1"><p>…of putting one person in treatment and everyone else in control<a href="without-a-model-you-can-get-the-answer-pretty-wrong.html#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="diagnosands-and-diagnosis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="declaration-diagnosis-redesign.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="models-versus-modelling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="declaring-exogenous-and-endogenous-variables-in-the-population.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
