@@ -13,41 +13,31 @@ Second reader assigned to all of them.
 
 This section is only in words, not in code (until the software primer)
 
-## Preamble (high level overview)
-- How to use this book
-- Using code snippets (copy paste, download, etc.)
-
-## MIDA 
+- Preamble
 - Explain MIDA [AC]
 - Diagnosands and diagnosis [AC]
 - Explain declaration -> diagnosis -> redesign process (graphic?) [GB]
-
-## Software primer [GB]
-
-- How to read declarations (if you don't know)
-- Declare functions are function factories (with handlers)
-  - Map of data in and data out (how the three data frames are passed along, Neal's graph; graphic of one run)
-- Diagnosis is chaining functions together
-  - Graphic of simulations (of multiple runs)
+- How to use this book
+- Software primer [GB]
 
 # Part B: A Guide to Declaration and Diagnosis in Practice
 
 NOTE: an R script for each subsection. For code snippets, two buttons: copy/paste and download full code for that subsection
 
-## Research questions
+## What is your research question [AC] 
 
-### What is your research question [AC] 
-
-- What is your research question? 
-- What is the relationship between theory and estimands?
+- What is your research question?  
 - Topics vs. questions; how to come up with a question - lit review, hunch, data
 - research questions often begin with a bivariate "idea" (an x and a y for causal qs, or how does y vary according to x for descriptive)
 - Do you want to answer a causal or descriptive question? [MH]
 - Typology of questions: COE vs EOC for causal; questions about one of the modes of the distribution of a variable; [MH]
 - What is your inquiry if you don’t know the question in advance? (Discovery)
-- The fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective? [JC]
 
-### Is your research question good? [GB]
+## Types of steps, not components [JC 1p]
+
+- The fact that these steps go in different orders in different projects / are sometimes missing. One research "project" often has many designs (by our definition). E.g. your JMP might have a series of inquiries and get at them through field exp, observational, qual, and survey exp. How to approach those situations from MIDA_perspective?
+
+## Is your research question good? [GB]
 - Is the answer to your question known? How would you know? Meta-analysis, systematic review, disagreement in literature
 - Is your question important? (Change decisions; change answer in a literature)
 - Important question answered poorly / Irrelevant question answered well. We want important questions answered well.
