@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 9 Choosing an Answer Strategy | Research Design: Declare, Diagnose, Redesign</title>
+  <title>2.2 Diagnosands and diagnosis | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 9 Choosing an Answer Strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="2.2 Diagnosands and diagnosis | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 9 Choosing an Answer Strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="2.2 Diagnosands and diagnosis | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="crafting-a-data-strategy.html"/>
-<link rel="next" href="diagnosis.html"/>
+<link rel="prev" href="model-inquiry-data-strategy-model-strategy.html"/>
+<link rel="next" href="what-is-a-complete-design-declaration.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -244,17 +244,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="choosing-an-answer-strategy" class="section level1">
-<h1><span class="header-section-number">Chapter 9</span> Choosing an Answer Strategy</h1>
-
+<div id="diagnosands-and-diagnosis" class="section level2">
+<h2><span class="header-section-number">2.2</span> Diagnosands and diagnosis</h2>
+<p>The ability to calculate distributions of answers, given a model, opens multiple avenues for assessment and critique. How good is the answer you expect to get from a given strategy? Would you do better, given some desideratum, with a different data strategy? With a different analysis strategy? How good is the strategy if the model is wrong in some way or another?</p>
+<p>To allow for this kind of <em>diagnosis</em> of a design, we introduce two further concepts, both functions of research designs. These are quantities that a researcher or a third party could calculate with respect to a design.</p>
+<ul>
+<li><p>A {} is a summary statistic generated from a “run” of a design—that is, the results given a possible realization of variables, given the model and data strategy. A diagnostic statistic may or may not depend on the model as well as realized data. For example the statistic: <span class="math inline">\(e=\)</span> “difference between the estimated and the actual average treatment effect” depends on the model (since the ATE depends on the model’s assumptions about potential outcomes). The statistic <span class="math inline">\(s = \mathbb{1}(p \leq 0.05)\)</span>, interpreted as “the result is considered statistically significant at the 5% level”,’’ does not depend on the model but it does presuppose an answer strategy that reports a <span class="math inline">\(p\)</span> value.</p>
+<p>Diagnostic statistics are governed by probability distributions that arise because both the model and the data generation, given the model, may be stochastic.</p></li>
+<li><p>A <em>Diagnosand</em> is a summary of the distribution of a diagnostic statistic. For example, (expected)  in the estimated treatment effect is <span class="math inline">\(\mathbb{E}(e)\)</span> and statistical  is <span class="math inline">\(\mathbb{E}(s)\)</span>.</p></li>
+</ul>
+<p>To illustrate, consider the following design. A model <em>M</em> specifies three variables <span class="math inline">\(X\)</span>, <span class="math inline">\(Y\)</span> and <span class="math inline">\(Z\)</span> (all defined on the reals). These form the signature. In additional we assume functional relationships between them that allow for the possibility of confounding (for example, <span class="math inline">\(Y = bX + Z + \epsilon_Y; X = Z+ \epsilon_X\)</span>, with <span class="math inline">\(Z, \epsilon_X, \epsilon_Z\)</span> distributed standard normal). The inquiry <span class="math inline">\(I\)</span> is ``what would be the average effect of a unit increase in <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> in the population?’’ Note that this question depends on the signature of the model, but not the functional equations of the model (the answer provided by the model does of course depend on the functional equations). Consider now a data strategy, <span class="math inline">\(D\)</span>, in which data is gathered on <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> for <span class="math inline">\(n\)</span> randomly selected units. An answer <span class="math inline">\(a^A\)</span>, is then generated using ordinary least squares as the answer strategy, <span class="math inline">\(A\)</span>.</p>
+<p>We have specified all the components of MIDA. We now ask: How strong is this research design? One way to answer this question is with respect to the diagnosand “expected error.” Here the model’s functional equations provide an answer, <span class="math inline">\(a^M\)</span> to the inquiry (for any draw of <span class="math inline">\(\beta\)</span>), and so the distribution of the expected error, <em>given the model</em>, <span class="math inline">\(a^A-a^M\)</span>, can be calculated.</p>
+<p>In this example the expected performance of the design may be poor, as measured by this diagnosand, because the data and analysis strategy do not handle the confounding described by the model. In comparison, better performance may be achieved through an alternative data strategy (e.g., where <span class="math inline">\(D&#39;\)</span> randomly assigned <span class="math inline">\(X\)</span> to <span class="math inline">\(n\)</span> units before recording <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>) or an alternative analysis strategy (e.g., <span class="math inline">\(A&#39;\)</span> conditions on <span class="math inline">\(Z\)</span>). These design evaluations depend on the model, and so one might reasonably ask how performance would look were the model different (for example if the underlying process involved nonlinearities).</p>
+<p>In all cases, the evaluation of a design depends on the assessment of a diagnosand, and comparing the diagnoses to what could be achieved under alternative designs.</p>
+<p>In section X we discuss possible choices of diagnosands and operate a set of these</p>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="crafting-a-data-strategy.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="diagnosis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="model-inquiry-data-strategy-model-strategy.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="what-is-a-complete-design-declaration.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
