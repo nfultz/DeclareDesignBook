@@ -11,7 +11,7 @@ Exercises in every chapter.
 
 Second reader assigned to all of them.
 
-# Introduction
+# Introduction to Design Declaration and Diagnosis
 
 This section is only in words, not in code (until the software primer)
 
@@ -56,7 +56,7 @@ This section is only in words, not in code (until the software primer)
   - Map of data in and data out (how the three data frames are passed along, Neal's graph; graphic of one run)
 - Diagnosis is chaining functions together
 
-# Declaration and Diagnosis in Practice
+# A Guide to Declaration and Diagnosis in Practice
 
 NOTE: an R script for each subsection. For code snippets, two buttons: copy/paste and download full code for that subsection
 
@@ -109,7 +109,6 @@ NOTE: for next four sections, four subsections: 1) walk through of how you speci
 - Expected ATT vs realized ATT
 - Vector-valued inquiries (set of predictions for N units), i.e. the CEF 
 - Models as estimands
-- inquiries about "regimes" (i.e., vote share at the precinct level.)  Related to a problem I (ac) have about persistence
 
 ## Crafting a Data Strategy [AC]
 
@@ -189,6 +188,10 @@ NOTE: include links to declared designs for each study
 ### Inference about unobserved variables (systematic and nonsystematic measurement error) [AC]
 ### Structural estimation
 
+- x Topic analysis [GB]
+- x Respondent driven sampling 
+- x Forecasting (predicting in future) [JC]
+
 ## Experimental designs for descriptive inference
 ### Audit experiments [AC]
 ### Experiments for sensitive questions [GB]
@@ -202,6 +205,13 @@ NOTE: include links to declared designs for each study
 ### Stepped-wedge designs [JC]
 ### Partial population design for spillover analysis [JC]
 
+- x Parallel design for mediation effects [GB]
+- x Crossover designs
+- x Selective trials [JC]
+- x Adaptive trials [AC]
+- x Multi-site designs (could be descriptive too; hard part is I) [GB]
+- x Experiments where blocks and clusters are also sampled from populations of blocks/clusters [JC]
+
 ## Observational designs for causal inference
 ### Selection on observables (matching and regression etc.) [AC]
 ### Instrumental variables for continuous instruments
@@ -210,8 +220,31 @@ NOTE: include links to declared designs for each study
 ### Process tracing [JC]
 ### Synthetic control [GB]
 
+- x Cross national time series [JC]
+- x Mediation [GB]
+- x Nested designs [MH]
+- x Qualitative comparative analysis [MH]
+- x Meta-analysis [GB] 
 
 # Conclusion
 
 
+
+# Designs brainstorm
+
+- geographic RD
+- spatial processes
+- IRT
+- country-year FE
+- EITM
+- computational evolutional models
+- mapping social networks
+- an ANES study
+- interrupted time series
+- time series (uninterrupted)
+- selection on observables
+- "is this a good predictor"
+- inquiries about "regimes" (i.e., vote share at the precinct level.)  Related to a problem I (ac) have about persistence
+- need to but the handbook of lab experiments
+- weighting to get PATEs and SATEs under non-compliance and non-response when you have a baseline
 
