@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>14.3 Encouragement designs | Research Design: Declare, Diagnose, Redesign</title>
+  <title>References | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="14.3 Encouragement designs | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="References | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="14.3 Encouragement designs | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="References | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="multiarm-and-factorial-designs.html"/>
-<link rel="next" href="stepped-wedge-designs.html"/>
+<link rel="prev" href="a-library-of-research-designs-as-objects.html"/>
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -271,83 +271,69 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="encouragement-designs" class="section level2">
-<h2><span class="header-section-number">14.3</span> Encouragement designs</h2>
-<p>Idea for this one would be to show how violations of no defiers and excludability lead to bias.</p>
-<!-- make sure to rename the section title below -->
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1">types &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Always-Taker&quot;</span>, <span class="st">&quot;Never-Taker&quot;</span>, <span class="st">&quot;Complier&quot;</span>, <span class="st">&quot;Defier&quot;</span>)</a>
-<a class="sourceLine" id="cb42-2" title="2">direct_effect_of_encouragement &lt;-<span class="st"> </span><span class="fl">0.0</span></a>
-<a class="sourceLine" id="cb42-3" title="3">proportion_defiers &lt;-<span class="st"> </span><span class="fl">0.0</span></a>
-<a class="sourceLine" id="cb42-4" title="4"></a>
-<a class="sourceLine" id="cb42-5" title="5">design &lt;-</a>
-<a class="sourceLine" id="cb42-6" title="6"><span class="st">  </span><span class="kw">declare_population</span>(</a>
-<a class="sourceLine" id="cb42-7" title="7">    <span class="dt">N =</span> <span class="dv">500</span>,</a>
-<a class="sourceLine" id="cb42-8" title="8">    <span class="dt">type =</span> <span class="kw">sample</span>(</a>
-<a class="sourceLine" id="cb42-9" title="9">      types,</a>
-<a class="sourceLine" id="cb42-10" title="10">      N,</a>
-<a class="sourceLine" id="cb42-11" title="11">      <span class="dt">replace =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb42-12" title="12">      <span class="dt">prob =</span> <span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.8</span> <span class="op">-</span><span class="st"> </span>proportion_defiers, proportion_defiers)</a>
-<a class="sourceLine" id="cb42-13" title="13">    ),</a>
-<a class="sourceLine" id="cb42-14" title="14">    <span class="dt">noise =</span> <span class="kw">rnorm</span>(N)</a>
-<a class="sourceLine" id="cb42-15" title="15">  ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-16" title="16"><span class="st">  </span><span class="kw">declare_potential_outcomes</span>(</a>
-<a class="sourceLine" id="cb42-17" title="17">    D <span class="op">~</span><span class="st"> </span><span class="kw">case_when</span>(</a>
-<a class="sourceLine" id="cb42-18" title="18">      Z <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>type <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Never-Taker&quot;</span>, <span class="st">&quot;Complier&quot;</span>) <span class="op">~</span><span class="st"> </span><span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb42-19" title="19">      Z <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>type <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Never-Taker&quot;</span>, <span class="st">&quot;Defier&quot;</span>) <span class="op">~</span><span class="st"> </span><span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb42-20" title="20">      Z <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>type <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Always-Taker&quot;</span>, <span class="st">&quot;Defier&quot;</span>) <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb42-21" title="21">      Z <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>type <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Always-Taker&quot;</span>, <span class="st">&quot;Complier&quot;</span>) <span class="op">~</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb42-22" title="22">    )</a>
-<a class="sourceLine" id="cb42-23" title="23">  ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-24" title="24"><span class="st">  </span><span class="kw">declare_potential_outcomes</span>(</a>
-<a class="sourceLine" id="cb42-25" title="25">    Y <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span> <span class="op">*</span><span class="st"> </span>(type <span class="op">==</span><span class="st"> &quot;Complier&quot;</span>) <span class="op">*</span><span class="st"> </span>D <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-26" title="26"><span class="st">      </span><span class="fl">0.25</span> <span class="op">*</span><span class="st"> </span>(type <span class="op">==</span><span class="st"> &quot;Always-Taker&quot;</span>) <span class="op">*</span><span class="st"> </span>D <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-27" title="27"><span class="st">      </span><span class="fl">0.75</span> <span class="op">*</span><span class="st"> </span>(type <span class="op">==</span><span class="st"> &quot;Defier&quot;</span>) <span class="op">*</span><span class="st"> </span>D <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-28" title="28"><span class="st">      </span>direct_effect_of_encouragement <span class="op">*</span><span class="st"> </span>Z <span class="op">+</span><span class="st"> </span>noise,</a>
-<a class="sourceLine" id="cb42-29" title="29">    <span class="dt">assignment_variables =</span> <span class="kw">c</span>(<span class="st">&quot;D&quot;</span>, <span class="st">&quot;Z&quot;</span>)</a>
-<a class="sourceLine" id="cb42-30" title="30">  ) <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-31" title="31"><span class="st">  </span><span class="kw">declare_estimand</span>(<span class="dt">CACE =</span> <span class="kw">mean</span>((Y_D_<span class="dv">1</span>_Z_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>Y_D_<span class="dv">1</span>_Z_<span class="dv">0</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span></a>
-<a class="sourceLine" id="cb42-32" title="32"><span class="st">                                 </span>(Y_D_<span class="dv">0</span>_Z_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>Y_D_<span class="dv">0</span>_Z_<span class="dv">0</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>),</a>
-<a class="sourceLine" id="cb42-33" title="33">                   <span class="dt">subset =</span> type <span class="op">==</span><span class="st"> &quot;Complier&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-34" title="34"><span class="st">  </span><span class="kw">declare_assignment</span>(<span class="dt">prob =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-35" title="35"><span class="st">  </span><span class="kw">declare_reveal</span>(D, <span class="dt">assignment_variable =</span> <span class="st">&quot;Z&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-36" title="36"><span class="st">  </span><span class="kw">declare_reveal</span>(Y, <span class="dt">assignment_variables =</span> <span class="kw">c</span>(<span class="st">&quot;D&quot;</span>, <span class="st">&quot;Z&quot;</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb42-37" title="37"><span class="st">  </span><span class="kw">declare_estimator</span>(Y <span class="op">~</span><span class="st"> </span>D <span class="op">|</span><span class="st"> </span>Z, <span class="dt">model =</span> iv_robust, <span class="dt">estimand =</span> <span class="st">&quot;CACE&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">designs &lt;-<span class="st"> </span><span class="kw">redesign</span>(</a>
-<a class="sourceLine" id="cb43-2" title="2">  design,</a>
-<a class="sourceLine" id="cb43-3" title="3">  <span class="dt">proportion_defiers =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">0.3</span>, <span class="dt">length.out =</span> <span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb43-4" title="4">  <span class="dt">direct_effect_of_encouragement =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">0.3</span>, <span class="dt">length.out =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb43-5" title="5">)</a>
-<a class="sourceLine" id="cb43-6" title="6"></a>
-<a class="sourceLine" id="cb43-7" title="7">simulations &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(designs, <span class="dt">sims =</span> sims)</a></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1">gg_df &lt;-</a>
-<a class="sourceLine" id="cb44-2" title="2"><span class="st">  </span>simulations <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb44-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(proportion_defiers,</a>
-<a class="sourceLine" id="cb44-4" title="4">           direct_effect_of_encouragement) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb44-5" title="5"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">bias =</span> <span class="kw">mean</span>(estimate <span class="op">-</span><span class="st"> </span>estimand))</a>
-<a class="sourceLine" id="cb44-6" title="6"></a>
-<a class="sourceLine" id="cb44-7" title="7"></a>
-<a class="sourceLine" id="cb44-8" title="8"><span class="kw">ggplot</span>(gg_df,</a>
-<a class="sourceLine" id="cb44-9" title="9">       <span class="kw">aes</span>(</a>
-<a class="sourceLine" id="cb44-10" title="10">         proportion_defiers,</a>
-<a class="sourceLine" id="cb44-11" title="11">         bias,</a>
-<a class="sourceLine" id="cb44-12" title="12">         <span class="dt">group =</span> direct_effect_of_encouragement,</a>
-<a class="sourceLine" id="cb44-13" title="13">         <span class="dt">color =</span> direct_effect_of_encouragement</a>
-<a class="sourceLine" id="cb44-14" title="14">       )) <span class="op">+</span></a>
-<a class="sourceLine" id="cb44-15" title="15"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb44-16" title="16"><span class="st">  </span><span class="kw">geom_line</span>() </a></code></pre></div>
-<p><img src="book_files/figure-html/unnamed-chunk-121-1.png" width="672" /></p>
-<div id="references-2" class="section level3">
-<h3><span class="header-section-number">14.3.1</span> References</h3>
+<div id="references-5" class="section level1 unnumbered">
+<h1>References</h1>
 
+<div id="refs" class="references">
+<div>
+<p>Blair, Graeme, Alexander Coppock, and Margaret Moor. 2018. “When to Worry About Sensitivity Bias: Evidence from 30 Years of List Experiments.” <em>Unpublished Manuscript</em>.</p>
+</div>
+<div>
+<p>Carnegie, Allison, and Cyrus Samii. 2017. “International Institutions and Political Liberalization: Evidence from the World Bank Loans Program.” <em>British Journal of Political Science</em>, 1–23.</p>
+</div>
+<div>
+<p>Coppock, Alexander. 2017. “Did Shy Trump Supporters Bias the 2016 Polls? Evidence from a Nationally-Representative List Experiment.” <em>Statistics, Politics and Policy</em> 8 (1): 29–40.</p>
+</div>
+<div>
+<p>Gelman, Andrew, and Guido Imbens. 2017. “Why High-Order Polynomials Should Not Be Used in Regression Discontinuity Designs.” <em>Journal of Business &amp; Economic Statistics</em>, no. Forthcoming.</p>
+</div>
+<div>
+<p>Hahn, Jinyong, Petra Todd, and Wilbert Van der Klaauw. 1999. “Evaluating the Effect of an Antidiscrimination Law Using a Regression-Discontinuity Design.” National Bureau of Economic Research.</p>
+</div>
+<div>
+<p>Halpern, Joseph Y. 2000. “Axiomatizing Causal Reasoning.” <em>Journal of Artificial Intelligence Research</em> 12: 317–37.</p>
+</div>
+<div>
+<p>Imai, Kosuke, Gary King, and Elizabeth A. Stuart. 2008. “Misunderstandings Between Experimentalists and Observationalists About Causal Inference.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em> 171 (2): 481–502.</p>
+</div>
+<div>
+<p>Keele, Luke, and Rocı́o Titiunik. 2016. “Natural Experiments Based on Geography.” <em>Political Science Research and Methods</em> 4 (1): 65–95.</p>
+</div>
+<div>
+<p>Miller, Judith Droitcour. 1984. “A New Survey Technique for Studying Deviant Behavior.” PhD thesis, George Washington University.</p>
+</div>
+<div>
+<p>Mitchell, Ojmarrh, Joshua C. Cochran, Daniel P. Mears, and William D. Bales. 2017. “Examining Prison Effects on Recidivism: A Regression Discontinuity Approach.” <em>Justice Quarterly</em> 34 (4): 571–96.</p>
+</div>
+<div>
+<p>Qin, Xuezheng, Castiel Chen Zhuang, and Rudai Yang. 2017. “Does the One-Child Policy Improve Children’s Human Capital in Urban China? A Regression Discontinuity Design.” <em>Journal of Comparative Economics</em> 45 (2): 287–303.</p>
+</div>
+<div>
+<p>Rosenbaum, Paul R. 2002. <em>Observational Studies</em>. New York: Springer.</p>
+</div>
+<div>
+<p>Sekhon, Jasjeet S., and Rocı́o Titiunik. 2017. “On Interpreting the Regression Discontinuity Design as a Local Experiment.” In <em>Regression Discontinuity Designs</em>, 1–28.</p>
 </div>
 </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="multiarm-and-factorial-designs.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="stepped-wedge-designs.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="a-library-of-research-designs-as-objects.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
