@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>2.1 Model-Inquiry-Data Strategy-Model Strategy | Research Design: Declare, Diagnose, Redesign</title>
+  <title>8.3 how to select an answer strategy | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="2.1 Model-Inquiry-Data Strategy-Model Strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="8.3 how to select an answer strategy | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="2.1 Model-Inquiry-Data Strategy-Model Strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="8.3 how to select an answer strategy | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="mida.html"/>
-<link rel="next" href="diagnosands-and-diagnosis.html"/>
+<link rel="prev" href="what-are-the-properties-of-a-good-answer-strategy.html"/>
+<link rel="next" href="diagnosis.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -275,32 +275,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="model-inquiry-data-strategy-model-strategy" class="section level2">
-<h2><span class="header-section-number">2.1</span> Model-Inquiry-Data Strategy-Model Strategy</h2>
-<p>The specification of a problem requires a description of the world and the question to be asked about the world as described. The answering requires a description of what information is used and how conclusions are reached given the information.</p>
-<p>At its most basic we think of a research design, <span class="math inline">\(\Delta\)</span>, as including four elements <span class="math inline">\(&lt;M,I,D,A&gt;\)</span>:</p>
+<div id="how-to-select-an-answer-strategy" class="section level2">
+<h2><span class="header-section-number">8.3</span> how to select an answer strategy</h2>
 <ul>
-<li><p>A , <span class="math inline">\(M\)</span>, of how the world works. In general following Pearl’s definition of a probabilistic causal model we will assume that a model contains three core elements. First, a specification of the variables <span class="math inline">\(X\)</span> about which research is being conducted. This includes endogenous and exogenous variables (<span class="math inline">\(V\)</span> and <span class="math inline">\(U\)</span> respectively) and the ranges of these variables. In the formal literature this is sometimes called the  of a model <span class="citation">(Halpern <a href="#ref-halpern2000">2000</a>)</span>. Second, a specification of how each endogenous variable depends on other variables (the <code>functional relations'' or, as in @Imbens2015,</code>potential outcomes’’), <span class="math inline">\(F\)</span>. Third, a probability distribution over exogenous variables, <span class="math inline">\(P(U)\)</span>.</p></li>
-<li><p>An , <span class="math inline">\(I\)</span>, about the distribution of variables, <span class="math inline">\(X\)</span>, perhaps given interventions on some variables. Using Pearl’s notation we can distinguish between questions that ask about the conditional values of variables, such as <span class="math inline">\(\Pr(X_1 | X_2 =1)\)</span> and questions that ask about values that would arise under interventions: <span class="math inline">\(\Pr(X_1 | do(X_2 = 1))\)</span>. We let <span class="math inline">\(a^M\)</span> denote the answer to <span class="math inline">\(I\)</span> . Conditional on the model, <span class="math inline">\(a^M\)</span> is the value of the estimand, the quantity that the researcher wants to learn about.</p></li>
-<li><p>A  strategy, <span class="math inline">\(D\)</span>, generates data <span class="math inline">\(d\)</span> on <span class="math inline">\(X\)</span>. Data <span class="math inline">\(d\)</span> arises, under model <span class="math inline">\(M\)</span> with probability <span class="math inline">\(P_M(d|D)\)</span>. The data strategy includes sampling strategies and assignment strategies, which we denote with <span class="math inline">\(P_S\)</span> and <span class="math inline">\(P_Z\)</span> respectively. Measurement techniques are also a part of data strategies and can be thought of as a selection of observable variables that carry information about unobservable variables.</p></li>
-<li><p>An <strong>answer</strong> strategy, <span class="math inline">\(A\)</span>, that generates answer <span class="math inline">\(a^A\)</span> using data <span class="math inline">\(d\)</span>.</p></li>
+<li>your data strategy should shape your answer strategy (analyse as you randomize)
+<ul>
+<li>assignment strategies (blocks and/or clusters, heterogeneous assignment probabilities, etc.)</li>
+<li>sampling strategies (strata and/or clusters, heterogeneous sampling probabilities, etc.)</li>
+</ul></li>
+<li><p>this is true not just for experiments but for surveys (how did you sample), natural experiments (how did nature assign the treatment), and other designs</p></li>
+<li><p>you can <em>select an answer strategy in advance</em>, by simulating data. when estimators are selected with the data in hand, choices are often made in response to the realized data through examining model fit statistics that appear ideal in the context of this data, but are not ideal from the perspective of other data that could have been collected. we want answer strategies that perform well no matter how the data turn out.</p></li>
+<li><p>to compare answer strategies, you can imagine the estimators that are possible <em>if things go well</em> as well as <em>if things go wrong</em>, when there is missing data or there are outliers in variables. a good answer strategy (which might be a single estimator, or a procedure if-this-then-that) can handle both states of the world.</p></li>
 </ul>
-<p>A key feature of this bare specification is that if <span class="math inline">\(M\)</span>, <span class="math inline">\(D\)</span>, and <span class="math inline">\(A\)</span> are sufficiently well described, the answer to question <span class="math inline">\(I\)</span> has a distribution <span class="math inline">\(P_M(a^A|D)\)</span>. Moreover, one can construct a distribution of comparisons of this answer to the correct answer, under <span class="math inline">\(M\)</span>, for example by assessing <span class="math inline">\(P_M(a^M-a^A|D)\)</span>. One can also compare this to results under different data or analysis strategies, <span class="math inline">\(P_M(a^M-a^A|D&#39;)\)</span> and <span class="math inline">\(P_M(a^M-a^{A&#39;}|D)\)</span>, and to answers generated under alternative models, <span class="math inline">\(P_M(a^{M&#39;}-a^{A}|D)\)</span>, as long as these possess signatures that are consistent with inquiries and answer strategies.</p>
-<p><em>MIDA</em> captures the analysis-relevant features of a design, but it does not describe substantive elements, such as how theories are derived or interventions are implemented. Yet many other aspects of a design that are not explicitly labeled in these features enter into this framework if they are analytically relevant. For example, logistical details of data collection such as the duration of time between a treatment being administered and endline data collection enter into the model if the longer time until data collection affects subject recall of the treatment. However, information in {} is typically insufficient to assess those substantive elements, an important and separate part of assessing the quality of a research study.</p>
+
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+<!-- start post here, do not edit above -->
 </div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-halpern2000">
-<p>Halpern, Joseph Y. 2000. “Axiomatizing Causal Reasoning.” <em>Journal of Artificial Intelligence Research</em> 12: 317–37.</p>
-</div>
-</div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="mida.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="diagnosands-and-diagnosis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="what-are-the-properties-of-a-good-answer-strategy.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="diagnosis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>2.1 Model-Inquiry-Data Strategy-Model Strategy | Research Design: Declare, Diagnose, Redesign</title>
+  <title>8.1 What is included in an answer strategy | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="2.1 Model-Inquiry-Data Strategy-Model Strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="8.1 What is included in an answer strategy | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="2.1 Model-Inquiry-Data Strategy-Model Strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="8.1 What is included in an answer strategy | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="mida.html"/>
-<link rel="next" href="diagnosands-and-diagnosis.html"/>
+<link rel="prev" href="choosing-an-answer-strategy.html"/>
+<link rel="next" href="what-are-the-properties-of-a-good-answer-strategy.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -275,32 +275,99 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="model-inquiry-data-strategy-model-strategy" class="section level2">
-<h2><span class="header-section-number">2.1</span> Model-Inquiry-Data Strategy-Model Strategy</h2>
-<p>The specification of a problem requires a description of the world and the question to be asked about the world as described. The answering requires a description of what information is used and how conclusions are reached given the information.</p>
-<p>At its most basic we think of a research design, <span class="math inline">\(\Delta\)</span>, as including four elements <span class="math inline">\(&lt;M,I,D,A&gt;\)</span>:</p>
+<div id="what-is-included-in-an-answer-strategy" class="section level2">
+<h2><span class="header-section-number">8.1</span> What is included in an answer strategy</h2>
 <ul>
-<li><p>A , <span class="math inline">\(M\)</span>, of how the world works. In general following Pearl’s definition of a probabilistic causal model we will assume that a model contains three core elements. First, a specification of the variables <span class="math inline">\(X\)</span> about which research is being conducted. This includes endogenous and exogenous variables (<span class="math inline">\(V\)</span> and <span class="math inline">\(U\)</span> respectively) and the ranges of these variables. In the formal literature this is sometimes called the  of a model <span class="citation">(Halpern <a href="#ref-halpern2000">2000</a>)</span>. Second, a specification of how each endogenous variable depends on other variables (the <code>functional relations'' or, as in @Imbens2015,</code>potential outcomes’’), <span class="math inline">\(F\)</span>. Third, a probability distribution over exogenous variables, <span class="math inline">\(P(U)\)</span>.</p></li>
-<li><p>An , <span class="math inline">\(I\)</span>, about the distribution of variables, <span class="math inline">\(X\)</span>, perhaps given interventions on some variables. Using Pearl’s notation we can distinguish between questions that ask about the conditional values of variables, such as <span class="math inline">\(\Pr(X_1 | X_2 =1)\)</span> and questions that ask about values that would arise under interventions: <span class="math inline">\(\Pr(X_1 | do(X_2 = 1))\)</span>. We let <span class="math inline">\(a^M\)</span> denote the answer to <span class="math inline">\(I\)</span> . Conditional on the model, <span class="math inline">\(a^M\)</span> is the value of the estimand, the quantity that the researcher wants to learn about.</p></li>
-<li><p>A  strategy, <span class="math inline">\(D\)</span>, generates data <span class="math inline">\(d\)</span> on <span class="math inline">\(X\)</span>. Data <span class="math inline">\(d\)</span> arises, under model <span class="math inline">\(M\)</span> with probability <span class="math inline">\(P_M(d|D)\)</span>. The data strategy includes sampling strategies and assignment strategies, which we denote with <span class="math inline">\(P_S\)</span> and <span class="math inline">\(P_Z\)</span> respectively. Measurement techniques are also a part of data strategies and can be thought of as a selection of observable variables that carry information about unobservable variables.</p></li>
-<li><p>An <strong>answer</strong> strategy, <span class="math inline">\(A\)</span>, that generates answer <span class="math inline">\(a^A\)</span> using data <span class="math inline">\(d\)</span>.</p></li>
+<li><p>an estimator is connected to an estimand, and is designed to produces estimates of the estimand</p></li>
+<li><p>a function to produce an estimate and measure(s) of uncertainty of the estimate.</p></li>
+<li><p>may be as simple as a mean or difference-in-means, as in our simple design:</p></li>
 </ul>
-<p>A key feature of this bare specification is that if <span class="math inline">\(M\)</span>, <span class="math inline">\(D\)</span>, and <span class="math inline">\(A\)</span> are sufficiently well described, the answer to question <span class="math inline">\(I\)</span> has a distribution <span class="math inline">\(P_M(a^A|D)\)</span>. Moreover, one can construct a distribution of comparisons of this answer to the correct answer, under <span class="math inline">\(M\)</span>, for example by assessing <span class="math inline">\(P_M(a^M-a^A|D)\)</span>. One can also compare this to results under different data or analysis strategies, <span class="math inline">\(P_M(a^M-a^A|D&#39;)\)</span> and <span class="math inline">\(P_M(a^M-a^{A&#39;}|D)\)</span>, and to answers generated under alternative models, <span class="math inline">\(P_M(a^{M&#39;}-a^{A}|D)\)</span>, as long as these possess signatures that are consistent with inquiries and answer strategies.</p>
-<p><em>MIDA</em> captures the analysis-relevant features of a design, but it does not describe substantive elements, such as how theories are derived or interventions are implemented. Yet many other aspects of a design that are not explicitly labeled in these features enter into this framework if they are analytically relevant. For example, logistical details of data collection such as the duration of time between a treatment being administered and endline data collection enter into the model if the longer time until data collection affects subject recall of the treatment. However, information in {} is typically insufficient to assess those substantive elements, an important and separate part of assessing the quality of a research study.</p>
-</div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-halpern2000">
-<p>Halpern, Joseph Y. 2000. “Axiomatizing Causal Reasoning.” <em>Journal of Artificial Intelligence Research</em> 12: 317–37.</p>
-</div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">estimates_df &lt;-<span class="st"> </span><span class="kw">difference_in_means</span>(Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data =</span> simple_design_data)</a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="kw">kable</span>(<span class="kw">tidy</span>(estimates_df))</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+<th style="text-align:right;">
+conf.low
+</th>
+<th style="text-align:right;">
+conf.high
+</th>
+<th style="text-align:right;">
+df
+</th>
+<th style="text-align:left;">
+outcome
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Z
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+-5.853102
+</td>
+<td style="text-align:right;">
+6.853102
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Y
+</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>in this case, there is a single statistic (the average difference between outcomes in treated and controlled) that represents the <em>estimate</em>. this is our guess of the estimand, the average treatment effect.</p></li>
+<li><p>in addition, we have several statistics that assess the <em>uncertainty of the estimate</em>, here the standard error and a frequentist confidence interval. the answer strategy is not just how you get to the answer, but how sure you are of it.</p></li>
+<li><p>we often also have statistics related to <em>hypothesis testing</em>, here a test statistics and p-value under the null hypothesis of a zero average treatment effect. our “answer” may either be the estimate of the average treatment effect, or in some cases the decision, is there a non-zero average treatment effect.</p></li>
+<li><p>your answer strategy is the full set of steps from first seeing the data until the estimate of the estimand you present in the paper, which is usually more than just the estimate, its uncertainty measure, and associated hypothesis test.</p></li>
+<li><p><em>procedures</em>, if any, by which you explore the data and determine a final set of estimates are part of the answer strategy. for example, we sometimes find that the model we planned to run to analyze the data cannot be estimated. in these cases, there is an iterative estimation procedure in which a first model is run, changes to the specification are made, and a second or third model is presented as the result. that full set of steps – a decision tree, depending on what is estimable – is the answer strategy and we can evaluate whether it is a good one not only under the realized data but under other possible realizations where the decision <em>tree</em> would be the same but the decisions different.</p></li>
+<li><p><em>preanalysis plans</em> are part of the answer strategy.</p></li>
+<li><p><em>procedures for addressing deviations from expected analyses</em> are part of the answer strategy. whether a study has a PAP or not, we often have a way we expect to analyze the data if things go well. when they do not – because data are missing, there is noncompliance to an intervention, or the study is suspended for example – the answers will change. these procedures determine the answer the study provides (or in some cases does not), so are part of the answer strategy. <em>standard operating procedures</em> (lin and green) are documents that systematize these procedures in advange.</p></li>
+<li><p><em>how you present the estimates</em> — graphically, in tables, and in text — are all parts of the answer strategy. this is because the inferences readers make about the estimand from your paper do not just come from the numerical estimate. in some cases, the number may not even be presented exactly, and instead a graphic of the estimate and its confidence interval is what readers rely on.</p></li>
+<li><p><em>robustness checks</em> are part of the answer strategy. often, a single estimator is presented as the main analysis but then a series of alternative specifications are displayed in an appendix (such as including or excluding covariates and their interactions, different subsets of the data, or alternative statistical models). the purpose is to provide readers with evidence about how dependent the main results are on the specification, data subset, and statistical model used. when this is the case, the decision a reader makes based on their inferences about the estimand from the estimate depend not only on the main estimate but also the robustness checks. as a result, we want to assess the properties of the two together.</p></li>
+<li><p>your answer strategy should take into account <em>how many statistical tests</em> you are conducting, not just focus on the estimate-estimand pair. when you present the results from many null hypothesis tests, the rate of falsely rejecting at least one of those tests even when all are true goes up, due to the multiple comparisons problem. if you plan to adjust for this problem, those adjustments are part of your answer strategy, because they will typically adjust the p-values you report and the decisions readers make with them.</p></li>
+</ul>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="mida.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="diagnosands-and-diagnosis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="choosing-an-answer-strategy.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="what-are-the-properties-of-a-good-answer-strategy.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
