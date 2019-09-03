@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>8.1 What is included in an answer strategy | Research Design: Declare, Diagnose, Redesign</title>
+  <title>7.2 Choosing an assignment procedure | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="8.1 What is included in an answer strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="7.2 Choosing an assignment procedure | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="8.1 What is included in an answer strategy | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="7.2 Choosing an assignment procedure | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="choosing-an-answer-strategy.html"/>
-<link rel="next" href="what-are-the-properties-of-a-good-answer-strategy.html"/>
+<link rel="prev" href="choosing-a-sampling-procedure.html"/>
+<link rel="next" href="choosing-a-measurement-procedure.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -298,97 +298,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="what-is-included-in-an-answer-strategy" class="section level2">
-<h2><span class="header-section-number">8.1</span> What is included in an answer strategy</h2>
+<div id="choosing-an-assignment-procedure" class="section level2">
+<h2><span class="header-section-number">7.2</span> Choosing an assignment procedure</h2>
 <ul>
-<li><p>once you have the data, you need to have a procedure to develop an answer or a decision from it. it should be quantitative or qualitative.</p></li>
-<li><p>you will connect an estimator to an estimand, and the estimator designed to produces estimates of the estimand. distinguish estimate/estimator, using the notation from the paper (am Am etc.).</p></li>
-<li><p>a function to produce an estimate and measure(s) of uncertainty of the estimate.</p></li>
-<li><p>may be as simple as a mean or difference-in-means, as in our simple design:</p></li>
-</ul>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">estimates_df &lt;-<span class="st"> </span><span class="kw">difference_in_means</span>(Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data =</span> simple_design_data)</a>
-<a class="sourceLine" id="cb30-2" title="2"><span class="kw">kable</span>(<span class="kw">tidy</span>(estimates_df))</a></code></pre></div>
-<table>
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-p.value
-</th>
-<th style="text-align:right;">
-conf.low
-</th>
-<th style="text-align:right;">
-conf.high
-</th>
-<th style="text-align:right;">
-df
-</th>
-<th style="text-align:left;">
-outcome
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Z
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
--5.853102
-</td>
-<td style="text-align:right;">
-6.853102
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Y
-</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><p>in this case, there is a single statistic (the average difference between outcomes in treated and controlled) that represents the <em>estimate</em>. this is our guess of the estimand, the average treatment effect.</p></li>
-<li><p>these are basically all diagnostic statistics. need to highlight the estimate as the most important part of the answer strategy.</p></li>
-<li><p>in addition, we have several statistics that assess the <em>uncertainty of the estimate</em>, here the standard error and a frequentist confidence interval. the answer strategy is not just how you get to the answer, but how sure you are of it.</p></li>
-<li><p>we often also have statistics related to <em>hypothesis testing</em>, here a test statistics and p-value under the null hypothesis of a zero average treatment effect. our “answer” may either be the estimate of the average treatment effect, or in some cases the decision, is there a non-zero average treatment effect.</p></li>
-<li><p>your answer strategy is the full set of steps from first seeing the data until the estimate of the estimand you present in the paper, which is usually more than just the estimate, its uncertainty measure, and associated hypothesis test.</p></li>
-<li><p><em>procedures</em>, if any, by which you explore the data and determine a final set of estimates are part of the answer strategy. for example, we sometimes find that the model we planned to run to analyze the data cannot be estimated. in these cases, there is an iterative estimation procedure in which a first model is run, changes to the specification are made, and a second or third model is presented as the result. that full set of steps – a decision tree, depending on what is estimable – is the answer strategy and we can evaluate whether it is a good one not only under the realized data but under other possible realizations where the decision <em>tree</em> would be the same but the decisions different.</p></li>
-<li><p>precommittment is part of the answer strategy</p></li>
-<li><p><em>procedures for addressing deviations from expected analyses</em> are part of the answer strategy. whether a study has a PAP or not, we often have a way we expect to analyze the data if things go well. when they do not – because data are missing, there is noncompliance to an intervention, or the study is suspended for example – the answers will change. these procedures determine the answer the study provides (or in some cases does not), so are part of the answer strategy. <em>standard operating procedures</em> (lin and green) are documents that systematize these procedures in advange.</p></li>
-<li><p><em>procedures where you run two procedures and pick the best fit or preferred on some dimensions</em></p></li>
-<li><p><em>how you present the estimates</em> — graphically, in tables, and in text — are all parts of the answer strategy. this is because the inferences readers make about the estimand from your paper do not just come from the numerical estimate. in some cases, the number may not even be presented exactly, and instead a graphic of the estimate and its confidence interval is what readers rely on.</p></li>
-<li><em>robustness checks</em> are part of the answer strategy. often, a single estimator is presented as the main analysis but then a series of alternative specifications are displayed in an appendix (such as including or excluding covariates and their interactions, different subsets of the data, or alternative statistical models). the purpose is to provide readers with evidence about how dependent the main results are on the specification, data subset, and statistical model used. when this is the case, the decision a reader makes based on their inferences about the estimand from the estimate depend not only on the main estimate but also the robustness checks. as a result, we want to assess the properties of the two together. (<strong>or is it a diagnostic statistic??</strong> CHANGE THIS TO TALK ABOUT THIS AS A SET OF STATISTICS THAT ARE FOR A SINGLE RUN. ROBUSTNESS OF THE ANSWER STRATEGY. ROBUSTNESS AS A DIAGNOSTIC STATISTIC.)</li>
-<li>distinguish this from changes to the model where we do robustnesss vis a vis a fixed answer and data strategy.</li>
-<li>two notions of “robustness”. one is fix I D A and change M, is this “design” robust to changes in M. the other is, within a given run, is the estimate “robust” to changing the estimation procedure, so this is a diagnostic statistic.</li>
-<li><p>note I must be defined across these changes in M.</p></li>
-<li><p>your answer strategy should take into account <em>how many statistical tests</em> you are conducting, not just focus on the estimate-estimand pair. when you present the results from many null hypothesis tests, the rate of falsely rejecting at least one of those tests even when all are true goes up, due to the multiple comparisons problem. if you plan to adjust for this problem, those adjustments are part of your answer strategy, because they will typically adjust the p-values you report and the decisions readers make with them.</p></li>
-<li><p>as this seection has highlighted, the answer strategy is intimately connected with the data strategy. people often think of their entire research design as the answer strategy. but they can’t be separated.</p></li>
+<li>simple, complete, blocked, clustered, blocked and clustered</li>
+<li>point restricted randomization</li>
+<li>no assignment procedure at all</li>
+<li>multiple arms</li>
 </ul>
 </div>
             </section>
@@ -396,8 +312,8 @@ Y
           </div>
         </div>
       </div>
-<a href="choosing-an-answer-strategy.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="what-are-the-properties-of-a-good-answer-strategy.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="choosing-a-sampling-procedure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="choosing-a-measurement-procedure.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
