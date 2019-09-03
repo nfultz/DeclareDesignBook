@@ -11,7 +11,7 @@ cache:
     - $HOME/bin
     
 before_install:
-  - sudo apt-get install -y libgsl-dev
+  - sudo apt-get install -y libgsl-dev libv8-dev
   - mkdir ~/.R
   - echo "CXX_STD = CXX14" > ~/.R/Makevars
   - echo "CXX14 = g++" >> ~/.R/Makevars
@@ -25,7 +25,6 @@ r_github_packages:
   - r-lib/remotes#340
   - ebenmichael/augsynth
   - malcolmbarrett/tidymeta
-
 
 before_script:
   - mkdir ~/Dropbox
