@@ -49,12 +49,34 @@ The data strategy is a *set of procedures* that result in a dataset. It is impor
 ## Choosing a sampling procedure
 
 - simple, complete, stratified, clustered, stratified and clustered
+- weighted sampling (over/undersampling)
+- quota sampling
 
 ## Choosing an assignment procedure
 
 - simple, complete, blocked, clustered, blocked and clustered
+- point restricted randomization
+- no assignment procedure at all
+- multiple arms
 
 ## Choosing a measurement procedure
 
 - Should this be where we do the first bit of distinction between latent and observed
+
+- more T (david McKenzie).  How frequently to measure.  Andy - arguing against intermediate measurement?
+
+- multiple measurements of Y.  make a scale
+
+
+
+## 
+
+- just downloading the data.  Did you offload the data strategy
+- possibly ambiguous where the data strategy ends and the analysis strategy ends.
+- SOMEone did parts of the datastrategy
+
+
+
+
+
 
