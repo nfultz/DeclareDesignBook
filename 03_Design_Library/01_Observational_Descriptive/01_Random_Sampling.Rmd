@@ -17,15 +17,22 @@ source("scripts/before_chapter_script.R")
 
 <!-- start post here, do not edit above -->
 
-## Simple Random Sampling and Stratified-and-Clustered Random Sampling
+## Random sampling
 
-### Simple Random Sampling
+```{r random_sampling, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 500
+b_sims <- 20
+```
+
+### Simple random sampling
 
 Often we are interested in features of a population, but data on the entire population is prohibitively expensive to collect. Instead, researchers obtain data on a small fraction of the population and use measurements taken on that sample to draw inferences about the population.
 
 Imagine we seek to estimate the average political ideology of residents of the small town of Portola, California, on a left-right scale that varies from 1 (most liberal) to 7 (most conservative). We draw a simple random sample in which all residents have an equal chance of inclusion in the study. It's a straightforward design but formally declaring it will make it easy to assess its properties. 
 
-### Design Declaration
+#### Design Declaration
 
 - **M**odel: 
 
@@ -68,7 +75,7 @@ design <- population + estimand +  sampling + estimator
 diagnosands <- declare_diagnosands(select = c(bias, coverage, mean_estimate, sd_estimate))
 ```
 
-### Takeaways
+#### Takeaways
 
 With the design declared we can run a diagnosis and plot results from Monte Carlo simulations of the design:
 
@@ -81,23 +88,7 @@ The diagnosis indicates that under simple random sampling, the sample mean estim
 
 Things work well here it seems. In the exercises we suggest some small modifications of the design that point to conditions under which things might break down.
 
-### Exercises
-
-1. Modify the declaration to change the distribution of $Y$ from being uniform to something else: perhaps imagine that more extreme ideologies are more prevalent than moderate ones. Is the sample mean estimator still unbiased? Interpret your answer.
-2. Change the sampling procedure to favor units with higher values of ideology. Is the sample mean estimator still unbiased? Interpret your answer.
-3. Modify the estimation function to use this formula for the standard error: $\widehat{se} \equiv \frac{\widehat\sigma}{\sqrt{n}}$. This equation differs from the one used in our declaration (it ignores the total population size $N$). Check that the coverage of this new design is incorrect when $N=n$. Assess how large $N$ has to be for the difference between these procedures not to matter. 
-
-
-### Stratified-clustered random sampling
-
-<!-- make sure to rename the section title below -->
-
-```{r Stratified_Clustered_Sampling, echo = FALSE, output = FALSE, purl = FALSE}
-# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- FALSE
-sims <- 500
-b_sims <- 20
-```
+### Stratified and clustered random sampling
 
 Researchers often cannot randomly sample at the individual level because it may, among other reasons, be too costly or logistically impractical. Instead, they may choose to randomly sample households, political precincts, or any group of individuals in order to draw inferences about the population. This strategy may be cheaper and simpler but may also introduce risks of less precise estimates.
 
@@ -105,7 +96,7 @@ Say we are interested in the average party ideology in the entire state of Calif
 
 Assuming enough variation in the outcome of interest, the random assignment of equal-sized clusters yields unbiased but imprecise estimates. By sampling clusters, we select groups of individuals who may share common attributes. Unlike simple random sampling, we need to take  account of this intra-cluster correlation in our estimation of the standard error.^[The intra-cluster correlation coefficient (ICC) can be calculated directly and is a feature of this design.] The higher the degree of within-cluster similarity, the more variance we observe in cluster-level averages and the more imprecise are our estimates.^[In ordinary least square (OLS) models, we assume errors are independent (error terms between individual observations are uncorrelated with each other) and homoskedastic (the size of errors is homogeneous across individuals). In reality, this is often not the case with cluster sampling.] We address this by considering cluster-robust standard errors in our answer strategy below.
 
-### Design Declaration
+#### Design Declaration
 
 - **M**odel: 
 
@@ -164,7 +155,7 @@ cluster_sampling_design <- declare_population(data = fixed_pop) +
                     label = "Clustered Standard Errors")
 ```
 
-### Takeaways
+#### Takeaways
 
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
 diagnosis <- diagnose_design(cluster_sampling_design, sims = sims)
@@ -230,7 +221,12 @@ ggplot(sims, aes(x=estimate)) +
 
 The figure above may give us the impression that our estimate with clustered standard errors is less precise, when in fact, it correctly accounts for the uncertainty surrounding our estimates. The blue lines in the graph demonstrate the estimates from simulations which contain our estimand. As our table and graphs show, the share of these simulations over the total number of simulations, also known as coverage, is (correctly) close to 95% in estimations with clustered standard errors and 54% in estimations without clustered standard errors. As expected, the mean estimate itself and the bias is the same in both specifications.
 
-### References
+#### Exercises
+
+1. Modify the declaration to change the distribution of $Y$ from being uniform to something else: perhaps imagine that more extreme ideologies are more prevalent than moderate ones. Is the sample mean estimator still unbiased? Interpret your answer.
+2. Change the sampling procedure to favor units with higher values of ideology. Is the sample mean estimator still unbiased? Interpret your answer.
+3. Modify the estimation function to use this formula for the standard error: $\widehat{se} \equiv \frac{\widehat\sigma}{\sqrt{n}}$. This equation differs from the one used in our declaration (it ignores the total population size $N$). Check that the coverage of this new design is incorrect when $N=n$. Assess how large $N$ has to be for the difference between these procedures not to matter. 
+
 
 
 

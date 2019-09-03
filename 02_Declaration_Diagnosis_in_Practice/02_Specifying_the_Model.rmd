@@ -15,6 +15,22 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are
 source("scripts/before_chapter_script.R")
 ```
 
+<!-- start post here, do not edit above -->
+
+# Specifying the model
+
+<!-- make sure to rename the section title below -->
+
+```{r specifying_the_model, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+```
 
 <!-- - Introduce DAGs and potential outcomes
 - What is your DAG? How do you write a DAG? What must be in it? What will be missing from it (heterogeneity!)? [MH]
@@ -26,8 +42,6 @@ source("scripts/before_chapter_script.R")
 - Attrition is a potential outcome 
 - Measurements are potential outcomes
  -->
-
-# Specifying the Model
 
 In section X, we said that a model has three things: a set of endogenous and exogenous variables; a set of equations defining how those variables are related; and a set of probability distributions over the exogenous variables. In this chapter, we'll talk about how to go about the tricky task of specifying those three things and why it's so important to do so. 
 
