@@ -51,7 +51,9 @@ simple_design_data <- draw_data(simple_design)
 
 ## What is included in an answer strategy
 
-- an estimator is connected to an estimand, and is designed to produces estimates of the estimand
+- once you have the data, you need to have a procedure to develop an answer or a decision from it. it should be quantitative or qualitative. 
+
+- you will connect an estimator to an estimand, and the estimator designed to produces estimates of the estimand. distinguish estimate/estimator, using the notation from the paper (am Am etc.).
 
 - a function to produce an estimate and measure(s) of uncertainty of the estimate.
 
@@ -64,6 +66,8 @@ kable(tidy(estimates_df))
 
 - in this case, there is a single statistic (the average difference between outcomes in treated and controlled) that represents the *estimate*. this is our guess of the estimand, the average treatment effect. 
 
+- these are basically all diagnostic statistics. need to highlight the estimate as the most important part of the answer strategy. 
+
 - in addition, we have several statistics that assess the *uncertainty of the estimate*, here the standard error and a frequentist confidence interval. the answer strategy is not just how you get to the answer, but how sure you are of it. 
 
 - we often also have statistics related to *hypothesis testing*, here a test statistics and p-value under the null hypothesis of a zero average treatment effect. our "answer" may either be the estimate of the average treatment effect, or in some cases the decision, is there a non-zero average treatment effect. 
@@ -72,15 +76,22 @@ kable(tidy(estimates_df))
 
 - *procedures*, if any, by which you explore the data and determine a final set of estimates are part of the answer strategy. for example, we sometimes find that the model we planned to run to analyze the data cannot be estimated. in these cases, there is an iterative estimation procedure in which a first model is run, changes to the specification are made, and a second or third model is presented as the result. that full set of steps -- a decision tree, depending on what is estimable -- is the answer strategy and we can evaluate whether it is a good one not only under the realized data but under other possible realizations where the decision *tree* would be the same but the decisions different.
 
-- *preanalysis plans* are part of the answer strategy. 
+- precommittment is part of the answer strategy
 
 - *procedures for addressing deviations from expected analyses* are part of the answer strategy. whether a study has a PAP or not, we often have a way we expect to analyze the data if things go well. when they do not -- because data are missing, there is noncompliance to an intervention, or the study is suspended for example -- the answers will change. these procedures determine the answer the study provides (or in some cases does not), so are part of the answer strategy. *standard operating procedures* (lin and green) are documents that systematize these procedures in advange.
 
+- *procedures where you run two procedures and pick the best fit or preferred on some dimensions* 
+
 - *how you present the estimates* --- graphically, in tables, and in text --- are all parts of the answer strategy. this is because the inferences readers make about the estimand from your paper do not just come from the numerical estimate. in some cases, the number may not even be presented exactly, and instead a graphic of the estimate and its confidence interval is what readers rely on.
 
-- *robustness checks* are part of the answer strategy. often, a single estimator is presented as the main analysis but then a series of alternative specifications are displayed in an appendix (such as including or excluding covariates and their interactions, different subsets of the data, or alternative statistical models). the purpose is to provide readers with evidence about how dependent the main results are on the specification, data subset, and statistical model used. when this is the case, the decision a reader makes based on their inferences about the estimand from the estimate depend not only on the main estimate but also the robustness checks. as a result, we want to assess the properties of the two together.
+- *robustness checks* are part of the answer strategy. often, a single estimator is presented as the main analysis but then a series of alternative specifications are displayed in an appendix (such as including or excluding covariates and their interactions, different subsets of the data, or alternative statistical models). the purpose is to provide readers with evidence about how dependent the main results are on the specification, data subset, and statistical model used. when this is the case, the decision a reader makes based on their inferences about the estimand from the estimate depend not only on the main estimate but also the robustness checks. as a result, we want to assess the properties of the two together. (**or is it a diagnostic statistic??** CHANGE THIS TO TALK ABOUT THIS AS A SET OF STATISTICS THAT ARE FOR A SINGLE RUN. ROBUSTNESS OF THE ANSWER STRATEGY. ROBUSTNESS AS A DIAGNOSTIC STATISTIC.)
+- distinguish this from changes to the model where we do robustnesss vis a vis a fixed answer and data strategy. 
+- two notions of "robustness". one is fix I D A and change M, is this "design" robust to changes in M. the other is, within a given run, is the estimate "robust" to changing the estimation procedure, so this is a diagnostic statistic.
+- note I must be defined across these changes in M.
 
 - your answer strategy should take into account *how many statistical tests* you are conducting, not just focus on the estimate-estimand pair. when you present the results from many null hypothesis  tests, the rate of falsely rejecting at least one of those tests even when all are true goes up, due to the multiple comparisons problem. if you plan to adjust for this problem, those adjustments are part of your answer strategy, because they will typically adjust the p-values you report and the decisions readers make with them.
+
+- as this seection has highlighted, the answer strategy is intimately connected with the data strategy. people often think of their entire research design as the answer strategy. but they can't be separated.
 
 ## what are the properties of a good answer strategy
 
@@ -88,7 +99,13 @@ kable(tidy(estimates_df))
 
 - we often think about increasing the power of a design by changing our sample size or other aspects of the data strategy. but there is often significant room to grow power through the answer strategy alone, holding the data strategy constant. in an experiment, controlling for pretreatment covariates that are very predictive of the outcome often yields significant power gains, for example. 
 
+- best in the set (among set of simple linear models, what is the best model)
+
 ## how to select an answer strategy
+
+- introduce classes of estimators: qual/quant, frequentist/bayesian, design based and model based (logit probit etc.)
+
+- talk about issue of model-based vs design based, as separated from the model you assume in M. in model based you run a procedure that assumes a dgp, which may or may not be connected to the M.
 
 - your data strategy should shape your answer strategy (analyse as you randomize)
   - assignment strategies (blocks and/or clusters, heterogeneous assignment probabilities, etc.)
