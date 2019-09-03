@@ -23,14 +23,13 @@ source("scripts/before_chapter_script.R")
 
 ```{r audit_experiments, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- TRUE
+do_diagnosis <- FALSE
 sims <- 100
 b_sims <- 20
 ```
 
 ```{r, echo = FALSE}
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
-library(blockTools)
 ```
 
 A basic requirement of a good research design is that the question it seeks to answer does in fact *have* an answer, at least under plausible models of the world. In our framework, this means that an inquiry $I$ must have an associated answer $a^M$, which refers to the answer under the model. Interestingly, we sometimes might not be conscious that the questions we ask do not have answers. Fortunately, when we ask a computer to answer such a question, it complains.
@@ -101,7 +100,7 @@ design <-
   potential_outcomes + 
   assignment + 
   estimand_1 + estimand_2 + estimand_3 + 
-  declare_reveal(outcome_variable_names = c("R", "Y")) + 
+  declare_reveal(outcome_variables = c("R", "Y")) + 
   estimator_1 + estimator_2 + estimator_3
 ```
 
@@ -123,7 +122,7 @@ diagnosis <- read_rds(rds_file_path)
 ```
 
 ```{r, echo = FALSE}
-kable(diagnosis)
+knitr::kable(reshape_diagnosis(diagnosis))
 ```
 
 We learn three things from the design diagnosis. First, as expected, our experiment is unbiased for the average treatment effect on response.
