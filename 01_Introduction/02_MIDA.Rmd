@@ -1,15 +1,39 @@
-# MIDA
+---
+title: "MIDA"
+output: html_document
+bibliography: ../bib/book.bib 
+---
 
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+```{r mida, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(blockTools)
+```
+
+# MIDA
 
 Research designs are the procedures we use to learn about the world as we imagine it. Research designs vary according to how we imagine the world, the questions we want answer, the information we collect, and how we summarize the information in order to yield an answer. 
 
-
-
-
-
 Interviews, surveys, case studies, randomized experiments, laboratory games, [etc], are all research designs
-
-
 
 All empirical research designs gather and analyze information in order to answer a question about the world, stated in terms of a background model. 
 
