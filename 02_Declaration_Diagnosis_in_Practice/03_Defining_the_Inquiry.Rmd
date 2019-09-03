@@ -33,6 +33,135 @@ b_sims <- 20
 ```
 
 
+---
+title: "Defining the Inquiry"
+output: html_document
+bibliography: ../../bib/book.bib 
+---
+
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # files are all relative to RStudio project home
+```
+
+```{r, eval = !exists("do_bookdown"), echo = FALSE, include = FALSE, purl = FALSE}
+# load common packages, set ggplot ddtheme, etc.
+source("scripts/before_chapter_script.R")
+```
+
+<!-- start post here, do not edit above -->
+
+# Defining the Inquiry
+
+<!-- make sure to rename the section title below -->
+
+```{r MIDA-inquiry, echo = FALSE, output = FALSE, purl = FALSE}
+# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
+do_diagnosis <- FALSE
+sims <- 100
+b_sims <- 20
+```
+
+```{r, echo = FALSE}
+# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(dagitty)
+```
+
+
+## Classes of estimands 
+
+A well defined research design usually requires a well defined question and the quality of a design can often be assessed in terms of how well the question can be answered. 
+
+In all that follows we will make use of the concept of an *estimand*, which we take to be quantity that you seek to estimate, it is the correct answer to the question you are asking.
+
+It's October in an election year. Your inquiry is: "how many voters will vote Democrat in November?" The true answer is 66,221,143. This true answer is your estimand, you seek to estimate this number now, even though the election has not happened yet. On the basis of a survey your best guess is 65, 112, 114. This is your estimate for this estimand.
+
+In this case the estimand is a number and one that will eventually be revealed, letting you assess how well your estimate measures up against your estimand. But in social science inequiry estimands can take many different forms. 
+
+We describe eight families of estimand. These different families  reflect different social scientific orientations and often different 
+
+It turns out that many estimands can be thought of as summaries of potential outcomes. TO describe these we will imagine a  simple model, in which $Y$ is thought to depend on $X$ and $M$ and $M$ in turn is thought to depend on $X$. We represent this barebones model using a DAG in figure \@ref(XMYgraph).
+
+```{r XMYgraph, echo = FALSE, fig.caption = "X affects Y directly as well as indirectly via M"}
+
+plot(dagitty::graphLayout(dagitty("dag{ 
+  X -> Y ;
+  X -> M ;
+  M -> Y
+ }")))
+```
+
+
+### Descriptive estimands
+
+Descriptive estimands can also require inference, not simply measurement. 
+
+An example of a descriptive estimand is:
+
+$$\Pr(Y=1 | X=1)$$
+
+This descriptive estimand is to be distinguished from the counterfactual estimand:
+
+
+$$\Pr(Y=1 | X \leftarrow 1)$$
+
+where $\leftarrow$ is interpreted to mean that $X$ is "set" to the indicated value. 
+
+### Simple causal estimands
+
+The simplest causal estimand is the outcome that a unit (or group) would have under a possibly counterfactual condition. The **potential outcome**:
+
+$$\Pr(Y=1 | X \leftarrow 1)$$
+
+
+The **average treatment effect** is a summary of such potential outcomes across two conditions.
+
+$$\Pr(Y=1 | X \leftarrow 1) - \Pr(Y=1 | X \leftarrow 0)$$
+
+Defined over a population *N*, the average treatment effect is written using potential outcomes notation as:
+
+$$E_{i\in N}(Y(X=1) - Y(X=0))$$
+
+These simple estimands might condition on observational quantities, giving rise to the **conditional average treatment effect**:
+
+$$\Pr(Y=1 | X \leftarrow 1, M = 1) - \Pr(Y=1 | X \leftarrow 0, M = 1)$$
+
+or, perhaps,  **controlled average treatment effects**:
+
+$$\Pr(Y=1 | X \leftarrow 1, M \leftarrow 1) - \Pr(Y=1 | X \leftarrow 0, M \leftarrow 1)$$
+
+or, perhaps *differences* in effects:
+
+### Complex counterfactuals
+
+### Local estimands
+
+### Parametric estimands
+
+### Study dependent estimands
+Expected ATT vs realized ATT
+
+### Vector-valued inquiries (set of predictions for N units), i.e. the CEF
+
+QCA estimand.
+
+### Models as estimands
+
+
+
+## Selecting estimands
+
+### You are responsible for your estimand
+
+### Estimands to purpose. Choice of inquiry is not valueless
+
+### Implication of estimand definition for analysis
+
+### Estimand scope:What is the set of units which you want to learn the answer about? Know what ATE averages over
+
+### Unknown estimands: Inquiries for discovery
+
 
 
 
