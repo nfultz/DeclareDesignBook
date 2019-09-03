@@ -59,5 +59,7 @@ Multi-site studies – take a design from another study and use it for another o
 Knowledge accumulation
 
 
-## A library of research designs as objects
+## Improving designs in the social sciences
+
+### A library of research designs as objects
 
