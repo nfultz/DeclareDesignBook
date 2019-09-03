@@ -227,11 +227,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="16.4.2" data-path="regression-discontinuity.html"><a href="regression-discontinuity.html#takeaways-2"><i class="fa fa-check"></i><b>16.4.2</b> Takeaways</a></li>
 <li class="chapter" data-level="16.4.3" data-path="regression-discontinuity.html"><a href="regression-discontinuity.html#further-reading"><i class="fa fa-check"></i><b>16.4.3</b> Further Reading</a></li>
 <li class="chapter" data-level="16.4.4" data-path="regression-discontinuity.html"><a href="regression-discontinuity.html#exercises-1"><i class="fa fa-check"></i><b>16.4.4</b> Exercises</a></li>
-<li class="chapter" data-level="16.4.5" data-path="regression-discontinuity.html"><a href="regression-discontinuity.html#references-3"><i class="fa fa-check"></i><b>16.4.5</b> References</a></li>
 </ul></li>
 <li class="chapter" data-level="16.5" data-path="process-tracing.html"><a href="process-tracing.html"><i class="fa fa-check"></i><b>16.5</b> Process tracing</a></li>
 <li class="chapter" data-level="16.6" data-path="synthetic-controls.html"><a href="synthetic-controls.html"><i class="fa fa-check"></i><b>16.6</b> Synthetic controls</a><ul>
-<li class="chapter" data-level="16.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-4"><i class="fa fa-check"></i><b>16.6.1</b> References</a></li>
+<li class="chapter" data-level="16.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-3"><i class="fa fa-check"></i><b>16.6.1</b> References</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>IV Conclusion</b></span></li>
@@ -250,7 +249,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="17.3" data-path="a-library-of-research-designs-as-objects.html"><a href="a-library-of-research-designs-as-objects.html"><i class="fa fa-check"></i><b>17.3</b> A library of research designs as objects</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="references-5.html"><a href="references-5.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="" data-path="references-4.html"><a href="references-4.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
 <li><a href="https://declaredesign.org" target="blank">DeclareDesign</a></li>
 
@@ -284,44 +283,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>In our example, the running variable <span class="math inline">\(X\)</span> is the Democratic party’s margin of victory at time <span class="math inline">\(t-1\)</span>; and the treatment, <span class="math inline">\(Z\)</span>, is whether the Democratic party won the election in time <span class="math inline">\(t-1\)</span>. The outcome, <span class="math inline">\(Y\)</span>, is the Democratic vote margin at time <span class="math inline">\(t\)</span>. We’ll consider a population of 1,000 of these pairs of elections.</p>
 <p>A major assumption required for regression discontinuity is that the conditional expectation functions for both treatment and control potential outcomes are continuous at the cutoff.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> To satisfy this assumption, we specify two smooth conditional expectation functions, one for each potential outcome. The figure plots <span class="math inline">\(Y\)</span> (the Democratic vote margin at time <span class="math inline">\(t\)</span>) against <span class="math inline">\(X\)</span> (the margin at time <span class="math inline">\(t-1\)</span>). We’ve also plotted the true conditional expectation functions for the treated and control potential outcomes. The solid lines correspond to the observed data and the dashed lines correspond to the unobserved data.</p></li>
 </ul>
-<p><img src="book_files/figure-html/unnamed-chunk-143-1.png" width="672" /></p>
+<!-- make sure to rename the section title below -->
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1">cutoff &lt;-<span class="st"> </span><span class="fl">.5</span></a>
+<a class="sourceLine" id="cb45-2" title="2">control &lt;-<span class="st"> </span><span class="cf">function</span>(X) {</a>
+<a class="sourceLine" id="cb45-3" title="3">  <span class="kw">as.vector</span>(<span class="kw">poly</span>(X, <span class="dv">4</span>, <span class="dt">raw =</span> <span class="ot">TRUE</span>) <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(.<span class="dv">7</span>, <span class="fl">-.8</span>, <span class="fl">.5</span>, <span class="dv">1</span>))}</a>
+<a class="sourceLine" id="cb45-4" title="4">treatment &lt;-<span class="st"> </span><span class="cf">function</span>(X) {</a>
+<a class="sourceLine" id="cb45-5" title="5">  <span class="kw">as.vector</span>(<span class="kw">poly</span>(X, <span class="dv">4</span>, <span class="dt">raw =</span> <span class="ot">TRUE</span>) <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">-1.5</span>, <span class="fl">.5</span>, <span class="fl">.8</span>)) <span class="op">+</span><span class="st"> </span><span class="fl">.15</span>}</a>
+<a class="sourceLine" id="cb45-6" title="6"></a>
+<a class="sourceLine" id="cb45-7" title="7">rd_design &lt;-</a>
+<a class="sourceLine" id="cb45-8" title="8"><span class="st">  </span><span class="co"># Model -------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb45-9" title="9"><span class="kw">declare_population</span>(</a>
+<a class="sourceLine" id="cb45-10" title="10">  <span class="dt">N =</span> <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb45-11" title="11">  <span class="dt">X =</span> <span class="kw">runif</span>(N, <span class="dv">0</span>, <span class="dv">1</span>) <span class="op">-</span><span class="st"> </span>cutoff,</a>
+<a class="sourceLine" id="cb45-12" title="12">  <span class="dt">noise =</span> <span class="kw">rnorm</span>(N, <span class="dv">0</span>, <span class="fl">.1</span>),</a>
+<a class="sourceLine" id="cb45-13" title="13">  <span class="dt">Z =</span> <span class="dv">1</span> <span class="op">*</span><span class="st"> </span>(X <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb45-14" title="14">) <span class="op">+</span></a>
+<a class="sourceLine" id="cb45-15" title="15"><span class="st">  </span><span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span>Z <span class="op">*</span><span class="st"> </span><span class="kw">treatment</span>(X) <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Z) <span class="op">*</span><span class="st"> </span><span class="kw">control</span>(X) <span class="op">+</span><span class="st"> </span>noise) <span class="op">+</span></a>
+<a class="sourceLine" id="cb45-16" title="16"><span class="st">  </span></a>
+<a class="sourceLine" id="cb45-17" title="17"><span class="st">  </span><span class="co"># Inquiry -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb45-18" title="18"><span class="kw">declare_estimand</span>(<span class="dt">LATE =</span> <span class="kw">treatment</span>(<span class="dv">0</span>) <span class="op">-</span><span class="st"> </span><span class="kw">control</span>(<span class="dv">0</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb45-19" title="19"><span class="st">  </span></a>
+<a class="sourceLine" id="cb45-20" title="20"><span class="st">  </span><span class="co"># Data Strategy -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb45-21" title="21"><span class="kw">declare_reveal</span>(Y, Z) <span class="op">+</span></a>
+<a class="sourceLine" id="cb45-22" title="22"><span class="st">  </span></a>
+<a class="sourceLine" id="cb45-23" title="23"><span class="st">  </span><span class="co"># Answer Strategy ---------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb45-24" title="24"><span class="kw">declare_estimator</span>(<span class="dt">formula =</span> Y <span class="op">~</span><span class="st"> </span><span class="kw">poly</span>(X, <span class="dv">4</span>) <span class="op">*</span><span class="st"> </span>Z,</a>
+<a class="sourceLine" id="cb45-25" title="25">                  <span class="dt">model =</span> lm_robust,</a>
+<a class="sourceLine" id="cb45-26" title="26">                  <span class="dt">estimand =</span> <span class="st">&quot;LATE&quot;</span>)</a></code></pre></div>
+<p><img src="book_files/figure-html/unnamed-chunk-147-1.png" width="672" /></p>
 <ul>
 <li><p><strong>I</strong>nquiry: Our estimand is the effect of a Democratic win in an election on the Democratic vote margin of the next election, when the Democratic vote margin of the first election is zero. Formally, it is the difference in the conditional expectation functions of the control and treatment potential outcomes when the running variable is exactly zero. The black vertical line in the plot shows this difference.</p></li>
 <li><p><strong>D</strong>ata strategy: We collect data on the Democratic vote share at time <span class="math inline">\(t-1\)</span> and time <span class="math inline">\(t\)</span> for all 1,000 pairs of elections. There is no sampling or random assignment.</p></li>
 <li><p><strong>A</strong>nswer strategy: We will approximate the treated and untreated conditional expectation functions to the left and right of the cutoff using a flexible regression specification estimated via OLS. In particular, we fit each regression using a fourth-order polynomial. Much of the literature on regression discontinuity designs focuses on the tradeoffs among answer strategies, with many analysts recommending against higher-order polynomial regression specifications. We use one here to highlight how well such an answer strategy does when it matches the functional form in the model. We discuss alternative estimators in the exercises.</p></li>
 </ul>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="co"># Model -------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb45-2" title="2">cutoff &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
-<a class="sourceLine" id="cb45-3" title="3">control &lt;-<span class="st"> </span><span class="cf">function</span>(X) {</a>
-<a class="sourceLine" id="cb45-4" title="4">  <span class="kw">as.vector</span>(<span class="kw">poly</span>(X, <span class="dv">4</span>, <span class="dt">raw =</span> T) <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(.<span class="dv">7</span>, <span class="fl">-.8</span>, <span class="fl">.5</span>, <span class="dv">1</span>))}</a>
-<a class="sourceLine" id="cb45-5" title="5">treatment &lt;-<span class="st"> </span><span class="cf">function</span>(X) {</a>
-<a class="sourceLine" id="cb45-6" title="6">  <span class="kw">as.vector</span>(<span class="kw">poly</span>(X, <span class="dv">4</span>, <span class="dt">raw =</span> T) <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">-1.5</span>, <span class="fl">.5</span>, <span class="fl">.8</span>)) <span class="op">+</span><span class="st"> </span><span class="fl">.15</span>}</a>
-<a class="sourceLine" id="cb45-7" title="7">population &lt;-<span class="st"> </span><span class="kw">declare_population</span>(</a>
-<a class="sourceLine" id="cb45-8" title="8">  <span class="dt">N =</span> <span class="dv">1000</span>,</a>
-<a class="sourceLine" id="cb45-9" title="9">  <span class="dt">X =</span> <span class="kw">runif</span>(N,<span class="dv">0</span>,<span class="dv">1</span>) <span class="op">-</span><span class="st"> </span>cutoff,</a>
-<a class="sourceLine" id="cb45-10" title="10">  <span class="dt">noise =</span> <span class="kw">rnorm</span>(N,<span class="dv">0</span>,.<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb45-11" title="11">  <span class="dt">Z =</span> <span class="dv">1</span> <span class="op">*</span><span class="st"> </span>(X <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb45-12" title="12">)</a>
-<a class="sourceLine" id="cb45-13" title="13">potential_outcomes &lt;-<span class="st"> </span><span class="kw">declare_potential_outcomes</span>(</a>
-<a class="sourceLine" id="cb45-14" title="14">  <span class="dt">Y_Z_0 =</span> <span class="kw">control</span>(X) <span class="op">+</span><span class="st"> </span>noise,</a>
-<a class="sourceLine" id="cb45-15" title="15">  <span class="dt">Y_Z_1 =</span> <span class="kw">treatment</span>(X) <span class="op">+</span><span class="st"> </span>noise)</a>
-<a class="sourceLine" id="cb45-16" title="16"></a>
-<a class="sourceLine" id="cb45-17" title="17"><span class="co"># Inquiry -----------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb45-18" title="18">estimand &lt;-<span class="st"> </span><span class="kw">declare_estimand</span>(<span class="dt">LATE =</span> <span class="kw">treatment</span>(<span class="dv">0</span>) <span class="op">-</span><span class="st"> </span><span class="kw">control</span>(<span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb45-19" title="19"></a>
-<a class="sourceLine" id="cb45-20" title="20"><span class="co"># Answer Strategy ---------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb45-21" title="21">estimator &lt;-<span class="st"> </span><span class="kw">declare_estimator</span>(</a>
-<a class="sourceLine" id="cb45-22" title="22">  <span class="dt">formula =</span> Y <span class="op">~</span><span class="st"> </span><span class="kw">poly</span>(X, <span class="dv">4</span>) <span class="op">*</span><span class="st"> </span>Z,</a>
-<a class="sourceLine" id="cb45-23" title="23">  <span class="dt">model =</span> lm_robust,</a>
-<a class="sourceLine" id="cb45-24" title="24">  <span class="dt">estimand =</span> estimand)</a>
-<a class="sourceLine" id="cb45-25" title="25"></a>
-<a class="sourceLine" id="cb45-26" title="26"><span class="co"># Design ------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb45-27" title="27">design &lt;-<span class="st"> </span>population <span class="op">+</span><span class="st"> </span>potential_outcomes <span class="op">+</span></a>
-<a class="sourceLine" id="cb45-28" title="28"><span class="st">  </span>estimand <span class="op">+</span><span class="st"> </span>reveal_outcomes <span class="op">+</span><span class="st"> </span>estimator</a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1">rd_diagnosis &lt;-<span class="st"> </span><span class="kw">diagnose_design</span>(rd_design, <span class="dt">sims =</span> sims, <span class="dt">bootstrap_sims =</span> b_sims)</a></code></pre></div>
+<p>Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1"><span class="kw">summary</span>(rd_diagnosis)</a></code></pre></div>
+<pre><code>## 
+## Research design diagnosis based on 100 simulations. Diagnosand estimates with bootstrapped standard errors in parentheses (20 replicates).
+## 
+##  Design Label Estimand Label Estimator Label        Term N Sims   Bias
+##     rd_design           LATE       estimator poly(X, 4)1    100   2.08
+##                                                                 (2.36)
+##    RMSE  Power Coverage Mean Estimate SD Estimate Mean Se Type S Rate
+##   24.82   0.06     0.95          2.23       24.85   26.52        0.33
+##  (1.50) (0.02)   (0.02)        (2.36)      (1.54)  (0.28)      (0.21)
+##  Mean Estimand
+##           0.15
+##         (0.00)</code></pre>
 </div>
 <div id="takeaways-2" class="section level3">
 <h3><span class="header-section-number">16.4.2</span> Takeaways</h3>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1">diagnosis &lt;-<span class="st"> </span><span class="kw">diagnose_design</span>(rd_design, <span class="dt">sims =</span> sims, <span class="dt">bootstrap_sims =</span> b_sims)</a></code></pre></div>
 <p>We highlight three takeaways. First, the power of this design is very low: with 1,000 units we do not achieve even 10% statistical power. However, our estimates of the uncertainty are not too wide: the coverage probability indicates that our confidence intervals indeed contain the estimand 95% of the time as they should. Our answer strategy is highly uncertain because the fourth-order polynomial specification in regression model gives weights to the data that greatly increase the variance of the estimator (<span class="citation">Gelman and Imbens (<a href="#ref-gelman2017high">2017</a>)</span>). In the exercises we explore alternative answer strategies that perform better.</p>
 <p>Second, the design is biased because polynomial approximations of the average effect at exactly the point of the threshold will be inaccurate in small samples (<span class="citation">Sekhon and Titiunik (<a href="#ref-sekhontitiunik2017">2017</a>)</span>), especially as units farther away from the cutoff are incorporated into the answer strategy. We know that the estimated bias is not due to simulation error by examining the bootstrapped standard error of the bias estimates.</p>
 <p>Finally, from the figure, we can see how poorly the average effect at the threshold approximates the average effect for all units. The average treatment effect among the treated (to the right of the threshold in the figure) is negative, whereas at the threshold it is positive. This clarifies that the estimand of the regression discontinuity design, the difference at the cutoff, is only relevant for a small – and possibly empty – set of units very close to the cutoff.</p>
@@ -340,10 +352,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>Reduce the number of polynomial terms of the the <code>treatment()</code> and <code>control()</code> functions and assess how the bias of the design changes as the potential outcomes become increasingly linear as a function of the running variable.</p></li>
 <li><p>Redefine the population function so that units with higher potential outcome are more likely to locate just above the cutoff than below it. Assess whether and how this affects the bias of the design.</p></li>
 </ol>
-</div>
-<div id="references-3" class="section level3">
-<h3><span class="header-section-number">16.4.5</span> References</h3>
 
+<!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
+<!-- start post here, do not edit above -->
 </div>
 </div>
 <h3>References</h3>
