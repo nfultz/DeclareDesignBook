@@ -1,6 +1,8 @@
 ---
 title: "Software Primer"
-output: html_document
+output: 
+  html_document:
+    number_sections: true
 bibliography: ../bib/book.bib 
 ---
 
@@ -32,126 +34,197 @@ b_sims <- 20
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 ```
 
+## Installing R 
 
-```{r, message = FALSE, warning = FALSE}
-library(DeclareDesign)
+This book relies on the statistical computing environment R, which you can download for free from [https://cran.r-project.org/](CRAN). We also recommend (and assume you are using) the free program [https://www.rstudio.com/products/rstudio/download/](RStudio), which provides a friendly interface to R. 
 
-set.seed(1) 
-# M -- Model
-
-population         <- declare_population(N = 5, u = rnorm(N))
-potential_outcomes <- declare_potential_outcomes(Y_Z_0 = 0,
-                                                 Y_Z_1 = 1 + u)
-# I -- Inquiries: A query defined in terms of potential outcomes
-estimand_1 <- declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0))
-estimand_2 <- declare_estimand(SATE = mean(Y_Z_1 - Y_Z_0))
-
-# D -- Data Strategy: Researcher interventions on the world
-sampling   <- declare_sampling(n = 4)
-assignment <- declare_assignment()
-reveal_Y   <- declare_reveal(Y,Z)
-
-# A -- Answer steps
-estimate   <- declare_estimator(Y~Z, estimand = c("PATE", "SATE"))
-
-design <- population + potential_outcomes + estimand_2 +
-  sampling + estimand_1 + assignment + reveal_Y+ estimate
-
-simulations <- simulate_design(design, sims = 1)
-```
-
-<!-- <img src="pipedreams.pdf" alt="some text"  width="4200" height="4200"> -->
-
-
-
-
-
-
-## A simple design declaration 
-
-```{r simple_design, echo = FALSE, output = FALSE, purl = FALSE}
-# run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- FALSE
-sims <- 100
-b_sims <- 20
-```
-
-- Here we're going to walk through a design
-
-- The way DD works is that it generates a dataset, and passes that dataset along, modifying or summarizing it at each step
-
-
-### Parameters 
-
-```{r}
-tau <- .10
-N <- 8
-N_sampled <- 4
-```
-
-### $M$odel 
-
-
-```{r}
-population <- declare_population(N = N, e = runif(N)) 
-potential_outcomes <- declare_potential_outcomes(Y_Z_0 = .5 < e,
-                                                 Y_Z_1 = .5 < e + tau)
-```
-
-### $I$nquiry
-
-```{r}
-estimand <- declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0))
-```
-
-### $D$ata strategy
-
-```{r}
-sampling <- declare_sampling(n = N_sampled)
-assignment <- declare_assignment(prob = .5)
-reveal_outcomes <- declare_reveal(Y, Z)
-```
-
-### $A$nswer strategy
-
-```{r}
-estimator <- declare_estimator(Y ~ Z, label = "DiM", estimand = "PATE")
-```
-
-### Putting it all together
-
-
-```{r}
-simple_design <- population + potential_outcomes + estimand + 
-  sampling + assignment + reveal_outcomes + estimator
-```
-
-### Appending, Modifying, Expanding
-
+Once you've got RStudio installed, open it up and install `DeclareDesign` and its  related packages. These include three packages that enable specific steps in the research process (`fabricatr` for simulating social science data; `randomizr`, for random sampling and random assignment; and `estimatr` for design-based estimators). You can also install `DesignLibrary`, which gets standard designs up-and-running in one line. To install them, you can type:
 
 ```{r, eval = FALSE}
-simple_design <- simple_design + linear_estimator
+install.packages(c("DeclareDesign", "fabricatr", "randomizr", "estimatr", "DesignLibrary"))
 ```
 
+We also recommend you install the `tidyverse` suite of packages for data analysis, which we will use throughout the book:
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+
+## Building a step of a research design 
+
+We begin learning about how to build a research design in `DeclareDesign` by declaring a single step: random assignment. We take as a starting point a fixed set of data, describing a set of voters in Los Angeles. The research project we are planning involves randomly assigning voters to receive a knock on their door from a canvasser (or not to receive a door knock). Our data look like this:
+
+```{r, echo = FALSE}
+voter_file <- fabricate(
+  N = 100,
+  age = sample(18:80, N, replace = TRUE),
+  sex = sample(c("F", "M"), N, replace = TRUE),
+  party = sample(c("DEM", "REP", "GRN"), N, replace = TRUE),
+  precinct = sample(2000:10000, N, replace = TRUE)
+)
+```
 
 ```{r}
-simple_design <- redesign(simple_design, N = 100)
+kable(head(voter_file))
 ```
+
+There are `r nrow(voter_file)` voters in the dataset. 
+
+### In dplyr
+
+We plan to randomly assign 50 of the voters to treatment (door knock) and 50 to control. We want to create an indicator variable `Z`, where `1` represents assignment to treatment and `0` control. In order to do this, we use the `sample` function:
 
 ```{r}
-simple_designs <- redesign(simple_design, N = c(50,100,200))
+voter_file <- voter_file %>% 
+  mutate(Z = sample(c(0, 1), size = 100, replace = TRUE, prob = c(0.5, 0.5)))
 ```
+
+This says: draw a random sample of the possible values `0` and `1` 100 times (the number of voters) with probability `0.5` for `0` and `0.5` for `1` with replacement. Now our data frame `voter_file` includes the `Z` indicator:
 
 ```{r}
-null_potential_outcomes <- declare_potential_outcomes(Y_Z_0 = .5 < e,
-                                                      Y_Z_1 = Y_Z_0)
-simple_designs <- replace_step(simple_design, "potential_outcomes", null_potential_outcomes)
+kable(head(voter_file))
 ```
 
+We make things just a little bit easier with the `randomizr` package, which includes common random assignment functions including simple random assignment used here (see Chapter XX for a description of common kinds of random assignment). You can instead write:
+
+```{r}
+voter_file <- voter_file %>% 
+  mutate(Z = simple_ra(N = 100, prob = 0.5))
+```
+
+Now we have a few ways to write our design step for random assignment. In order to diagnose our research design, though, we will need to run this step over and over again as part of our design simulation to explore its properties. 
+
+### As a function
+
+To simulate the design, we turn the assignment step into a *function*. In DeclareDesign, we are going to use *tidy* functions, which means that each function takes *in* a data frame and sends back *out* a data frame (with more variables, sampled observations, or some other change to them). Here is a simple tidy function that takes the data and returns the same data with a new variable `new_variable` added to it:
+
+```{r}
+# note the first argument of a tidy function must be called data
+simple_tidy_function <- function(data){
+  data %>% mutate(new_variable = 1)
+}
+```
+
+Now we can run that function on our voter file data:
+
+```{r}
+simple_tidy_function(voter_file) %>% head %>% kable
+```
+
+For our random assignment step, we want to create a tidy function that adds our assignment indicator `Z`. We write:
+
+```{r}
+simple_random_assignment_function <- function(data) {
+  data %>% mutate(Z = simple_ra(N = 100, prob = 0.5))
+}
+```
+
+Now, when we run our random assignment function on the voter file, it adds in `Z`:
+
+```{r}
+simple_random_assignment_function(voter_file) %>% head %>% kable
+```
+
+### In DeclareDesign
+
+`DeclareDesign` make writing each design step just a bit easier. Instead of writing a function each time, it writes a function for us. The core of `DeclareDesign` is the set of `declare_*` functions, including `declare_assignment`. Each one is a *function factory*, meaning it takes a set of parameters about your research design like the number of units and the random assignment probability as *inputs*, and returns a *function* as an output. Instead of writing the function `simple_random_assignment_function`, in `DeclareDesign` we declare it:
+
+```{r}
+simple_random_assignment_step <- declare_assignment(prob = 0.5)
+```
+
+`simple_random_assignment_step` is a tidy function. You can run the function on data:
+
+```{r}
+simple_random_assignment_step(voter_file) %>% head %>% kable
+```
+
+Every step of a research design in MIDA can be written using one of the `declare_*` functions. In the next section, we walk through each step and how to declare it using `DeclareDesign`. 
+
+## MIDA in DeclareDesign
+
+### Model
+
+#### Population
+
+1. Bring your own data
 
 
+2. Use our default interface through fabricatr
 
 
+3. Write your own
 
+#### Potential outcomes
 
+1. Define each potential outcome, one-by-one
 
+2. Write the potential outcomes as a formula
+
+3. Write your own 
+
+### Inquiry
+
+1. Define an estimand using simple R expressions
+
+2. Write your own
+
+- what's different is you return a df of estimands
+
+### Data strategy
+
+#### Sampling
+
+1. Simple
+
+2. Stratified
+
+- look the probs differ!
+
+3. Write your own 
+
+#### Assignment
+
+1. Complete
+
+2. Blocked
+
+- look the probs differ!
+
+3. Write your own
+
+### Answer strategy
+
+1. lm
+
+2. dim
+
+3. Write your own
+
+### Rolling your own steps
+
+1. You can add a step anywhere using `declare_step`.
+
+2. You can use `dplyr` verbs.
+
+## Building a design from a set of steps
+
+## Simulating a research design
+
+- pipeline of a design based on the DeclareDesign steps piped together
+
+- `simulate_design`
+
+## Diagnosing a research design
+
+1. group_by() %>% summarize
+
+2. Defining diagnosands 
+
+3. `diagnose_design`
+
+## Comparing designs
+
+1. `compare_designs`
+
+2. `compare_diagnoses`
