@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>5.1 Models versus modelling | Research Design: Declare, Diagnose, Redesign</title>
+  <title>3.2 Building a step of a research design | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="5.1 Models versus modelling | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="3.2 Building a step of a research design | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="5.1 Models versus modelling | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="3.2 Building a step of a research design | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="specifying-the-model.html"/>
-<link rel="next" href="without-a-model-you-can-get-the-answer-pretty-wrong.html"/>
+<link rel="prev" href="installing-r.html"/>
+<link rel="next" href="mida-in-declaredesign.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -305,23 +305,806 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="models-versus-modelling" class="section level2">
-<h2><span class="header-section-number">5.1</span> Models versus modelling</h2>
-<p>In this chapter, we’re not talking about “statistical models” used to estimate unknown parameters—that’s part of your answer strategy. We’re talking about specifying simulation models: a set of assumptions encoded in math or computer language that can be used to generate imaginary datasets. <!-- Using a capital $M$ model to simulate fake datasets, you can learn about the properties of your answer strategy, which may or may not involve statistical modelling.  --></p>
-<p>The distinction is a subtle but important one. To see why, let’s talk about fish. How many fish <em>are</em> there in the ocean, anyway? It turns out we don’t know the answer to this question: we just can’t count all the fish.</p>
-<p>We do have answers, though: scientists estimate there are 3.5 trillion fish in the ocean as of 2017. But if we can’t count them, how do we get this answer and why should we ever believe it? It all depends on comparisons between <span class="math inline">\(M\)</span>odels and modelling.</p>
-<p>Let’s say our <span class="math inline">\(M\)</span>odel states that <span class="math inline">\(N\)</span> fish exist. We want to see how well a statistical modelling strategy would do at guessing <span class="math inline">\(N\)</span>. Our <span class="math inline">\(M\)</span>odel further assumes the fish don’t die, reproduce, or migrate. They don’t have any favorite spots in the sea, so they’re equally likely to be caught no matter where you cast your net. Moreover, the fish are brave fish: having been caught once and released, the fish don’t shy away from being caught again.</p>
-<p>One of the simplest modelling techniques to estimate the size of an unknown population is the capture-recapture technique: Net <span class="math inline">\(n\)</span> fish, tag them, and release them; catch another <span class="math inline">\(K\)</span> fish, count the <span class="math inline">\(k\)</span> that are tagged (from the previous netting), and release them. This leads to a pretty simple statistical model, <span class="math inline">\(n/N = k/K \Rightarrow \hat{N} = Kn/k\)</span>. In our [design library entry on sample-resample designs][Sample-resample designs] we show that this design does a fairly good job of getting the answer right, <em>under this <span class="math inline">\(M\)</span>odel</em>.</p>
-<p>In reality though, we know that the posited <span class="math inline">\(M\)</span>odel of the world is very unrealistic: fish die, migrate, reproduce, favor certain spots, drop their tags, and avoid nets at different rates. So, if you were told you that the 3.5 million number came from the simple modelling exercise above, you’d rightly distrust it. What fisheries scientists actually do is draw on a wealth of research to build really complex and much more realistic <span class="math inline">\(M\)</span>odels on computers, which are capable of simulating fish stocks. With those <span class="math inline">\(M\)</span>odels and the imaginary but known fish populations they generate, we can test the performance of more sophisticated statistical modelling strategies. If the statistical models do a pretty good job of guessing the size of the imaginary fish populations, then we should feel more inclined to trust the numbers they give us when we go out and use them in the real world.</p>
-<p>In other words, the distinction between <span class="math inline">\(M\)</span>odels and modelling here gives us something quite profound: though we may never know how many fish are really in the ocean, we can know how many fish we <em>would</em> guess are in the ocean were our assumptions about the ocean correct. We never get to know if we guessed correctly, but we do get to know which guesses we should and shouldn’t trust, given the assumptions we’re willing to make about the world. <!-- If our $M$odel seems plausible and the statistical modelling gives us decent answers on average, then maybe the answer we get when we apply that statistical model to real data is not all that bad. So, we've made an unanswerable question answerable, and we know the conditions under which the answer is good. --> <!-- In fact, this principle is pretty general:   --></p>
+<div id="building-a-step-of-a-research-design" class="section level2">
+<h2><span class="header-section-number">3.2</span> Building a step of a research design</h2>
+<p>We begin learning about how to build a research design in <code>DeclareDesign</code> by declaring a single step: random assignment. We take as a starting point a fixed set of data, describing a set of voters in Los Angeles. The research project we are planning involves randomly assigning voters to receive a knock on their door from a canvasser (or not to receive a door knock). Our data look like this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">kable</span>(<span class="kw">head</span>(voter_file))</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+ID
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:left;">
+sex
+</th>
+<th style="text-align:left;">
+party
+</th>
+<th style="text-align:right;">
+precinct
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+001
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+9104
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+002
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+8029
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+003
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+GRN
+</td>
+<td style="text-align:right;">
+8383
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+004
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+2048
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+005
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+5210
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+006
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+2155
+</td>
+</tr>
+</tbody>
+</table>
+<p>There are 100 voters in the dataset.</p>
+<div id="in-dplyr" class="section level3">
+<h3><span class="header-section-number">3.2.1</span> In dplyr</h3>
+<p>We plan to randomly assign 50 of the voters to treatment (door knock) and 50 to control. We want to create an indicator variable <code>Z</code>, where <code>1</code> represents assignment to treatment and <code>0</code> control. In order to do this, we use the <code>sample</code> function:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">voter_file &lt;-<span class="st"> </span>voter_file <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Z =</span> <span class="kw">sample</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">size =</span> <span class="dv">100</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dt">prob =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>)))</a></code></pre></div>
+<p>This says: draw a random sample of the possible values <code>0</code> and <code>1</code> 100 times (the number of voters) with probability <code>0.5</code> for <code>0</code> and <code>0.5</code> for <code>1</code> with replacement. Now our data frame <code>voter_file</code> includes the <code>Z</code> indicator:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">kable</span>(<span class="kw">head</span>(voter_file))</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+ID
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:left;">
+sex
+</th>
+<th style="text-align:left;">
+party
+</th>
+<th style="text-align:right;">
+precinct
+</th>
+<th style="text-align:right;">
+Z
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+001
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+9104
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+002
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+8029
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+003
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+GRN
+</td>
+<td style="text-align:right;">
+8383
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+004
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+2048
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+005
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+5210
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+006
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+2155
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>We make things just a little bit easier with the <code>randomizr</code> package, which includes common random assignment functions including simple random assignment used here (see Chapter XX for a description of common kinds of random assignment). You can instead write:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">voter_file &lt;-<span class="st"> </span>voter_file <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Z =</span> <span class="kw">simple_ra</span>(<span class="dt">N =</span> <span class="dv">100</span>, <span class="dt">prob =</span> <span class="fl">0.5</span>))</a></code></pre></div>
+<p>Now we have a few ways to write our design step for random assignment. In order to diagnose our research design, though, we will need to run this step over and over again as part of our design simulation to explore its properties.</p>
+</div>
+<div id="as-a-function" class="section level3">
+<h3><span class="header-section-number">3.2.2</span> As a function</h3>
+<p>To simulate the design, we turn the assignment step into a <em>function</em>. In DeclareDesign, we are going to use <em>tidy</em> functions, which means that each function takes <em>in</em> a data frame and sends back <em>out</em> a data frame (with more variables, sampled observations, or some other change to them). Here is a simple tidy function that takes the data and returns the same data with a new variable <code>new_variable</code> added to it:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># note the first argument of a tidy function must be called data</span></a>
+<a class="sourceLine" id="cb7-2" title="2">simple_tidy_function &lt;-<span class="st"> </span><span class="cf">function</span>(data){</a>
+<a class="sourceLine" id="cb7-3" title="3">  data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">new_variable =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-4" title="4">}</a></code></pre></div>
+<p>Now we can run that function on our voter file data:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">simple_tidy_function</span>(voter_file) <span class="op">%&gt;%</span><span class="st"> </span>head <span class="op">%&gt;%</span><span class="st"> </span>kable</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+ID
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:left;">
+sex
+</th>
+<th style="text-align:left;">
+party
+</th>
+<th style="text-align:right;">
+precinct
+</th>
+<th style="text-align:right;">
+Z
+</th>
+<th style="text-align:right;">
+new_variable
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+001
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+9104
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+002
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+8029
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+003
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+GRN
+</td>
+<td style="text-align:right;">
+8383
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+004
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+2048
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+005
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+5210
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+006
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+2155
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+</tbody>
+</table>
+<p>For our random assignment step, we want to create a tidy function that adds our assignment indicator <code>Z</code>. We write:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">simple_random_assignment_function &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb9-2" title="2">  data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Z =</span> <span class="kw">simple_ra</span>(<span class="dt">N =</span> <span class="dv">100</span>, <span class="dt">prob =</span> <span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb9-3" title="3">}</a></code></pre></div>
+<p>Now, when we run our random assignment function on the voter file, it adds in <code>Z</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">simple_random_assignment_function</span>(voter_file) <span class="op">%&gt;%</span><span class="st"> </span>head <span class="op">%&gt;%</span><span class="st"> </span>kable</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+ID
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:left;">
+sex
+</th>
+<th style="text-align:left;">
+party
+</th>
+<th style="text-align:right;">
+precinct
+</th>
+<th style="text-align:right;">
+Z
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+001
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+9104
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+002
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+8029
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+003
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+GRN
+</td>
+<td style="text-align:right;">
+8383
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+004
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+2048
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+005
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+5210
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+006
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+2155
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="in-declaredesign" class="section level3">
+<h3><span class="header-section-number">3.2.3</span> In DeclareDesign</h3>
+<p><code>DeclareDesign</code> make writing each design step just a bit easier. Instead of writing a function each time, it writes a function for us. The core of <code>DeclareDesign</code> is the set of <code>declare_*</code> functions, including <code>declare_assignment</code>. Each one is a <em>function factory</em>, meaning it takes a set of parameters about your research design like the number of units and the random assignment probability as <em>inputs</em>, and returns a <em>function</em> as an output. Instead of writing the function <code>simple_random_assignment_function</code>, in <code>DeclareDesign</code> we declare it:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">simple_random_assignment_step &lt;-<span class="st"> </span><span class="kw">declare_assignment</span>(<span class="dt">prob =</span> <span class="fl">0.5</span>)</a></code></pre></div>
+<p><code>simple_random_assignment_step</code> is a tidy function. You can run the function on data:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">simple_random_assignment_step</span>(voter_file) <span class="op">%&gt;%</span><span class="st"> </span>head <span class="op">%&gt;%</span><span class="st"> </span>kable</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+ID
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:left;">
+sex
+</th>
+<th style="text-align:left;">
+party
+</th>
+<th style="text-align:right;">
+precinct
+</th>
+<th style="text-align:right;">
+Z
+</th>
+<th style="text-align:right;">
+Z_cond_prob
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+001
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+9104
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+002
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+8029
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+003
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+GRN
+</td>
+<td style="text-align:right;">
+8383
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+004
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+DEM
+</td>
+<td style="text-align:right;">
+2048
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+005
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+5210
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+006
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:left;">
+REP
+</td>
+<td style="text-align:right;">
+2155
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+</tr>
+</tbody>
+</table>
+<p>Every step of a research design in MIDA can be written using one of the <code>declare_*</code> functions. In the next section, we walk through each step and how to declare it using <code>DeclareDesign</code>.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="specifying-the-model.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="without-a-model-you-can-get-the-answer-pretty-wrong.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="installing-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="mida-in-declaredesign.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
