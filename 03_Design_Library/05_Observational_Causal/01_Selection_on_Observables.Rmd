@@ -1,5 +1,5 @@
 ---
-title: "Selection on observables"
+title: "Selection on Observables"
 output: html_document
 bibliography: ../../bib/book.bib 
 ---
@@ -24,48 +24,121 @@ source("scripts/before_chapter_script.R")
 
 ```{r selection_on_observables, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- FALSE
+do_diagnosis <- TRUE
 sims <- 100
 b_sims <- 20
 ```
 
 ```{r, echo = FALSE}
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
-library(blockTools)
 ```
 
-You can use the global bib file via rmarkdown cites like this: @imai2008
+
+
+### Classic Confounding
+
+- We want to know the effect of Z on Y, but it's confounded by X
+- DIM is biased, OLS is unbiased because we happen to get the functional forms right enough.
+
+
+```{r, echo=FALSE, fig.align='center', fig.cap = 'DAG with one observed confounder', out.width = '40%'}
+knitr::include_graphics("figures/regression_dag_1.png")
+```
 
 ```{r}
-design <-
-  declare_population(N = 100, u = rnorm(N)) +
-  declare_potential_outcomes(Y ~ Z + u) +
-  declare_assignment(prob = 0.5) +
-  declare_reveal(Y, Z) +
-  declare_estimator(Y ~ Z, model = difference_in_means)
+design_1 <-
+  declare_population(N = 100, 
+                     U_z = rnorm(N),
+                     U_x = rnorm(N),
+                     U_y = rnorm(N),
+                     X = U_x) +
+  declare_potential_outcomes(Y ~ 0.5*Z + X + U_y) +
+  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(prob_unit = pnorm(U_z + U_x), simple = TRUE) +
+  declare_estimator(Y ~ Z, estimand = "ATE", label = "DIM") +
+  declare_estimator(Y ~ Z + X, model = lm, estimand = "ATE", label = "OLS")
 ```
-
-
-This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
-```{r, eval = do_diagnosis & !exists("do_bookdown")}
-simulations_pilot <- simulate_design(design, sims = sims)
-```
-
-Right after you do simulations, you want to save the simulations rds. 
-
-```{r, echo = FALSE, purl = FALSE}
-# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("section_template"), "/simulations_pilot.RDS")
-if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(simulations_pilot, path = rds_file_path)
-}
-simulations_pilot <- read_rds(rds_file_path)
-```
-
-Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
 
 ```{r}
-kable(head(simulations_pilot))
+dx_1 <- diagnose_design(design_1, sims = sims, bootstrap_sims = b_sims)
+dx_1
+```
+
+### What if the functional form is wrong?
+
+- Oh no, the functional form is wrong, so even though we're controlling for all confounders, there's still bias.
+- Solution: matching might do a better job since it's sort of a "nonparametric" form of covariate control.
+
+```{r}
+design_2 <-
+  declare_population(N = 100, 
+                     U_z = rnorm(N),
+                     U_x = rnorm(N),
+                     U_y = rnorm(N),
+                     X = U_x) +
+  declare_potential_outcomes(Y ~ 0.5*Z + X + X^2 + U_y) +
+  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(prob_unit = pnorm(U_z + U_x + U_x^2), simple = TRUE) +
+  declare_estimator(Y ~ Z, estimand = "ATE", label = "DIM") +
+  declare_estimator(Y ~ Z + X, model = lm, estimand = "ATE", label = "OLS")
+```
+
+```{r}
+dx_2 <- diagnose_design(design_2, sims = sims, bootstrap_sims = b_sims)
+dx_2
+```
+
+### What if you have unobserved confounding?
+
+```{r, echo=FALSE, fig.align='center', fig.cap = 'DAG with unobserved confounding', out.width = '40%'}
+knitr::include_graphics("figures/regression_dag_2.png", )
+```
+
+```{r}
+design_3 <-
+  declare_population(N = 100, 
+                     U_z = rnorm(N),
+                     U_x = rnorm(N),
+                     U_y = correlate(rnorm, given = U_z, rho = 0.9),
+                     X = U_x) +
+  declare_potential_outcomes(Y ~ 0.5*Z + X + U_y) +
+  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(prob_unit = pnorm(U_z + U_x), simple = TRUE) +
+  declare_estimator(Y ~ Z, estimand = "ATE", label = "DIM") +
+  declare_estimator(Y ~ Z + X, model = lm, estimand = "ATE", label = "OLS")
+```
+
+```{r}
+dx_3 <- diagnose_design(design_3, sims = sims, bootstrap_sims = b_sims)
+dx_3
+```
+
+
+### What if the observed covariate is post-treatment?
+
+```{r, echo=FALSE, fig.align='center', fig.cap = 'DAG with one observed mediator', out.width = '40%'}
+knitr::include_graphics("figures/regression_dag_3.png", )
+```
+
+
+```{r}
+design_4 <-
+  declare_population(N = 100, 
+                     U_z = rnorm(N),
+                     U_m = rnorm(N),
+                     U_y = rnorm(N)) +
+  declare_potential_outcomes(M ~ 0.5*Z + U_m) +
+  declare_potential_outcomes(Y ~ 0.5*Z + (0.5*Z + U_m) + U_y) +
+  declare_assignment(prob_unit = pnorm(U_z), simple = TRUE) +
+  declare_reveal(c(M, Y), Z) +
+  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_estimator(Y ~ Z, estimand = "ATE", label = "DIM") +
+  declare_estimator(Y ~ Z + M, model = lm, estimand = "ATE", label = "OLS")
+```
+
+```{r}
+dx_4 <- diagnose_design(design_4, sims = sims, bootstrap_sims = b_sims)
+dx_4
 ```
 
 
