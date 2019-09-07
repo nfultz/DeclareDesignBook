@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 11 Design Library | Research Design: Declare, Diagnose, Redesign</title>
+  <title>3.2 Where we are going | Research Design: Declare, Diagnose, Redesign</title>
   <meta name="description" content="describe the book" />
   <meta name="generator" content="bookdown 0.13.2 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 11 Design Library | Research Design: Declare, Diagnose, Redesign" />
+  <meta property="og:title" content="3.2 Where we are going | Research Design: Declare, Diagnose, Redesign" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 11 Design Library | Research Design: Declare, Diagnose, Redesign" />
+  <meta name="twitter:title" content="3.2 Where we are going | Research Design: Declare, Diagnose, Redesign" />
   
   <meta name="twitter:description" content="describe the book" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="redesign-1.html"/>
-<link rel="next" href="observational-designs-for-descriptive-inference.html"/>
+<link rel="prev" href="installing-r.html"/>
+<link rel="next" href="building-a-step-of-a-research-design.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -323,27 +323,117 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="design-library" class="section level1">
-<h1><span class="header-section-number">Chapter 11</span> Design Library</h1>
-<p>This section of the book ennumerates a series of common and not-so-common social science research design. Each entry will include description of the design in terms of MIDA and also a declaration of the design in code. We’ll often diagnose designs over the range of values of some design parameters in order to point out especially interesting or unusual features of the design.</p>
-<p>Our goal in this section is not to provide a comprehensive accounting of all empirical research designs. It’s also not to describe any of the particular designs in exhaustive detail, because we are quite sure that in order for these designs to be useful for any practical purpose, they will need to be modified. The entries in the design library are not recipies that, if you follow the instructions, out will come high-quality research.</p>
-<p>Instead, we hope that the entries provide inspiration for how to tailor a particular class of designs – the blocked-and-clustered randomized trial or the catch-and-release design – to your own research setting. The basic structure of the design library entry will be useful, but the specifics about plausible ranges of outcomes, sample size constraints, etc, will be different in each particular setting.</p>
-<p>We’ve split up designs by Inquiry and by Data strategy. Inquires can be descripitve or causal and Data strategies can be observational or experimental. This leads to four categories of research: Observational descriptive, Experimental descriptive, Observational Causal, and Experimental causal. A third dimension along which studies can vary is whether the Answer strategy is qualitative or quantitative. If we include this dimension in our typology, we’d end up with eight broad categories of research design. We don’t see the qualitative-quantitative difference in answer strategy to be as fundamental as the differences in inquiry and data strategy, so we’ll just include both qualitative and quantitative designs in each of our four categories. Besides, social scientists always appreciate a good two-by-two:</p>
-
-<p>In the broadest terms, descriptive inquiries can be described as <span class="math inline">\(f(\mathbf{Y(Z = Realized)})\)</span>, where <span class="math inline">\(f()\)</span> is some function and <span class="math inline">\(\mathbf{Y(Z = Realized)}\)</span> is a vector of realized outcomes. That is, descriptive designs seek to summarize (using <span class="math inline">\(f()\)</span>) the world as it is (as represented by <span class="math inline">\(\mathbf{Y(Z = Realized)}\)</span>). Descripitive designs can be better or worse at answering that inquiry. The quality of descriptive research designs depends on the extent of measurement, sampling, and estimation error.</p>
-<p>Causal inquiries can be described as <span class="math inline">\(f(\mathbf{Y(Z)})\)</span>, where <span class="math inline">\(Z\)</span> is not a realized vector of treatments, but is instead is a vector that could take on counterfactual values. A standard causal inquiry is the Average Treatment Effect, in which <span class="math inline">\(f()\)</span> is the function that takes the average of the difference between two potential outcome vectors, <span class="math inline">\(Y(Z = 1)\)</span> and <span class="math inline">\(Y(Z = 0)\)</span>. But there are many causal inquiries beyond the ATE – the thing they all have in common is that they are functions not of realized outcomes, but of potential outcomes. The quality of causal reseach designs depends on everything that a descriptive design depends on, but also on the understanding and quality of the mechanism that assigns units to treatment conditions.</p>
-<p>All research designs suffer from some kind of missing data problem. Rubin pointed out missing data in surveys come from people you didn’t survey or people who refused to answer. In causal inference problems, the data that are missing are the potential outcomes that were not revealed by the world. In Descriptive studies, the data that are missing are the true values of the things to be measured. Measurement error is a missing data problem too!</p>
-<p>Observational research designs are typified by reseachers having no impact on the units under study. They simply record the outcomes that happened in the world and would have happened even if the study did not occur. Experimental research designs are more active – they cause some potential outcomes to be revealed but not others. In this way, researchers have an impact on the units they study. For this reason, experimental studies tend to raise more ethical questions than do observational studies. Experimenters literally change what potential outcomes become realized outcomes.</p>
-<p>Sometimes the lines between types of research become blurry. The Hawthorne effect is the name given to the idea that measuring a thing changes it. If there are hawthorne effects, than observational research designs also change which potential outcomes are revealed. That is, if there is a difference between Y(Z = measured) and Y(Z = unmeasured), then the act of observation changes that which is observed. Passive data collection methods are sometimes preferred on these grounds.</p>
-
+<div id="where-we-are-going" class="section level2">
+<h2><span class="header-section-number">3.2</span> Where we are going</h2>
+<p>We will build up to declaring and diagnosing a design in this section. But to get a sense of the goal, below is a simple 100-unit randomized experiment design declared, diagnosed, and redesigned.</p>
+<div id="declaring-a-design" class="section level3">
+<h3><span class="header-section-number">3.2.1</span> Declaring a design</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># we should turn this into a picture labeling MIDA</span></a>
+<a class="sourceLine" id="cb3-2" title="2">simple_design &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="st">  </span><span class="co"># M: model</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="st">  </span><span class="co"># a 100-unit population with an unobserved shock &#39;e&#39;</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="st">  </span><span class="kw">declare_population</span>(<span class="dt">N =</span> <span class="dv">100</span>, <span class="dt">u =</span> <span class="kw">rnorm</span>(N)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="st">  </span><span class="co"># two potential outcomes, Y_Z_0 and Y_Z_1</span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="st">  </span><span class="co"># Y_Z_0 is the control potential outcome (what would happen if the unit is untreated)</span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="st">  </span><span class="co">#   it is equal to the unobserved shock &#39;u&#39;</span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="st">  </span><span class="co"># Y_Z_1 is the treated potential outcome </span></a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="st">  </span><span class="co">#   it is equal to the control potential outcome plus a treatment effect of 0.25</span></a>
+<a class="sourceLine" id="cb3-14" title="14"><span class="st">  </span><span class="kw">declare_potential_outcomes</span>(<span class="dt">Y_Z_0 =</span> u, <span class="dt">Y_Z_1 =</span> Y_Z_<span class="dv">0</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.25</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-15" title="15"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="st">  </span><span class="co"># I: inquiry</span></a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-18" title="18"><span class="st">  </span><span class="co"># we are interested in the average treatment effect in the population (PATE)</span></a>
+<a class="sourceLine" id="cb3-19" title="19"><span class="st">  </span><span class="kw">declare_estimand</span>(<span class="dt">PATE =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-20" title="20"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-21" title="21"><span class="st">  </span><span class="co"># D: data strategy</span></a>
+<a class="sourceLine" id="cb3-22" title="22"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-23" title="23"><span class="st">  </span><span class="co"># sampling: we randomly sample 50 of the 100 units in the population</span></a>
+<a class="sourceLine" id="cb3-24" title="24"><span class="st">  </span><span class="kw">declare_sampling</span>(<span class="dt">n =</span> <span class="dv">50</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-25" title="25"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-26" title="26"><span class="st">  </span><span class="co"># assignment: we randomly assign half of the 50 sampled units to treatment (half to control)</span></a>
+<a class="sourceLine" id="cb3-27" title="27"><span class="st">  </span><span class="kw">declare_assignment</span>(<span class="dt">prob =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-28" title="28"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-29" title="29"><span class="st">  </span><span class="co"># reveal outcomes: construct outcomes from the potential outcomes named Y depending on </span></a>
+<a class="sourceLine" id="cb3-30" title="30"><span class="st">  </span><span class="co">#   the realized value of their assignment variable named Z</span></a>
+<a class="sourceLine" id="cb3-31" title="31"><span class="st">  </span><span class="kw">declare_reveal</span>(<span class="dt">outcome_variables =</span> Y, <span class="dt">assignment_variables =</span> Z) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-32" title="32"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-33" title="33"><span class="st">  </span><span class="co"># A: answer strategy</span></a>
+<a class="sourceLine" id="cb3-34" title="34"><span class="st">  </span></a>
+<a class="sourceLine" id="cb3-35" title="35"><span class="st">  </span><span class="co"># calculate the difference-in-means of Y depending on Z </span></a>
+<a class="sourceLine" id="cb3-36" title="36"><span class="st">  </span><span class="co"># we link this estimator to PATE because this is our estimate of our inquiry</span></a>
+<a class="sourceLine" id="cb3-37" title="37"><span class="st">  </span><span class="kw">declare_estimator</span>(Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">model =</span> difference_in_means, <span class="dt">estimand =</span> <span class="st">&quot;PATE&quot;</span>)</a></code></pre></div>
+</div>
+<div id="diagnosis" class="section level3">
+<h3><span class="header-section-number">3.2.2</span> Diagnosis</h3>
+<p>To diagnose the design, we first define a set of diagnosands (see Section XX), which are statistical properties of the design. In this case, we select the bias (difference between the estimate and the estimand, which is the PATE); the root mean-squared error; and the statistical power of the design.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># Select diagnosands</span></a>
+<a class="sourceLine" id="cb4-2" title="2">simple_design_diagnosands &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="st">  </span><span class="kw">declare_diagnosands</span>(<span class="dt">select =</span> <span class="kw">c</span>(bias, rmse, power))</a></code></pre></div>
+<p>We then diagnose the design, which involves simulating the design and again and again, and then calculate the diagnosands based on the simulations data.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># Diagnose the design</span></a>
+<a class="sourceLine" id="cb5-2" title="2">simple_design_diagnosis &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="st">  </span><span class="kw">diagnose_design</span>(simple_design, <span class="dt">diagnosands =</span> simple_design_diagnosands, <span class="dt">sims =</span> <span class="dv">500</span>)</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+estimand_label
+</th>
+<th style="text-align:left;">
+estimator_label
+</th>
+<th style="text-align:right;">
+bias
+</th>
+<th style="text-align:right;">
+rmse
+</th>
+<th style="text-align:right;">
+power
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PATE
+</td>
+<td style="text-align:left;">
+estimator
+</td>
+<td style="text-align:right;">
+-0.0020108
+</td>
+<td style="text-align:right;">
+0.2912167
+</td>
+<td style="text-align:right;">
+0.146
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="redesign" class="section level3">
+<h3><span class="header-section-number">3.2.3</span> Redesign</h3>
+<p>We see that the power of the design is small, so we increase the number of sampled units from 50 to 100.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">redesigned_simple_design &lt;-</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw">replace_step</span>(simple_design, </a>
+<a class="sourceLine" id="cb6-3" title="3">               <span class="dt">step =</span> <span class="dv">4</span>, </a>
+<a class="sourceLine" id="cb6-4" title="4">               <span class="dt">new_step =</span> <span class="kw">declare_sampling</span>(<span class="dt">n =</span> <span class="dv">100</span>))</a></code></pre></div>
+<p>With the big picture of the declaration, diagnosis, and redesign of a simple design in mind, we now turn to building up from a single step to a full declared design.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="redesign-1.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="observational-designs-for-descriptive-inference.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="installing-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="building-a-step-of-a-research-design.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
