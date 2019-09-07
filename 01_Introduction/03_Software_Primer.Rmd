@@ -3,6 +3,7 @@ title: "Software Primer"
 output: 
   html_document:
     number_sections: true
+tables: yes
 bibliography: ../bib/book.bib 
 ---
 
@@ -34,9 +35,19 @@ b_sims <- 20
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 ```
 
+You can implement the MIDA framework in any software package. Indeed, a design could be declared in writing or mathematical notation and then diagnosed using analytical formula.^[However, we suggested in Section XX why analytical diagnoses may not be ideal for typical designs in the social sciences: they do not account for the specific features of research designs such as varying numbers of units per cluster and the interaction of choices about a data strategy and an answer strategy.] 
+
+Social scientists use [a number of tools](https://stackoverflow.blog/2017/10/10/impressive-growth-r) for conducting statistical analysis: Stata, R, Python, Julia, SPSS, SAS, Mathematica, and more. Stata and R are most commonly used.
+
+We wrote `DeclareDesign` in the R statistical environment because of the availability of other tools for implementing research designs and because it is free-to-use. 
+
+We have designed the rest of the book so that it can be read even if you do not use R, but you will have to translate the code into your own language of choice. On our Web site, we have a [translation](https://declaredesign.org/pap) of core parts of the declaration and diagnosis process into Stata, Python, and Excel.
+
+In this section, we introduce you to `DeclareDesign` for R and how each step of the design-diagnose-redesign process can be implemented in it.
+
 ## Installing R 
 
-This book relies on the statistical computing environment R, which you can download for free from [https://cran.r-project.org/](CRAN). We also recommend (and assume you are using) the free program [https://www.rstudio.com/products/rstudio/download/](RStudio), which provides a friendly interface to R. 
+This book relies on the statistical computing environment R, which you can download for free from [https://cran.r-project.org/](CRAN). We also recommend the free program [https://www.rstudio.com/products/rstudio/download/](RStudio), which provides a friendly interface to R.^[Both R and RStudio are available on Windows, Mac, and Linux.]
 
 Once you've got RStudio installed, open it up and install `DeclareDesign` and its  related packages. These include three packages that enable specific steps in the research process (`fabricatr` for simulating social science data; `randomizr`, for random sampling and random assignment; and `estimatr` for design-based estimators). You can also install `DesignLibrary`, which gets standard designs up-and-running in one line. To install them, you can type:
 
@@ -44,11 +55,94 @@ Once you've got RStudio installed, open it up and install `DeclareDesign` and it
 install.packages(c("DeclareDesign", "fabricatr", "randomizr", "estimatr", "DesignLibrary"))
 ```
 
-We also recommend you install the `tidyverse` suite of packages for data analysis, which we will use throughout the book:
+We also recommend you install and get to know the `tidyverse` suite of packages for data analysis, which we will use throughout the book:
 
 ```{r, eval = FALSE}
 install.packages("tidyverse")
 ```
+
+In this chapter, we will introduce the `DeclareDesign` software and how to implement the MIDA framework within it. We will not provide a general introduction to R or to the `tidyverse`, because there are already many terrific introductions. We especially recommend [`R for Data Science`](https://r4ds.had.co.nz) (available for free on the Web). 
+
+## Where we are going
+
+We will build up to declaring and diagnosing a design in this section. But to get a sense of the goal, below is a simple 100-unit randomized experiment design declared, diagnosed, and redesigned. 
+
+### Declaring a design
+
+```{r}
+# we should turn this into a picture labeling MIDA
+simple_design <- 
+  
+  # M: model
+  
+  # a 100-unit population with an unobserved shock 'e'
+  declare_population(N = 100, u = rnorm(N)) +
+  
+  # two potential outcomes, Y_Z_0 and Y_Z_1
+  # Y_Z_0 is the control potential outcome (what would happen if the unit is untreated)
+  #   it is equal to the unobserved shock 'u'
+  # Y_Z_1 is the treated potential outcome 
+  #   it is equal to the control potential outcome plus a treatment effect of 0.25
+  declare_potential_outcomes(Y_Z_0 = u, Y_Z_1 = Y_Z_0 + 0.25) +
+  
+  # I: inquiry
+  
+  # we are interested in the average treatment effect in the population (PATE)
+  declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0)) +
+  
+  # D: data strategy
+  
+  # sampling: we randomly sample 50 of the 100 units in the population
+  declare_sampling(n = 50) +
+  
+  # assignment: we randomly assign half of the 50 sampled units to treatment (half to control)
+  declare_assignment(prob = 0.5) +
+  
+  # reveal outcomes: construct outcomes from the potential outcomes named Y depending on 
+  #   the realized value of their assignment variable named Z
+  declare_reveal(outcome_variables = Y, assignment_variables = Z) +
+  
+  # A: answer strategy
+  
+  # calculate the difference-in-means of Y depending on Z 
+  # we link this estimator to PATE because this is our estimate of our inquiry
+  declare_estimator(Y ~ Z, model = difference_in_means, estimand = "PATE")
+```
+
+### Diagnosis
+
+To diagnose the design, we first define a set of diagnosands (see Section XX), which are statistical properties of the design. In this case, we select the bias (difference between the estimate and the estimand, which is the PATE); the root mean-squared error; and the statistical power of the design. 
+
+```{r}
+# Select diagnosands
+simple_design_diagnosands <- 
+  declare_diagnosands(select = c(bias, rmse, power))
+```
+
+We then diagnose the design, which involves simulating the design and again and again, and then calculate the diagnosands based on the simulations data. 
+
+```{r}
+# Diagnose the design
+simple_design_diagnosis <- 
+  diagnose_design(simple_design, diagnosands = simple_design_diagnosands, sims = 500)
+```
+
+```{r, echo = FALSE}
+get_diagnosands(simple_design_diagnosis) %>% select(estimand_label, estimator_label, bias, rmse, power) %>% kable
+```
+
+### Redesign
+
+We see that the power of the design is small, so we increase the number of sampled units from 50 to 100.
+
+```{r}
+redesigned_simple_design <-
+  replace_step(simple_design, 
+               step = 4, 
+               new_step = declare_sampling(n = 100))
+```
+
+With the big picture of the declaration, diagnosis, and redesign of a simple design in mind, we now turn to building up from a single step to a full declared design.
 
 ## Building a step of a research design 
 
@@ -64,7 +158,7 @@ voter_file <- fabricate(
 )
 ```
 
-```{r}
+```{r, echo = FALSE}
 kable(head(voter_file))
 ```
 
@@ -81,7 +175,7 @@ voter_file <- voter_file %>%
 
 This says: draw a random sample of the possible values `0` and `1` 100 times (the number of voters) with probability `0.5` for `0` and `0.5` for `1` with replacement. Now our data frame `voter_file` includes the `Z` indicator:
 
-```{r}
+```{r, echo = FALSE}
 kable(head(voter_file))
 ```
 
@@ -107,7 +201,10 @@ simple_tidy_function <- function(data){
 
 Now we can run that function on our voter file data:
 
-```{r}
+```{r, eval = FALSE}
+simple_tidy_function(voter_file)
+```
+```{r, echo = FALSE}
 simple_tidy_function(voter_file) %>% head %>% kable
 ```
 
@@ -121,7 +218,10 @@ simple_random_assignment_function <- function(data) {
 
 Now, when we run our random assignment function on the voter file, it adds in `Z`:
 
-```{r}
+```{r, eval = FALSE}
+simple_random_assignment_function(voter_file) 
+```
+```{r, echo = FALSE}
 simple_random_assignment_function(voter_file) %>% head %>% kable
 ```
 
@@ -135,7 +235,10 @@ simple_random_assignment_step <- declare_assignment(prob = 0.5)
 
 `simple_random_assignment_step` is a tidy function. You can run the function on data:
 
-```{r}
+```{r, eval = FALSE}
+simple_random_assignment_step(voter_file) 
+```
+```{r, echo = FALSE}
 simple_random_assignment_step(voter_file) %>% head %>% kable
 ```
 
@@ -149,25 +252,87 @@ Every step of a research design in MIDA can be written using one of the `declare
 
 1. Bring your own data
 
+```{r, eval = FALSE}
+declare_population(data = voter_file)
+```
+```{r, echo = FALSE}
+declare_population(data = voter_file)() %>% head %>% kable
+```
 
 2. Use our default interface through fabricatr
 
+```{r, eval = FALSE}
+fabricate(N = 100, u = rnorm(N))
+```
+
+```{r, eval = FALSE}
+declare_population(N = 100, u = rnorm(N))
+```
+
+When we run this population function, we will get a different 100-unit dataset each time:
+
+```{r, echo = FALSE}
+tab2 <- declare_population(N = 100, u = rnorm(N))() %>% head
+tab1 <- declare_population(N = 100, u = rnorm(N))() %>% head
+tab3 <- declare_population(N = 100, u = rnorm(N))() %>% head
+kable(list(tab1, tab2, tab3), booktabs = TRUE) %>% kable_styling()
+```
 
 3. Write your own
+
+```{r}
+
+```
 
 #### Potential outcomes
 
 1. Define each potential outcome, one-by-one
 
+```{r, eval = FALSE}
+declare_potential_outcomes(
+  Y_Z_0 = u, 
+  Y_Z_1 = Y_Z_0 + 0.25)
+```
+
+
+```{r, eval = FALSE}
+des <- declare_population(N = 100, u = rnorm(N)) +
+  declare_potential_outcomes(Y_Z_0 = u, Y_Z_1 = Y_Z_0 + 0.25)
+
+draw_data(des)
+```
+```{r, echo = FALSE}
+des <- declare_population(N = 100, u = rnorm(N)) +
+  declare_potential_outcomes(Y_Z_0 = u, Y_Z_1 = Y_Z_0 + 0.25)
+
+draw_data(des) %>% head %>% kable
+```
+
 2. Write the potential outcomes as a formula
 
+```{r, eval = FALSE}
+declare_potential_outcomes(Y ~ u + 0.25 * Z)
+```
+
 3. Write your own 
+
+```{r}
+
+```
 
 ### Inquiry
 
 1. Define an estimand using simple R expressions
 
+```{r, eval = FALSE}
+declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0))
+```
+
 2. Write your own
+
+```{r}
+
+```
 
 - what's different is you return a df of estimands
 
@@ -177,54 +342,270 @@ Every step of a research design in MIDA can be written using one of the `declare
 
 1. Simple
 
+```{r, eval = FALSE}
+declare_sampling(n = 50)
+```
+
 2. Stratified
+
+```{r, eval = FALSE}
+
+```
 
 - look the probs differ!
 
 3. Write your own 
 
+```{r}
+
+```
+
 #### Assignment
 
-1. Complete
+1. Simple
+
+```{r, eval = FALSE}
+declare_assignment(prob = 0.5)
+```
 
 2. Blocked
+
+```{r}
+
+```
 
 - look the probs differ!
 
 3. Write your own
 
+```{r}
+
+```
+
 ### Answer strategy
 
-1. lm
+1. dim
 
-2. dim
+```{r, echo = FALSE}
+simple_design <- 
+  declare_population(N = 100, u = rnorm(N)) +
+  declare_potential_outcomes(Y_Z_0 = u, Y_Z_1 = Y_Z_0 + 0.25) +
+  declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_sampling(n = 50) +
+  declare_assignment(prob = 0.5) +
+  declare_reveal(outcome_variables = Y, assignment_variables = Z) +
+  declare_estimator(Y ~ Z, model = difference_in_means, estimand = "PATE")
+simple_design_data <- draw_data(simple_design)
+simple_design_data %>% head %>% kable
+```
+
+We can calculate the difference-in-means estimate with a call to `summarize` from `dplyr`.
+
+```{r}
+simple_design_data %>% summarize(DiM = mean(Y[Z == 1]) - mean(Y[Z == 0]))
+```
+
+The `estimatr` package makes this easy and calculates the design-based standard error and a p-value and confidence interval for you:
+
+```{r, eval = FALSE}
+difference_in_means(Y ~ Z, data = simple_design_data)
+```
+```{r, echo = FALSE}
+difference_in_means(Y ~ Z, data = simple_design_data) %>% tidy %>% kable
+```
+
+```{r, eval = FALSE}
+declare_estimator(Y ~ Z, model = difference_in_means, estimand = "PATE")
+```
+
+2. lm
+
+```{r, eval = FALSE}
+lm_robust(Y ~ Z, data = simple_design_data)
+```
+
+```{r, echo = FALSE}
+lm_robust(Y ~ Z, data = simple_design_data) %>% tidy %>% kable
+```
+
+```{r, eval = FALSE}
+declare_estimator(Y ~ Z, model = lm, estimand = "PATE")
+```
 
 3. Write your own
+
+```{r}
+
+```
 
 ### Rolling your own steps
 
 1. You can add a step anywhere using `declare_step`.
 
-2. You can use `dplyr` verbs.
+```{r, eval = FALSE}
+collapse_data <- function(data, collapse_by) {
+  data %>% group_by({{ collapse_by }}) %>% summarize_all(mean, na.rm = TRUE)
+}
+
+declare_step(handler = collapse_data, collapse_by = neighborhoods)
+```
+
+2. You can use `dplyr` verbs directly
+
+```{r, eval = FALSE}
+# note the n() is a special function in dplyr that calculates the current number of rows
+# it works very much like the magic N in fabricate() and declare_population().
+declare_step(handler = mutate, background_variable = rnorm(n()))
+```
 
 ## Building a design from a set of steps
 
-## Simulating a research design
+In the last section, we defined a set of individual research steps. We draw one version of them together here:
 
-- pipeline of a design based on the DeclareDesign steps piped together
+```{r}
+population <- declare_population(N = 100, u = rnorm(N)) 
+potential_outcomes <- declare_potential_outcomes(Y_Z_0 = u, Y_Z_1 = Y_Z_0 + 0.25) 
+estimand <- declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0)) 
+sampling <- declare_sampling(n = 50) 
+assignment <- declare_assignment(prob = 0.5) 
+reveal <- declare_reveal(outcome_variables = Y, assignment_variables = Z) 
+estimator <- declare_estimator(Y ~ Z, model = difference_in_means, estimand = "PATE")
+```
+
+To construct a research design object that we can operate on --- diagnose, redesign, draw data from, etc. --- we add them together with the `+` operator.
+
+```{r}
+simple_design <- 
+  population + potential_outcomes + estimand + sampling + assignment + reveal + estimator
+```
+
+In the book, we'll use a more compact way of writing a design, where we define it all at once with the `+`:
+
+```{r}
+simple_design <- 
+  declare_population(N = 100, u = rnorm(N)) +
+  declare_potential_outcomes(Y_Z_0 = u, Y_Z_1 = Y_Z_0 + 0.25) +
+  declare_estimand(PATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_sampling(n = 50) +
+  declare_assignment(prob = 0.5) +
+  declare_reveal(outcome_variables = Y, assignment_variables = Z) +
+  declare_estimator(Y ~ Z, model = difference_in_means, estimand = "PATE")
+```
+
+### Order matters
+
+When defining a design, the order steps are included in the design via the `+` operator matters. Think of the order of your design as the causal order in which steps take place. 
+
+```{r, eval = FALSE}
+population + potential_outcomes + estimand + sampling + assignment + reveal + estimator
+```
+
+- where the estimand is defines its level (just calling it PATE won't work)
+- estimator typically has to come after defining and revealing outcomes
+- random assignment typically comes after sampling
+
+## Simulating implementing a research design
+
+```{r}
+population() %>% potential_outcomes %>% estimand
+```
+
+```{r}
+population() %>% potential_outcomes %>% sampling %>%  assignment %>% reveal %>% estimator
+```
+
+With simple design defined as an object, we can easily learn about what kind of data it generates, the values of its estimand and estimates, and other features. `DeclareDesign` comes with a set of functions to do each operation.
+
+To draw simulated data based on the design, we use `draw_data`:
+
+```{r, eval = FALSE}
+draw_data(simple_design)
+```
+```{r, echo = FALSE}
+draw_data(simple_design) %>% head %>% kable
+```
+
+To simulate the estimands from a single run of the design, we use `draw_estimands`:
+
+```{r, eval = FALSE}
+draw_estimands(simple_design)
+```
+```{r, echo = FALSE}
+draw_estimands(simple_design) %>% kable
+```
+
+Similarly, we can simulate the estimates from a single run with `draw_estimates`:
+
+```{r, eval = FALSE}
+draw_estimates(simple_design)
+```
+```{r, echo = FALSE}
+draw_estimates(simple_design) %>% kable
+```
+
+## Simulating a research design
 
 - `simulate_design`
 
+```{r, eval = FALSE}
+simulate_design(simple_design, sims = 500)
+```
+```{r, echo = FALSE}
+simulations_df <- simulate_design(simple_design, sims = 5) 
+
+simulations_df %>% kable
+```
+
 ## Diagnosing a research design
 
-1. group_by() %>% summarize
+1. Diagnosis in `dplyr`
 
-2. Defining diagnosands 
+```{r}
+simulations_df %>% 
+  group_by(estimand_label, estimator_label) %>% 
+  summarize(bias = mean(estimate - estimand),
+            rmse = sqrt(mean((estimate - estimand)^2)),
+            power = mean(p.value < .05))
+```
 
-3. `diagnose_design`
+2. Diagnosis in `DeclareDesign`
+
+First, declare your diagnosands. These are functions of the simulations data.
+
+```{r}
+study_diagnosands <- declare_diagnosands(
+  select = c(bias, rmse, power), 
+  mse = mean((estimate - estimand)^2))
+```
+
+Next, take your simulations data and the diagnosands, and diagnose. This runs a single operation, which is to calculate the diagnosands on your simulations data, just like in the `dplyr` version above.
+
+```{r, eval = FALSE}
+diagnose_design(simulations_df, diagnosands = study_diagnosands)
+```
+```{r, echo = FALSE}
+diagnose_design(simulations_df, diagnosands = study_diagnosands) %>% get_diagnosands %>% kable
+```
+
+We can also do this in a single step. When you send `diagnose_design` a design object, it will first run the simulations for you, then calculate the diagnosands from the simulations data frame that results.
+
+```{r, eval = FALSE}
+diagnose_design(simple_design, diagnosands = study_diagnosands)
+```
 
 ## Comparing designs
 
 1. `compare_designs`
 
+```{r, eval = FALSE}
+compare_designs(simple_design, redesigned_simple_design)
+```
+
 2. `compare_diagnoses`
+
+```{r, eval = FALSE}
+compare_diagnoses(simple_design, redesigned_simple_design)
+```
+```{r, echo = FALSE}
+compare_diagnoses(simple_design, redesigned_simple_design, sims = sims)$diagnosands_df %>% kable
+```
