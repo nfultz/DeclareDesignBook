@@ -138,10 +138,10 @@ multi_period_design <-
   declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0), subset = time == 1) + 
   
   declare_assignment(Z = 1*(unit_treated & pretreatment == FALSE), handler = fabricate) + 
-  
   declare_reveal(Y, Z) + 
   
-  declare_estimator(Y ~ Z + time, fixed_effects = ~ units, model = lm_robust, label = "fe", estimand = "ATE") 
+  declare_estimator(Y ~ Z + time, fixed_effects = ~ units + periods, 
+                    model = lm_robust, label = "twoway-fe", estimand = "ATE") 
   
 # diagnose_design(multi_period_design, diagnosands = declare_diagnosands(select = bias), sims = 500, bootstrap_sims = 1000)
 ```

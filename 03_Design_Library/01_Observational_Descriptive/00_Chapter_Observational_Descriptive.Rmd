@@ -1,4 +1,3 @@
-# Observational Designs for Descriptive Inference
+# Observational designs for descriptive inference
 
-
-blah blah about this section of designs
+section introduction

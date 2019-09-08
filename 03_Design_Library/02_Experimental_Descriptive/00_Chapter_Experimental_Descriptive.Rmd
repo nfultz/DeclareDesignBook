@@ -1,1 +1,3 @@
-# Experimental Designs for Descriptive Inference
+# Experimental designs for descriptive inference
+
+Section introduction

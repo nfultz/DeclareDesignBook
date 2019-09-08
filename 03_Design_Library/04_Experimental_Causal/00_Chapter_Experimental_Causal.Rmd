@@ -1,1 +1,3 @@
-# Experimental Designs for Causal Inference
+# Experimental designs for causal inference
+
+Section introduction
