@@ -73,4 +73,3 @@ kable(head(simulations_pilot))
 
 
 
-## Partial population design for spillover analysis
