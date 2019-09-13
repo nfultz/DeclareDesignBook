@@ -31,66 +31,114 @@ b_sims <- 20
 ```{r, echo = FALSE}
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 library(brms)
+library(lme4)
+library(distributions3)
 ```
 
 You can use the global bib file via rmarkdown cites like this: @imai2008
 
-```{r}
-# demographic summary statistics by state
-us_state_demographics_2000 <- fabricate(
-  state = add_level(
-    N = 50,
-    state_name        = state.abb,
-    state_population  = sample(8000:10000, N, replace = TRUE),
-    proportion_female = runif(N, min = .45, max = .55),
-    proportion_old    = runif(N, min = .25, max = .65))
-)
+```{r, echo = FALSE}
+delaware_senate_districts_df <- read_rds("data/delaware.RDS")
+kable(head(delaware_senate_districts_df))
+```
+
+```{r, eval = FALSE}
 
 # US population
-us_population_2000 <- fabricate(
-  data = us_state_demographics_2000,
+delaware_population_df <- fabricate(
+  data = delaware_senate_districts_df,
   individuals = add_level(
-    N = state_population,
-    female = draw_binary(N = N, prob = proportion_female),
-    old    = draw_binary(N = N, prob = proportion_old)
+    N = population_size,
+    race_white = rbinom(N, 1, prob = prop_white),
+    race_black = rbinom(N, 1, prob = prop_black),
+    race_asian = rbinom(N, 1, prob = prop_black),
+    race_hispanic_other = rbinom(N, 1, prob = prop_hispanic_other),
+    pid_republican = rbinom(N, 1, prob = prop_republican),
+    pid_democrat = rbinom(N, 1, prob = prop_democrat)
   )
-) 
-
-us_population_2000 <- us_population_2000 %>% 
-  select(-state_population, -proportion_female, -proportion_old)
+) %>% 
+  select(-starts_with("prop_"), -population_size)
 
 # population weights for MRP
-mrp_weights <- us_population_2000 %>%
-  select(state, state_name, individuals, female, old) %>% 
-  group_by(state, female, old) %>% 
+mrp_weights <- delaware_population_df %>%
+  group_by(district, race_white, race_black, race_asian, race_hispanic_other, pid_republican, pid_democrat) %>% 
   summarize(n_cell = n()) %>% 
-  group_by(state) %>% 
+  group_by(district) %>% 
   mutate(proportion_cell = n_cell/sum(n_cell)) %>% 
-  select(-n_cell)
+  select(-n_cell) %>% 
+  ungroup
 
-us_population_2000 <- us_population_2000 %>% 
-  left_join(mrp_weights)
+delaware_population_df <- mrp_weights %>% select(district, proportion_cell) %>% right_join(delaware_population_df)
+
+# brm_fit <- brm(
+#   policy_support ~ (1 | female) + (1 | old) + (1 | state),
+#   data = data,
+#   family = bernoulli(),
+#   prior = c(
+#     set_prior("normal(0, 0.2)", class = 'sd', group = "old"),
+#     set_prior("normal(0, 0.2)", class = 'sd', group = "female"),
+#     set_prior("normal(0, 0.2)", class = 'sd', group = "state")
+#   )
+# )
 
 # Lax and Philips APSR 2009
 # Policies are coded dichotomously, 1 for the progay policy and 0 otherwise: Adoption (9 states allow second-parent adoption in all jurisdictions)
 
 design <-
-  declare_population(data = us_population_2000) +
-  
-  declare_potential_outcomes(
-    policy_support = draw_binary(latent = 1 + .2 * female - .5 * old, link = "probit")) +
+  declare_population(
+    data = delaware_population_df, 
+    
+    districts = modify_level(district_effect = rnorm(N)),
+    
+    individuals = modify_level(
+      noise = rnorm(N, mean = district_effect),
+      policy_support = rbinom(N, 1, prob = pnorm(
+        0.25 + 0.2 * race_white - 0.1 * race_black - 0.2 * race_hispanic_other - 
+          0.1 * pid_democrat + 0.15 * pid_republican + noise))
+    )
+  ) + 
   
   declare_estimand(handler = function(data) {
-    data %>% 
-      group_by(state) %>% 
-      summarize(estimand = mean(policy_support)) %>% 
+    data %>%
+      group_by(district) %>%
+      summarize(estimand = mean(policy_support)) %>%
       ungroup %>% 
-      transmute(estimand_label = paste0("state", state, sep = ""), estimand)}) +
+      mutate(estimand_label = "mean_policy_support")
+  }) +
   
   declare_sampling(n = 500) +
   
-  declare_estimator(policy_support ~ 1, model = lm_robust)
-  # declare_estimator(handler = mrp)
+  declare_estimator(handler = tidy_estimator(function(data) {
+    data %>%
+      group_by(district) %>%
+      summarize(estimate = mean(policy_support))
+  }), label = "strata_means", estimand = "mean_policy_support") + 
+
+  declare_estimator(handler = tidy_estimator(function(data) {
+
+    model_fit <- glmer(
+      formula = policy_support ~ race_white + race_black + race_asian + race_hispanic_other +
+        pid_democrat + pid_republican + (1 | district),
+      data = data, family = binomial(link = "logit"))
+
+    data %>%
+      mutate(
+        support_predicted =
+          predict(model_fit, newdata = ., allow.new.levels = TRUE, type = "response"),
+        support_predicted_weighted = support_predicted * proportion_cell
+      ) %>%
+      group_by(district) %>%
+      summarize(estimate = sum(support_predicted_weighted))
+
+  }), label = "mrp_mle", estimand = "mean_policy_support")
+
+dat <- draw_data(design)
+
+draw_estimates(design)
+
+sims <- simulate_design(design, sims = 100)
+
+diag <- diagnose_design(design, sims = 100, diagnosands = declare_diagnosands(select = bias), add_grouping_variables = "state")
 
 # need to figure out how to write the mrp function
 # 1. write my own stan model
@@ -99,39 +147,24 @@ design <-
 # 4. get out samples using tidybayes and post-stratify using dplyr
 
 # mrp <- function(data){
-#   brm_fit <- brm(
-#     policy_support ~ (1 | female) + (1 | old) + (1 | state),
-#     data = data,
-#     family = bernoulli(),
-#     prior = c(
-#       set_prior("normal(0, 0.2)", class = 'sd', group = "old"),
-#       set_prior("normal(0, 0.2)", class = 'sd', group = "female"),
-#       set_prior("normal(0, 0.2)", class = 'sd', group = "state")
-#     )
-#   )
 #   
+# 
 #   brm_fit %>%
 #     spread_draws(~state) %>%
 #     summarize_at(
 #       vars(female, old),
 #       funs(mean, sd, low, high, equivprop)
-#     ) 
-#   
-#   # %>% 
+#     )
+# 
+#   # %>%
 #     # gather(coefficient, value) %>%
 #     # rename(Stat = coefficient) %>%
-#     # separate(Stat, c("coefficient", "Stat"), "_") %>% 
+#     # separate(Stat, c("coefficient", "Stat"), "_") %>%
 #     # spread(Stat, value)
 # 
-#   
+# 
 # }
-# 
-# 
-# library(rstan)
-# 
-# dat <- draw_data(design)
-# 
-# draw_estimates(design)
+
 ```
 
 
