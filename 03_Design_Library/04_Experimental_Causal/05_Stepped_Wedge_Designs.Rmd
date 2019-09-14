@@ -19,51 +19,104 @@ source("scripts/before_chapter_script.R")
 
 ## Stepped wedge designs
 
-<!-- make sure to rename the section title below -->
-
-```{r stepped_wedge_design, echo = FALSE, output = FALSE, purl = FALSE}
+```{r stepped_wedge, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- FALSE
+do_diagnosis <- TRUE
 sims <- 100
 b_sims <- 20
 ```
 
-```{r, echo = FALSE}
-# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
-library(blockTools)
-```
+Plan with this vignette:
 
-You can use the global bib file via rmarkdown cites like this: @imai2008
+- Show why you would want to do stepped wedge 
+  - Increases power
+  - There are more estimands
+- Show conditions under which FE give you wrong answer, draw connection to two-way FE papers in econ
+- Show how to get answer right under hetfx
+- Show additional tradeoffs in sample allocation
+
+### Design Declaration
+
+- **M**odel: 
+
+- **I**nquiry: 
+
+- **D**ata strategy:
+
+- **A**nswer strategy: 
 
 ```{r}
-design <-
-  declare_population(N = 100, u = rnorm(N)) +
-  declare_potential_outcomes(Y ~ Z + u) +
-  declare_assignment(prob = 0.5) +
-  declare_reveal(Y, Z) +
-  declare_estimator(Y ~ Z, model = difference_in_means)
+p_00 <- p_W1 <- p_W2 <- p_W3 <- 1/4
+
+design <- 
+  declare_population(
+    t = add_level(N = 3, u_t = rnorm(N), trend = as.numeric(t), 
+                  p = c(p_W1, p_W1 + p_W2, p_W1 + p_W2 + p_W3)),
+    i = add_level(N = 8, u_i = rnorm(N), nest = FALSE),
+    obs = cross_levels(by = join(t, i), u_ti = rnorm(N))) + 
+  declare_potential_outcomes(
+    Y_Z_0 = u_i + u_t + u_ti,
+    Y_Z_1 = u_i + u_t + u_ti + trend) + 
+  declare_assignment(clusters = i, 
+                     conditions = 1:4, 
+                     prob_each = c(p_W1, p_W2, p_W3, p_00),
+                     assignment_variable = "wave") + 
+  declare_step(Z = as.numeric(t >= wave), 
+               ip = 1 / (Z * p + (1 - Z) * (1 - p)),
+               handler = fabricate) + 
+  declare_reveal(Y, Z) + 
+  declare_estimand(ate = mean(Y_Z_1 - Y_Z_0)) + 
+  declare_estimator(Y ~ Z, model = difference_in_means, label = "Unweighted SW") +
+  declare_estimator(Y ~ Z, model = difference_in_means, label = "Weighted SW", weights = ip) 
 ```
 
 
-This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-simulations_pilot <- simulate_design(design, sims = sims)
+# Diagnose design
+diagnoses <- diagnose_design(design)
 ```
-
-Right after you do simulations, you want to save the simulations rds. 
 
 ```{r, echo = FALSE, purl = FALSE}
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("section_template"), "/simulations_pilot.RDS")
+rds_file_path <- paste0(get_dropbox_path("05_Stepped_Wedge_Designs.Rmd"), "/diagnoses.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(simulations_pilot, path = rds_file_path)
+  write_rds(diagnoses, path = rds_file_path)
 }
-simulations_pilot <- read_rds(rds_file_path)
+diagnoses <- read_rds(rds_file_path)
 ```
 
-Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
 
 ```{r}
-kable(head(simulations_pilot))
+reshape_diagnosis(diagnoses) %>% kable()
 ```
+
+- Change assignment allocation
+
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+# Diagnose design
+no_SW <- redesign(design, p_00 = .5, p_W1 = .5, p_W2 = 0, p_W3 = 0)
+no_control <- redesign(design, p_00 = 0, p_W1 = .34, p_W2 = .33, p_W3 = .33)
+more_earlier <- redesign(design, p_00 = .5, p_W1 = .30, p_W2 = .10, p_W3 = .10)
+sw_comparisons <- diagnose_designs(no_SW, no_control, more_earlier)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("05_Stepped_Wedge_Designs.Rmd"), "/sw_comparisons.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(sw_comparisons, path = rds_file_path)
+}
+sw_comparisons <- read_rds(rds_file_path)
+```
+
+
+```{r}
+reshape_diagnosis(sw_comparisons) %>% kable()
+```
+
+
+### References
+
+
+
 
