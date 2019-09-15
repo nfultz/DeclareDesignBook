@@ -44,6 +44,7 @@ Plan with this vignette:
 - **D**ata strategy:
 
 - **A**nswer strategy: 
+  The weights consider 
 
 ```{r}
 p_00 <- p_W1 <- p_W2 <- p_W3 <- 1/4
@@ -66,8 +67,18 @@ design <-
                handler = fabricate) + 
   declare_reveal(Y, Z) + 
   declare_estimand(ate = mean(Y_Z_1 - Y_Z_0)) + 
-  declare_estimator(Y ~ Z, model = difference_in_means, label = "Unweighted SW") +
-  declare_estimator(Y ~ Z, model = difference_in_means, label = "Weighted SW", weights = ip) 
+  declare_estimator(Y ~ Z, model = lm_robust, label = "Unweighted SW") +
+  declare_estimator(Y ~ Z, model = lm_robust, label = "Weighted SW", weights = ip) 
+```
+
+
+```{r}
+draw_data(design) %>% 
+  mutate(i = fct_reorder(i, wave), Assignment = ifelse(Z == 1, "Treatment", "Control")) %>% 
+  ggplot(aes(x = t, y = i, fill = Assignment)) +
+  geom_tile(color = "white") + scale_fill_grey(start = .9,end = .5) +
+  geom_text(aes(label = round(ip,1))) +
+  dd_theme()
 ```
 
 
