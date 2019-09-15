@@ -63,7 +63,7 @@ The distinction is a subtle but important one. We should only trust the inferenc
 
 $M$odels often lurk where you might not expect them. When researchers do experiments, they often compare the average observed outcome in the treatment group to the average observed outcome in the control group in order to get an estimate of the average treatment effect.^[...of putting one person in treatment and everyone else in control] This comparison requires no statistical modelling of the distributions of the observed variables: it follows from the fact that the average difference in two potential outcomes is equal to the difference in the averages of those two potential outcomes. So it seems as though such strategies are completely agnostic as to how the data was generated. 
 
-Implicit in the very definition of the average treatment effect here, however, is a $M$odel: specifically, one in which any particular draw of the random assignment is able to reveal no more than two potential outcomes for any given individual---this is sometimes referred to as a "no spillovers" assumption. But many social processes violate this assumption. If I do something differently every time you get treated and I do not, then I have at least three potential outcomes: one in which I am treated, one in which neither of us are treated, and one in which you are treated but I am not. The average observed difference-in-means across random assignments might diverge quite substantially from the effect we are interested in (say, of putting just one person in treatment and the rest in control). So even the simplest, most agnostic research design is relying on the plausibility of an implicit $M$odel in order to generate insights that are correct on average. 
+Implicit in the very definition of the average treatment effect here, however, is a $M$odel: specifically, one in which any particular draw of the random assignment is able to reveal no more than two potential outcomes for any given individual---this is sometimes referred to as a "no spillovers" assumption. But many social processes violate this assumption. If I do something differently every time you get treated and I do not, then I have at least three potential outcomes: one in which I am treated, one in which neither of us are treated, and one in which you are treated but I am not. The average observed difference-in-means across random assignments might diverge quite substantially from the average effect we are interested in (say, of putting just one person in treatment and the rest in control). So even the simplest, most agnostic research design is relying on the plausibility of an implicit $M$odel in order to generate insights that are correct on average. 
 
 In practice, we never get to know whether our $M$odel is right. For example, we can never really know how many potential outcomes there are. So we also cannot know if we got the right answer. What we can do, however, is study our procedure for generating answers under $M$odels of the world that we find plausible. That way, we do get to know which answers we should and should not trust, given the assumptions we are willing to make about the world.
 
@@ -102,9 +102,9 @@ population <- declare_population(N = 8, e = runif(N), X = rnorm(N, e, 1))
 ```
 
 An **exogenous variable** is one whose values do not depend on the values of any other variable in the $M$odel. 
-Here, `e` is an exogenous variable: it is simply a random draw from the uniform distribution between 0 and 1, inclusive. So long as $N$ stays fixed, no other variables influence the values that `e` takes on. 
+Here, `e` is an exogenous variable: it is simply a random draw from the uniform distribution between 0 and 1, inclusive. So long as `N` stays fixed, no other variables influence the values that `e` takes on. 
 
-An **endogenous variable** is one whose values *can* depend on another variable. We use the term "parent" to describe the variables that endogenous variables depend on directly. Here, because `X` is defined as a function of the value that `e` takes, we say `X` is endogenous to its parent, `e`. The code says that the value that `X` takes for a given individual is equal to a random draw from a normal distribution whose mean is equal to their value of `e` and whose standard deviation is equal to 1. <!-- Say, for example, that `e` took the value .35 for the fifth individual in the study.  In that case, the fifth individual will get a value of `X` that should be close to, but not exactly, .35.  --> <!-- Our model has two variables, one of which is uniformly distributed and the other of which is normally distributed, with the mean of `X` depending on the value of `e`. --> <!-- We refer to `e` as a parent of `X` because it appears in the expression for `X`.  -->
+An **endogenous variable** is one whose values *can* depend on another variable. Here, because `X` is defined as a function of the value that `e` takes, we say `X` is endogenous to its "parent," `e` (we use the term "parent" to describe the variables that appear in the function defining an endogenous variable). The code says that the value that `X` takes for a given individual is equal to a random draw from a normal distribution whose mean is equal to their value of `e` and whose standard deviation is equal to 1. <!-- Say, for example, that `e` took the value .35 for the fifth individual in the study.  In that case, the fifth individual will get a value of `X` that should be close to, but not exactly, .35.  --> <!-- Our model has two variables, one of which is uniformly distributed and the other of which is normally distributed, with the mean of `X` depending on the value of `e`. --> <!-- We refer to `e` as a parent of `X` because it appears in the expression for `X`.  -->
 
 The population function we just declared generates random datasets with eight observations of `e` and `X`. Try running this code a few times to see:
 
@@ -114,18 +114,21 @@ population()
 
 As we will see below, the population function is a useful place to declare all of the exogenous variables and many of the endogenous variables in our study, along with some pretty complicated relationships between them. 
 
-If we want 
+If we want to learn about our inferences, however, our model also has to define potential outcomes.
 
 ## Declaring potential outcomes
-The point is that potential outcomes are the building blocks of your inquiry---if you are not interested in the counterfactual differences in an outcome generated by some other variable, then you do not need to worry about the corresponding potential outcomes. But if you want to know a causal effect, you have to model the state of the world when the cause is present and the one in which it is absent. A causal effect is defined as the difference between those two states of the world.
+
+Remember from section X that potential outcomes are the building blocks of your inquiry---they describe counterfactual states of the world that could exist, depending on some parent variable. 
+
+Say the parent variable is whether you are contacted by an election campaign canvasser. Then you might have at least two potential outcomes that depend on the value of this variable: whether you vote for their candidate when they contact you, on the one hand, and whether you vote for their candidate when they do not contact you, on the other. The difference in those two states of the world describes the treatment effect of the election campaign canvasser on your vote choice. 
+
+Say we had a canvasser visit five out of ten households, selected at random. Then we could define potential outcomes as endogenous variables: one would encode the vote choice of the ten people if they were not contacted, the other would encode their vote choice if they were contacted. We call these variables the "untreated" and "treated" potential outcomes, respectively. We can add a third, and distinct, variable: the vote choice that we would actually observe in an experiment where we actually assigned half of the people to canvassing. To reiterate, if a researcher wants to declare a study with two treatment conditions and no spillovers, her model will have to include at least three variables:
+
+1. The untreated potential outcome
+2. The treated potential outcome
+3. The observed outcome
 
 
-
-Consider the case of an outcome, $Y$, that responds to a (possibly randomized) treatment assignment, $Z$. For example, $Z$ might be a coin-flip that assigns people to treatment when it comes up heads ($Z = 1$) and to control when it comes up tails ($Z = 0$). We can express the $i$'th individual's outcome when the assignment variable takes value $z$ as $Y_i(Z_i = z)$. For a binary treatment, this gives rise to at least three different variables: $Y_i$, $Y_i(Z_i = 1)$, and $Y_i(Z_i = 0)$. 
-
-The first variable is a list of the actual observed outcomes for any given realization of treatment assignment: if you flip the coin eight times, for example, $Y_i$ will be a variable that is eight observations long that tells you what happened to the people who did and did not get assigned to treatment. The second variable is the potential outcome of an individual if you set their treatment assignment to 'treated'---i.e., a list of everyone's outcomes imagining that you only flipped heads. And the third is the potential outcome of an individual if you set their treatment assignment to 'untreated'---a list of every person's outcomes in a world where you only flip tails.
-
-What's so important about defining these imaginary potential outcomes? Why do we need all three of these variables, and not just $Y_i$, the values we actually observe? 
 
 That is why `DeclareDesign` has a whole step devoted to declaring potential outcomes. The `declare_potential_outcomes()` step is crucial because it splits up endogenous variables into the *counterfactual* sets of values they could take, given the variables they depend on. Consider this declaration:
 
