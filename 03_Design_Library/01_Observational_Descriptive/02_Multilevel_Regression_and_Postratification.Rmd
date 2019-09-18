@@ -32,7 +32,7 @@ b_sims <- 20
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 library(brms)
 library(lme4)
-library(distributions3)
+library(prediction)
 ```
 
 You can use the global bib file via rmarkdown cites like this: @imai2008
@@ -66,20 +66,11 @@ mrp_weights <- delaware_population_df %>%
   group_by(district) %>% 
   mutate(proportion_cell = n_cell/sum(n_cell)) %>% 
   select(-n_cell) %>% 
-  ungroup
+  ungroup 
 
-delaware_population_df <- mrp_weights %>% select(district, proportion_cell) %>% right_join(delaware_population_df)
-
-# brm_fit <- brm(
-#   policy_support ~ (1 | female) + (1 | old) + (1 | state),
-#   data = data,
-#   family = bernoulli(),
-#   prior = c(
-#     set_prior("normal(0, 0.2)", class = 'sd', group = "old"),
-#     set_prior("normal(0, 0.2)", class = 'sd', group = "female"),
-#     set_prior("normal(0, 0.2)", class = 'sd', group = "state")
-#   )
-# )
+delaware_population_df <- mrp_weights %>% 
+  select(district, proportion_cell) %>% 
+  right_join(delaware_population_df)
 
 # Lax and Philips APSR 2009
 # Policies are coded dichotomously, 1 for the progay policy and 0 otherwise: Adoption (9 states allow second-parent adoption in all jurisdictions)
@@ -114,6 +105,7 @@ design <-
       summarize(estimate = mean(policy_support))
   }), label = "strata_means", estimand = "mean_policy_support") + 
 
+  # this estimator owes code to https://timmastny.rbind.io/blog/multilevel-mrp-tidybayes-brms-stan/
   declare_estimator(handler = tidy_estimator(function(data) {
 
     model_fit <- glmer(
@@ -124,7 +116,7 @@ design <-
     data %>%
       mutate(
         support_predicted =
-          predict(model_fit, newdata = ., allow.new.levels = TRUE, type = "response"),
+          prediction(model_fit, data = ., allow.new.levels = TRUE, type = "response"),
         support_predicted_weighted = support_predicted * proportion_cell
       ) %>%
       group_by(district) %>%
@@ -136,35 +128,9 @@ dat <- draw_data(design)
 
 draw_estimates(design)
 
-sims <- simulate_design(design, sims = 100)
+sims <- simulate_design(design, sims = 3)
 
 diag <- diagnose_design(design, sims = 100, diagnosands = declare_diagnosands(select = bias), add_grouping_variables = "state")
-
-# need to figure out how to write the mrp function
-# 1. write my own stan model
-# 2. compile it (using model())
-# 3. draw samples from it
-# 4. get out samples using tidybayes and post-stratify using dplyr
-
-# mrp <- function(data){
-#   
-# 
-#   brm_fit %>%
-#     spread_draws(~state) %>%
-#     summarize_at(
-#       vars(female, old),
-#       funs(mean, sd, low, high, equivprop)
-#     )
-# 
-#   # %>%
-#     # gather(coefficient, value) %>%
-#     # rename(Stat = coefficient) %>%
-#     # separate(Stat, c("coefficient", "Stat"), "_") %>%
-#     # spread(Stat, value)
-# 
-# 
-# }
-
 ```
 
 
