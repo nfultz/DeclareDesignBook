@@ -120,15 +120,15 @@ If we want to learn about our inferences, however, our model also has to define 
 
 Remember from section X that potential outcomes are the building blocks of your inquiry---they describe counterfactual states of the world that could exist, depending on some parent variable. 
 
-Say the parent variable is whether you are contacted by an election campaign canvasser. Then you might have at least two potential outcomes that depend on the value of this variable: whether you vote for their candidate when they contact you, on the one hand, and whether you vote for their candidate when they do not contact you, on the other. The difference in those two states of the world describes the treatment effect of the election campaign canvasser on your vote choice. 
+Say the parent variable is whether you are contacted by an election campaign canvasser, who tries to convince you to vote for Jane Doe, a candidate running in your district. Then you might have at least two potential outcomes that depend on the value of this variable: whether you vote for Jane Doe when a canvasser from her campaign contacts you, on the one hand, and whether you vote for Jane Doe when that canvasser does not contact you, on the other. The difference in those two states of the world describes the treatment effect of the election campaign canvasser on whether you vote for Jane Doe.
 
-Say we had a canvasser visit five out of ten households, selected at random. Then we could define potential outcomes as endogenous variables: one would encode the vote choice of the ten people if they were not contacted, the other would encode their vote choice if they were contacted. We call these variables the "untreated" and "treated" potential outcomes, respectively. We can add a third, and distinct, variable: the vote choice that we would actually observe in an experiment where we actually assigned half of the people to canvassing. To reiterate, if a researcher wants to declare a study with two treatment conditions and no spillovers, her model will have to include at least three variables:
+Say we did an experiment in which that canvasser visits five out of ten people who answer doors, selected at random. Then we could define the potential outcomes of the people they visit as endogenous variables: the "untreated" potential outcome of the experiment would encode whether each door-answerer would vote for Jane Doe if they were not contacted by the canvasser, and the "treated" potential ouctcome would encode whether they vote for Jane Doe if they _were_ contacted by the canvasser. 
+
+In addiiton to the untreated and treated potential outcomes of this experiment, we can add a third, distinct, variable: the vote choice that we would actually observe in an experiment where we actually assigned half of the people to canvassing. To reiterate, if a researcher wants to declare a study with two treatment conditions and no spillovers, her model will have to include at least three variables:
 
 1. The untreated potential outcome
 2. The treated potential outcome
 3. The observed outcome
-
-
 
 That is why `DeclareDesign` has a whole step devoted to declaring potential outcomes. The `declare_potential_outcomes()` step is crucial because it splits up endogenous variables into the *counterfactual* sets of values they could take, given the variables they depend on. Consider this declaration:
 
@@ -137,9 +137,11 @@ potential_outcomes <- declare_potential_outcomes(Y_Z_0 = .5 < e,
                                                  Y_Z_1 = .5 < e + .05)
 ```
 
-Here, we have added two variables to the dataset, `Y_Z_0` and `Y_Z_1`. They are both endogenous, in the sense that they depend on the value that `e` takes and on the value that `Z` takes. In our framework, potential outcomes are labelled starting with the outcome (here, `Y`) followed by a specific parent variable whose effect we are interested in (here, `Z`), and the value that parent is set to (here `1` and `0`), all separated by underscores. 
+Here, we have added two variables to the dataset, `Y_Z_0` and `Y_Z_1`. They are both endogenous, in the sense that they depend on the value that `e` takes and on the value that `Z` takes.^[In `DeclareDesign`, potential outcomes are labelled starting with the outcome (here, `Y`) followed by a specific parent variable whose effect we are interested in (here, `Z`), and the value that parent is set to (here `1` and `0`), all separated by underscores.] 
 
-So `Y_Z_1` is a list of the hypothetical values `Y` *could* take, if you were to set a specific variable it depends on, `Z`, to take the value of `1`. In English, the code in the potential outcomes declaration reads, "the value of $Y$ when $Z$ is zero is TRUE if $e$ is greater than .5 and FALSE otherwise, while the value of $Y$ when $Z$ is one is TRUE if $e$ plus .05 is greater than .5." So, setting $Z$ to one makes $Y$ roughly five percentage points more likely to be TRUE, on average. In math, we could write this: $Y_i(Z_i = 0) = \mathbb{I}(.5 < e_i)$ and $Y_i(Z_i = 1) = \mathbb{I}(.5 < e_i + .05)$. Notice that this provides a pretty easy expression for the observed outcome: $Y_i = \mathbb{I}(.5 < e_i + Z_i \times .05)$. So the potential outcomes for a variable can either be expressed by defining each potential outcome explicitly, as we do above, or through what we call a "potential outcomes function:"
+So `Y_Z_1` is a list of the hypothetical values `Y` *could* take, if you were to set a specific variable it depends on, `Z`, to take the value of `1`. Suppose, for example, that `e` represents a person's utility from voting for Jane Doe. Then, the code says that each person will vote for Jane Doe if `e` is greater than .5 when they're untreated, and if they are treated, they vote for Jane Doe when `e + .05` is greater than .5. So, the $M$odel stipulates that canvassing makes people roughly five percentage points more likely to vote for Jane Doe.
+
+A variable's potential outcomes can either be expressed by defining each potential outcome explicitly, as we do above, or through what we call a "potential outcomes function:"
 
 ```{r}
 potential_outcomes <- declare_potential_outcomes(Y ~ .5 < e + .05 * Z)
