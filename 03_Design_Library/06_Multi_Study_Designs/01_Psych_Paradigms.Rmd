@@ -23,8 +23,8 @@ source("scripts/before_chapter_script.R")
 
 ```{r psych_paradigms, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
-do_diagnosis <- FALSE
-sims <- 100
+do_diagnosis <- TRUE
+sims <- 500
 b_sims <- 20
 ```
 
@@ -33,37 +33,257 @@ b_sims <- 20
 library(blockTools)
 ```
 
-You can use the global bib file via rmarkdown cites like this: @imai2008
+
+In many research projects, we seek to evaluate multiple observable implications 
+for a single theory. [Examples. Psychology. APSR articles that have an 
+experiment plus observational work.]
+
+1. correlation
+2. small study
+3. mechanism
+
+or
+
+1. small study
+2. moderators
+3. replication
+
+In such cases, a single piece of evidence does not constitute sufficient 
+evidence to validate the theory as a whole. 
+Rather, we believe in the theory when multiple pieces of evidence support it.
+
+Sometimes, the absence of evidence for an observable implication casts doubt
+on the theory. Reviewer / skeptic: an observable implication is X. 
+You have failed to provide evidence of X, this is inconsistent with your theory.
+But this overlooks power of constitutive tests. 
+Here, omnibus power matters---unlike multiple comparisons, where we worry about
+Pr(any signif), here we are worried about Pr(all signif). 
+
+Say my theory is that the effect of X on Y is positive, mostly because of 
+how the presence of M has a positive mediating effect of X on Y. 
+
+I do a study showing that X affects Y positively. 
+I do another showing that X affects M positively.
+I do another study showing that effects of X on Y increase in M positively.
+
 
 ```{r}
-design <-
-  declare_population(N = 100, u = rnorm(N)) +
-  declare_potential_outcomes(Y ~ Z + u) +
-  declare_assignment(prob = 0.5) +
-  declare_reveal(Y, Z) +
-  declare_estimator(Y ~ Z, model = difference_in_means)
+N1 <- 100
+N2 <- 100
+N3 <- 100
+rho <- .5
+tau <- .2
+
+N_study_design <- 
+  # Study 1 -- Bivariate correlation between X and Y
+  declare_population(N = N1, X1 = rnorm(N), M1 = rnorm(N, X1 * rho, sqrt(1 - rho^2)), 
+                     U1 = rnorm(N), Y1 = tau * X1 + tau * M1 * X1 + U1, data = NULL) +
+  declare_estimator(Y1 ~ X1, term = "X1", model = lm_robust, label = "Study 1") +
+  # Study 2 -- Bivariate correlation between M and X
+  declare_population(N = N2, X2 = rnorm(N), M2 = rnorm(N, X2 * rho, sqrt(1 - rho^2)), 
+                     U2 = rnorm(N), Y2 = tau * X2 + tau * M2 * X2 + U2, data = NULL) +
+  declare_estimator(M2 ~ X2, term = "X2", model = lm_robust, label = "Study 2") +
+  # Study 3 -- Interaction in X and M 
+  declare_population(N = N3, X3 = rnorm(N), M3 = rnorm(N, X3 * rho, sqrt(1 - rho^2)), 
+                     U3 = rnorm(N), Y3 = tau * X3 + tau * M3 * X3 + U3, data = NULL) +
+  declare_estimator(Y3 ~ X3 + M3 + X3:M3, term = "X3:M3", model = lm_robust, label = "Study 3") 
+
 ```
 
 
-This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-simulations_pilot <- simulate_design(design, sims = sims)
+# Simulate design
+simulations <- simulate_design(N_study_design)
 ```
-
-Right after you do simulations, you want to save the simulations rds. 
 
 ```{r, echo = FALSE, purl = FALSE}
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("section_template"), "/simulations_pilot.RDS")
+rds_file_path <- paste0(get_dropbox_path("01_Psych_Paradigms.Rmd"), "/simulations.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(simulations_pilot, path = rds_file_path)
+  write_rds(simulations, path = rds_file_path)
 }
-simulations_pilot <- read_rds(rds_file_path)
+simulations <- read_rds(rds_file_path)
 ```
 
-Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
+- Compare omnibus power to just looking at direction of effects
 
 ```{r}
-kable(head(simulations_pilot))
+simulations %>% 
+  group_by(sim_ID) %>% 
+  mutate(all_significant = all(p.value < .05),
+         all_positive = all(estimate > 0)) %>% 
+  group_by(estimator_label) %>% 
+  summarize(
+    omnibus_power = mean(all_significant),
+    power = mean(p.value < .05),
+    all_positive = mean(all_positive),
+    positive = mean(estimate > 0)) %>% 
+  kable()
 ```
+
+
+- Given the independence of the studies, the probability of rejecting the null
+across all studies is equal to the product of the studies' powers
+
+- If you condition whether you believe the theory on significance across 
+tests, then for 80% power you have .80^3 = 51% chance of confirming your
+theory. In almost half of the cases where you are right, you will think 
+you are wrong.
+
+- The problem is greatly alleviated if, instead of significance, we look at 
+the direction of effects.
+
+- What about false positives?
+
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+# Simulate design
+null_N_study_design <- redesign(N_study_design, tau = 0, rho = 0)
+null_simulations <- simulate_design(null_N_study_design)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("01_Psych_Paradigms.Rmd"), "/null_simulations")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(null_simulations, path = rds_file_path)
+}
+null_simulations <- read_rds(rds_file_path)
+```
+
+
+```{r}
+null_simulations %>% 
+  group_by(sim_ID) %>% 
+  mutate(all_significant = all(p.value < .05),
+         any_significant = any(p.value < .05),
+         all_positive = all(estimate > 0), 
+         any_positive = any(estimate > 0)) %>% 
+  group_by(estimator_label) %>% 
+  summarize(
+    omnibus_error_rate = mean(all_significant),
+    family_error_rate = mean(any_significant),
+    error_rate = mean(p.value < .05),
+    all_positive = mean(all_positive),
+    any_positive = mean(any_positive),
+    positive = mean(estimate > 0)) %>% 
+  kable()
+```
+
+
+- The approach of only looking at positive effects doesn't do much better
+when the null is true. The FWER is very high, but the probability of all 
+tests being positive is also high. 
+
+- The main takeaway is that you shouldn't reject a theory because one of the 
+observable implications was not statistically significant
+
+- But if you *do* reject the null across all tests, this is highly confirmatory.
+The probability of doing this under the global sharp null is very very low. 
+
+- The important thing, as always, is to have highly-powered tests and to be 
+wary of increasing the risk of family-wise false negatives.
+
+Show, for a null design and for a non-null design, how increasing the number 
+of studies affects inferences:
+
+```{r, echo = FALSE}
+rho <- .5
+tau <- .2
+
+N_studies <- 30
+
+replication_design <- 
+  declare_population(N = 100, X = rnorm(N), M = rnorm(N, X * rho, sqrt(1 - rho^2)), 
+                     U = rnorm(N), Y = tau * X + tau * M * X + U, data = NULL) +
+  declare_estimator(Y ~ X, term = "X", model = lm_robust, label = paste0("Study 1")) 
+
+for(i in 2:N_studies){
+  replication_design <- 
+    replication_design +
+    declare_population(N = 100, X = rnorm(N), M = rnorm(N, X * rho, sqrt(1 - rho^2)), 
+                       U = rnorm(N), Y = tau * X + tau * M * X + U, data = NULL) +
+    declare_estimator(Y ~ X, term = "X", model = lm_robust, label = paste0("Study ",i)) 
+}
+```
+
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+# Simulate design
+replication_simulations <- simulate_design(replication_design)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("01_Psych_Paradigms.Rmd"), "/replication_simulations")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(replication_simulations, path = rds_file_path)
+}
+replication_simulations <- read_rds(rds_file_path)
+```
+
+- Given theory is true (M mediates X on Y, all effects positive)
+  - Red line is probability all results are positive
+  - Black line is probability all results are significant
+
+
+```{r, echo = FALSE}
+get_N_study_diagnosands <- function(simulations, N){
+  studies <- paste0("Study ", 1:N)
+  simulations %>% 
+    filter(estimator_label %in% studies) %>% 
+    group_by(sim_ID) %>% 
+    mutate(all_significant = all(p.value < .05),
+           any_significant = any(p.value < .05),
+           all_positive = all(estimate > 0), 
+           any_positive = any(estimate > 0)) %>% 
+    group_by(estimator_label) %>% 
+    summarize(
+      omnibus_power = mean(all_significant),
+      family_power = mean(any_significant),
+      power = mean(p.value < .05),
+      all_positive = mean(all_positive),
+      any_positive = mean(any_positive),
+      positive = mean(estimate > 0)) %>% 
+    select(-starts_with("estimator_label")) %>% 
+    summarize_all("mean")
+}
+
+number_of_studies <- 
+  lapply(1:N_studies, get_N_study_diagnosands, 
+         simulations = replication_simulations) %>% 
+  do.call(what = "rbind")
+number_of_studies$N_studies <- 1:nrow(number_of_studies)
+
+number_of_studies %>% 
+  ggplot(aes(x = N_studies, y = omnibus_power)) +
+  geom_point() +
+  geom_point(aes(y = all_positive), color = "red")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
