@@ -291,7 +291,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="15.6" data-path="partial-population-design.html"><a href="partial-population-design.html"><i class="fa fa-check"></i><b>15.6</b> Partial Population Design</a></li>
 </ul></li>
 <li class="chapter" data-level="16" data-path="multi-study-designs.html"><a href="multi-study-designs.html"><i class="fa fa-check"></i><b>16</b> Multi-study designs</a><ul>
-<li class="chapter" data-level="16.1" data-path="papers-with-multiple-studies.html"><a href="papers-with-multiple-studies.html"><i class="fa fa-check"></i><b>16.1</b> Papers with multiple studies</a></li>
+<li class="chapter" data-level="16.1" data-path="papers-with-multiple-studies.html"><a href="papers-with-multiple-studies.html"><i class="fa fa-check"></i><b>16.1</b> Papers with multiple studies</a><ul>
+<li class="chapter" data-level="16.1.1" data-path="papers-with-multiple-studies.html"><a href="papers-with-multiple-studies.html#design-declaration-5"><i class="fa fa-check"></i><b>16.1.1</b> Design Declaration</a></li>
+<li class="chapter" data-level="16.1.2" data-path="papers-with-multiple-studies.html"><a href="papers-with-multiple-studies.html#takeaways-4"><i class="fa fa-check"></i><b>16.1.2</b> Takeaways</a></li>
+</ul></li>
 <li class="chapter" data-level="16.2" data-path="multi-site-studies.html"><a href="multi-site-studies.html"><i class="fa fa-check"></i><b>16.2</b> Multi-site studies</a></li>
 </ul></li>
 <li class="part"><span><b>IV Conclusion</b></span></li>
@@ -336,296 +339,274 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="papers-with-multiple-studies" class="section level2">
 <h2><span class="header-section-number">16.1</span> Papers with multiple studies</h2>
 <!-- make sure to rename the section title below -->
-<p>In many research projects, we seek to evaluate multiple observable implications
-for a single theory. [Examples. Psychology. APSR articles that have an
-experiment plus observational work.]</p>
-<ol style="list-style-type: decimal">
-<li>correlation</li>
-<li>small study</li>
-<li>mechanism</li>
-</ol>
-<p>or</p>
-<ol style="list-style-type: decimal">
-<li>small study</li>
-<li>moderators</li>
-<li>replication</li>
-</ol>
-<p>In such cases, a single piece of evidence does not constitute sufficient
-evidence to validate the theory as a whole.
+<p>In many research projects, we seek to evaluate multiple observable implications for a single theory. [Examples: Psychology; APSR articles that have an experiment plus observational work; replication efforts.]
+In such cases, a single piece of evidence does not constitute sufficient evidence to validate the theory as a whole.
 Rather, we believe in the theory when multiple pieces of evidence support it.</p>
-<p>Sometimes, the absence of evidence for an observable implication casts doubt
-on the theory. Reviewer / skeptic: an observable implication is X.
-You have failed to provide evidence of X, this is inconsistent with your theory.
-But this overlooks power of constitutive tests.
-Here, omnibus power matters—unlike multiple comparisons, where we worry about
-Pr(any signif), here we are worried about Pr(all signif).</p>
-<p>Say my theory is that the effect of X on Y is positive, mostly because of
-how the presence of M has a positive mediating effect of X on Y.</p>
-<p>I do a study showing that X affects Y positively.
-I do another showing that X affects M positively.
-I do another study showing that effects of X on Y increase in M positively.</p>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" title="1">N1 &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb133-2" title="2">N2 &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb133-3" title="3">N3 &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb133-4" title="4">rho &lt;-<span class="st"> </span><span class="fl">.5</span></a>
-<a class="sourceLine" id="cb133-5" title="5">tau &lt;-<span class="st"> </span><span class="fl">.2</span></a>
-<a class="sourceLine" id="cb133-6" title="6"></a>
-<a class="sourceLine" id="cb133-7" title="7">N_study_design &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb133-8" title="8"><span class="st">  </span><span class="co"># Study 1 -- Bivariate correlation between X and Y</span></a>
-<a class="sourceLine" id="cb133-9" title="9"><span class="st">  </span><span class="kw">declare_population</span>(<span class="dt">N =</span> N1, <span class="dt">X1 =</span> <span class="kw">rnorm</span>(N), <span class="dt">M1 =</span> <span class="kw">rnorm</span>(N, X1 <span class="op">*</span><span class="st"> </span>rho, <span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>rho<span class="op">^</span><span class="dv">2</span>)), </a>
-<a class="sourceLine" id="cb133-10" title="10">                     <span class="dt">U1 =</span> <span class="kw">rnorm</span>(N), <span class="dt">Y1 =</span> tau <span class="op">*</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>tau <span class="op">*</span><span class="st"> </span>M1 <span class="op">*</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>U1, <span class="dt">data =</span> <span class="ot">NULL</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb133-11" title="11"><span class="st">  </span><span class="kw">declare_estimator</span>(Y1 <span class="op">~</span><span class="st"> </span>X1, <span class="dt">term =</span> <span class="st">&quot;X1&quot;</span>, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;Study 1&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb133-12" title="12"><span class="st">  </span><span class="co"># Study 2 -- Bivariate correlation between M and X</span></a>
-<a class="sourceLine" id="cb133-13" title="13"><span class="st">  </span><span class="kw">declare_population</span>(<span class="dt">N =</span> N2, <span class="dt">X2 =</span> <span class="kw">rnorm</span>(N), <span class="dt">M2 =</span> <span class="kw">rnorm</span>(N, X2 <span class="op">*</span><span class="st"> </span>rho, <span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>rho<span class="op">^</span><span class="dv">2</span>)), </a>
-<a class="sourceLine" id="cb133-14" title="14">                     <span class="dt">U2 =</span> <span class="kw">rnorm</span>(N), <span class="dt">Y2 =</span> tau <span class="op">*</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>tau <span class="op">*</span><span class="st"> </span>M2 <span class="op">*</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>U2, <span class="dt">data =</span> <span class="ot">NULL</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb133-15" title="15"><span class="st">  </span><span class="kw">declare_estimator</span>(M2 <span class="op">~</span><span class="st"> </span>X2, <span class="dt">term =</span> <span class="st">&quot;X2&quot;</span>, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;Study 2&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb133-16" title="16"><span class="st">  </span><span class="co"># Study 3 -- Interaction in X and M </span></a>
-<a class="sourceLine" id="cb133-17" title="17"><span class="st">  </span><span class="kw">declare_population</span>(<span class="dt">N =</span> N3, <span class="dt">X3 =</span> <span class="kw">rnorm</span>(N), <span class="dt">M3 =</span> <span class="kw">rnorm</span>(N, X3 <span class="op">*</span><span class="st"> </span>rho, <span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>rho<span class="op">^</span><span class="dv">2</span>)), </a>
-<a class="sourceLine" id="cb133-18" title="18">                     <span class="dt">U3 =</span> <span class="kw">rnorm</span>(N), <span class="dt">Y3 =</span> tau <span class="op">*</span><span class="st"> </span>X3 <span class="op">+</span><span class="st"> </span>tau <span class="op">*</span><span class="st"> </span>M3 <span class="op">*</span><span class="st"> </span>X3 <span class="op">+</span><span class="st"> </span>U3, <span class="dt">data =</span> <span class="ot">NULL</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb133-19" title="19"><span class="st">  </span><span class="kw">declare_estimator</span>(Y3 <span class="op">~</span><span class="st"> </span>X3 <span class="op">+</span><span class="st"> </span>M3 <span class="op">+</span><span class="st"> </span>X3<span class="op">:</span>M3, <span class="dt">term =</span> <span class="st">&quot;X3:M3&quot;</span>, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;Study 3&quot;</span>) </a></code></pre></div>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" title="1"><span class="co"># Simulate design</span></a>
-<a class="sourceLine" id="cb134-2" title="2">simulations &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(N_study_design)</a></code></pre></div>
+<p>Conventions around what constitutes a convincing pattern of evidence vary. Some researchers will not believe a theory unless each piece of evidence in support of it is <em>statistically significant</em>.
+<!-- Reviewer / skeptic: an observable implication is X.  -->
+<!-- You have failed to provide evidence of X, this is inconsistent with your theory. -->
+Less stringent approaches simply seek evidence “consistent” with the theory, such as the observation that all effects are signed in the predicted direction.</p>
+<p>Here, we declare an <span class="math inline">\(N\)</span>-study design, and examine the consequences of these two different approaches to evaluating a theory in light of multiple studies. We show that, under multiple observable implications generated by the same process, conditioning on significance can lead one strongly astray. Generally speaking, looking at the sign of effects is more probative because it is much less prone to false negatives. With small numbers of studies, however, the risks of false positives are high.</p>
+<div id="design-declaration-5" class="section level3">
+<h3><span class="header-section-number">16.1.1</span> Design Declaration</h3>
 <ul>
-<li>Compare omnibus power to just looking at direction of effects</li>
+<li><p><strong>M</strong>odel: We declare <span class="math inline">\(N\)</span> populations, all of which are governed by the same
+data-generating process: <code>X</code> is exogenous and standard normally-distributed,
+<code>M</code> is standard-normally distributed and correlated with <code>X</code> by <code>rho</code>, and <code>Y</code> is a function of the main effect of <code>X</code> as well as the interaction between <code>X</code> and <code>M</code>, with the size and sign of the direct and interactive effects determined by <code>tau</code> and <code>gamma</code>, respectively.</p></li>
+<li><p><strong>I</strong>nquiry: We want to know, in a global sense, if our theory is “right.”
+Here, that means that the effect of <code>X</code> on <code>Y</code> is positive and increasing with <code>M</code>, and that <code>X</code> affects <code>M</code>.
+When <code>tau</code> is positive, our theory is correct. When it is zero or negative, our theory is incorrect.</p></li>
+<li><p><strong>D</strong>ata strategy: We conduct and collect independent datasets on <span class="math inline">\(N\)</span> datasets of size <code>n</code>. In the example below, we conduct three studies, assuming we only observe <code>X</code> and <code>Y</code> in the first, only <code>M</code> and <code>X</code> in the second, and <code>Y</code>, <code>M</code>, and <code>X</code>, in the third.</p></li>
+<li><p><strong>A</strong>nswer strategy: Using linear regression, we estimate the bivariate correlation between <code>X</code> and <code>Y</code> in study 1, the bivariate correlation between <code>X</code> and <code>M</code> in study 2, and the interaction between <code>X</code> and <code>M</code> on <code>Y</code> in study 3.</p></li>
 </ul>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" title="1">simulations <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb135-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(sim_ID) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb135-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">all_significant =</span> <span class="kw">all</span>(p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>),</a>
-<a class="sourceLine" id="cb135-4" title="4">         <span class="dt">all_positive =</span> <span class="kw">all</span>(estimate <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb135-5" title="5"><span class="st">  </span><span class="kw">group_by</span>(estimator_label) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb135-6" title="6"><span class="st">  </span><span class="kw">summarize</span>(</a>
-<a class="sourceLine" id="cb135-7" title="7">    <span class="dt">omnibus_power =</span> <span class="kw">mean</span>(all_significant),</a>
-<a class="sourceLine" id="cb135-8" title="8">    <span class="dt">power =</span> <span class="kw">mean</span>(p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>),</a>
-<a class="sourceLine" id="cb135-9" title="9">    <span class="dt">all_positive =</span> <span class="kw">mean</span>(all_positive),</a>
-<a class="sourceLine" id="cb135-10" title="10">    <span class="dt">positive =</span> <span class="kw">mean</span>(estimate <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb135-11" title="11"><span class="st">  </span><span class="kw">kable</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" title="1">n1 &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb133-2" title="2">n2 &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb133-3" title="3">n3 &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb133-4" title="4">rho &lt;-<span class="st"> </span><span class="fl">.5</span></a>
+<a class="sourceLine" id="cb133-5" title="5">gamma &lt;-<span class="st"> </span>tau &lt;-<span class="st"> </span><span class="fl">.2</span></a>
+<a class="sourceLine" id="cb133-6" title="6"></a>
+<a class="sourceLine" id="cb133-7" title="7">generate_study_sample &lt;-<span class="st"> </span><span class="cf">function</span>(n, rho, tau, gamma, data){</a>
+<a class="sourceLine" id="cb133-8" title="8">  <span class="kw">fabricate</span>(<span class="dt">N =</span> n, <span class="dt">X =</span> <span class="kw">rnorm</span>(N), <span class="dt">M =</span> <span class="kw">rnorm</span>(N, X <span class="op">*</span><span class="st"> </span>rho, <span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>rho<span class="op">^</span><span class="dv">2</span>)), </a>
+<a class="sourceLine" id="cb133-9" title="9">            <span class="dt">U =</span> <span class="kw">rnorm</span>(N), <span class="dt">Y =</span> tau <span class="op">*</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>gamma <span class="op">*</span><span class="st"> </span>M <span class="op">*</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>U)</a>
+<a class="sourceLine" id="cb133-10" title="10">}</a>
+<a class="sourceLine" id="cb133-11" title="11"></a>
+<a class="sourceLine" id="cb133-12" title="12">three_study_design &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb133-13" title="13"><span class="st">  </span><span class="co"># Study 1 -- Bivariate correlation between X and Y</span></a>
+<a class="sourceLine" id="cb133-14" title="14"><span class="st">  </span><span class="kw">declare_population</span>(<span class="dt">n =</span> n1, <span class="dt">tau =</span> tau, <span class="dt">gamma =</span> gamma, <span class="dt">rho =</span> rho, <span class="dt">handler =</span> generate_study_sample) <span class="op">+</span></a>
+<a class="sourceLine" id="cb133-15" title="15"><span class="st">  </span><span class="kw">declare_estimator</span>(Y <span class="op">~</span><span class="st"> </span>X, <span class="dt">term =</span> <span class="st">&quot;X&quot;</span>, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;Study 1&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb133-16" title="16"><span class="st">  </span><span class="co"># Study 2 -- Bivariate correlation between M and X</span></a>
+<a class="sourceLine" id="cb133-17" title="17"><span class="st">  </span><span class="kw">declare_population</span>(<span class="dt">n =</span> n2, <span class="dt">tau =</span> tau, <span class="dt">gamma =</span> gamma, <span class="dt">rho =</span> rho, <span class="dt">handler =</span> generate_study_sample) <span class="op">+</span></a>
+<a class="sourceLine" id="cb133-18" title="18"><span class="st">  </span><span class="kw">declare_estimator</span>(M <span class="op">~</span><span class="st"> </span>X, <span class="dt">term =</span> <span class="st">&quot;X&quot;</span>, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;Study 2&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb133-19" title="19"><span class="st">  </span><span class="co"># Study 3 -- Interaction in X and M </span></a>
+<a class="sourceLine" id="cb133-20" title="20"><span class="st">  </span><span class="kw">declare_population</span>(<span class="dt">n =</span> n3, <span class="dt">tau =</span> tau, <span class="dt">gamma =</span> gamma, <span class="dt">rho =</span> rho, <span class="dt">handler =</span> generate_study_sample) <span class="op">+</span></a>
+<a class="sourceLine" id="cb133-21" title="21"><span class="st">  </span><span class="kw">declare_estimator</span>(Y <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span>X<span class="op">:</span>M, <span class="dt">term =</span> <span class="st">&quot;X:M&quot;</span>, <span class="dt">model =</span> lm_robust, <span class="dt">label =</span> <span class="st">&quot;Study 3&quot;</span>) </a></code></pre></div>
+</div>
+<div id="takeaways-4" class="section level3">
+<h3><span class="header-section-number">16.1.2</span> Takeaways</h3>
+<p>Let us compare the performance of the “all significant” versus “all signed”
+approaches to theory confirmation when the theory is “correct” (<code>tau</code> and <code>gamma</code> positive),
+versus when it is “incorrect” (both parameters zero).
+In the first approach, a theory is deemed “supported” by the evidence when all effects
+are significant. In the second, the theory is supported by the evidence when the signs of all effects are positive.</p>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" title="1"><span class="co"># Simulate design</span></a>
+<a class="sourceLine" id="cb134-2" title="2">simulations &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(three_study_design)</a>
+<a class="sourceLine" id="cb134-3" title="3"><span class="co"># Simulate null design</span></a>
+<a class="sourceLine" id="cb134-4" title="4">null_three_study_design &lt;-<span class="st"> </span><span class="kw">redesign</span>(three_study_design, <span class="dt">tau =</span> <span class="dv">0</span>, <span class="dt">gamma =</span> <span class="dv">0</span>, <span class="dt">rho =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb134-5" title="5">null_simulations &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(null_three_study_design)</a></code></pre></div>
+<p>In the first three rows of the table, the theory is correct in that <code>tau</code>,<br />
+<code>gamma</code>, and <code>rho</code> are positive, in the second three rows it is incorrect because
+both the main effect and interaction are zero. The “power” column tells us the
+proportion of simulations in which the effect is significant at the <span class="math inline">\(\alpha = .05\)</span> level, the “all significant” column tells us the proportion of simulations in which all
+of the studies have significant effects, the “positive” column tells us how often
+the study found a positively signed result, while the “all positive column” tells
+us the proportion of simulations where all studies had a positively signed result.</p>
 <table>
 <thead>
 <tr>
+<th style="text-align:right;">
+tau
+</th>
 <th style="text-align:left;">
 estimator_label
 </th>
 <th style="text-align:right;">
-omnibus_power
+gamma
 </th>
 <th style="text-align:right;">
 power
 </th>
 <th style="text-align:right;">
-all_positive
+all_significant
 </th>
 <th style="text-align:right;">
 positive
+</th>
+<th style="text-align:right;">
+all_positive
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td style="text-align:right;">
+0.2
+</td>
 <td style="text-align:left;">
 Study 1
 </td>
 <td style="text-align:right;">
-0.25
+0.2
 </td>
 <td style="text-align:right;">
-0.444
+0.406
 </td>
 <td style="text-align:right;">
-0.964
+0.256
 </td>
 <td style="text-align:right;">
-0.972
+0.968
+</td>
+<td style="text-align:right;">
+0.938
 </td>
 </tr>
 <tr>
+<td style="text-align:right;">
+0.2
+</td>
 <td style="text-align:left;">
 Study 2
 </td>
 <td style="text-align:right;">
-0.25
+0.2
+</td>
+<td style="text-align:right;">
+0.998
+</td>
+<td style="text-align:right;">
+0.256
 </td>
 <td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0.964
-</td>
-<td style="text-align:right;">
-1.000
+0.938
 </td>
 </tr>
 <tr>
+<td style="text-align:right;">
+0.2
+</td>
 <td style="text-align:left;">
 Study 3
 </td>
 <td style="text-align:right;">
-0.25
+0.2
 </td>
 <td style="text-align:right;">
-0.556
+0.616
 </td>
 <td style="text-align:right;">
-0.964
+0.256
 </td>
 <td style="text-align:right;">
-0.992
+0.966
+</td>
+<td style="text-align:right;">
+0.938
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:left;">
+Study 1
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.058
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.500
+</td>
+<td style="text-align:right;">
+0.114
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:left;">
+Study 2
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.052
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.506
+</td>
+<td style="text-align:right;">
+0.114
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:left;">
+Study 3
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.060
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.530
+</td>
+<td style="text-align:right;">
+0.114
 </td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><p>Given the independence of the studies, the probability of rejecting the null
-across all studies is equal to the product of the studies’ powers</p></li>
-<li><p>If you condition whether you believe the theory on significance across
-tests, then for 80% power you have .80^3 = 51% chance of confirming your
-theory. In almost half of the cases where you are right, you will think
+<li><p>Notice that, because the studies are independent, the probability that all
+are significant is equal to the product of their power:
+Pr(all studies significant) = Pr(Study 1 significant) <span class="math inline">\(\times\)</span>…<span class="math inline">\(\times\)</span> Pr(Study <span class="math inline">\(N\)</span> significant). Thus, if you only believe a theory if the studies conducted to test it yield significant results, and those studies are all powered at the conventionally accepted level of 80%, you erroneously reject the theory with a probability of <span class="math inline">\(.8^N\)</span>. If you do three, conventionally well-powered, randomized studies each shooting at the right quantity of interest, then in almost half of the cases where you are right, you will think
 you are wrong.</p></li>
-<li><p>The problem is greatly alleviated if, instead of significance, we look at
-the direction of effects.</p></li>
-<li><p>What about false positives?</p></li>
+<li><p>Furthermore, notice how detrimental the addition of a small study can be by this metric, even if it gets at an important mechanism. As soon as you condition your inference about the theory being correct on the significance of all the observable implications, a low-powered test can sharply increase the risk of false rejection.</p></li>
+<li><p>What can we say about the risk of false positives? The power of the individual studies is where it should be: for a stated error rate of $= $5%, the studies are every so slightly conservative. However, the “all significant” desideratum creates a rejection rate that is too high.</p></li>
+<li><p>Some of these problems, though not all, are alleviated when we disregard significance and just look at signs. When the theory is right, there is a very good chance that all of the effects we estimate are positive: we surmise the theory is correct roughly 94% of the time when it actually is.</p></li>
+<li><p>When the theory is not correct in the sense that the true effects are zero, random error means that they are positive half the time and negative the other half. Consequently, the probability of erroneously accepting the theory based on the sign of effects when the true underlying effects are zero is equal to <span class="math inline">\(.5^N\)</span>. Here, that means we erroneously infer we are right at a relatively high rate of 12% of simulations.</p></li>
 </ul>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" title="1"><span class="co"># Simulate design</span></a>
-<a class="sourceLine" id="cb136-2" title="2">null_N_study_design &lt;-<span class="st"> </span><span class="kw">redesign</span>(N_study_design, <span class="dt">tau =</span> <span class="dv">0</span>, <span class="dt">rho =</span> <span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb136-3" title="3">null_simulations &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(null_N_study_design)</a></code></pre></div>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" title="1">null_simulations <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb137-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(sim_ID) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb137-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">all_significant =</span> <span class="kw">all</span>(p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>),</a>
-<a class="sourceLine" id="cb137-4" title="4">         <span class="dt">any_significant =</span> <span class="kw">any</span>(p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>),</a>
-<a class="sourceLine" id="cb137-5" title="5">         <span class="dt">all_positive =</span> <span class="kw">all</span>(estimate <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>), </a>
-<a class="sourceLine" id="cb137-6" title="6">         <span class="dt">any_positive =</span> <span class="kw">any</span>(estimate <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb137-7" title="7"><span class="st">  </span><span class="kw">group_by</span>(estimator_label) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb137-8" title="8"><span class="st">  </span><span class="kw">summarize</span>(</a>
-<a class="sourceLine" id="cb137-9" title="9">    <span class="dt">omnibus_error_rate =</span> <span class="kw">mean</span>(all_significant),</a>
-<a class="sourceLine" id="cb137-10" title="10">    <span class="dt">family_error_rate =</span> <span class="kw">mean</span>(any_significant),</a>
-<a class="sourceLine" id="cb137-11" title="11">    <span class="dt">error_rate =</span> <span class="kw">mean</span>(p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>),</a>
-<a class="sourceLine" id="cb137-12" title="12">    <span class="dt">all_positive =</span> <span class="kw">mean</span>(all_positive),</a>
-<a class="sourceLine" id="cb137-13" title="13">    <span class="dt">any_positive =</span> <span class="kw">mean</span>(any_positive),</a>
-<a class="sourceLine" id="cb137-14" title="14">    <span class="dt">positive =</span> <span class="kw">mean</span>(estimate <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb137-15" title="15"><span class="st">  </span><span class="kw">kable</span>()</a></code></pre></div>
-<table>
-<thead>
-<tr>
-<th style="text-align:left;">
-estimator_label
-</th>
-<th style="text-align:right;">
-omnibus_error_rate
-</th>
-<th style="text-align:right;">
-family_error_rate
-</th>
-<th style="text-align:right;">
-error_rate
-</th>
-<th style="text-align:right;">
-all_positive
-</th>
-<th style="text-align:right;">
-any_positive
-</th>
-<th style="text-align:right;">
-positive
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Study 1
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-<td style="text-align:right;">
-0.050
-</td>
-<td style="text-align:right;">
-0.11
-</td>
-<td style="text-align:right;">
-0.852
-</td>
-<td style="text-align:right;">
-0.458
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Study 2
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-<td style="text-align:right;">
-0.048
-</td>
-<td style="text-align:right;">
-0.11
-</td>
-<td style="text-align:right;">
-0.852
-</td>
-<td style="text-align:right;">
-0.518
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Study 3
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-<td style="text-align:right;">
-0.048
-</td>
-<td style="text-align:right;">
-0.11
-</td>
-<td style="text-align:right;">
-0.852
-</td>
-<td style="text-align:right;">
-0.470
-</td>
-</tr>
-</tbody>
-</table>
+<p>In the design above, the rates at which we rejected or accepted theories seemed
+to depend on the number of studies we considered. In the graph below, we look
+at twenty-nine different <span class="math inline">\(N\)</span>-study designs, all of which seek to confirm a theory
+by replicating evidence for it <span class="math inline">\(N\)</span> times. The first design is made of two studies,
+each independtly evaluating the hypothesis that <span class="math inline">\(Y\)</span> is positively correlated with <span class="math inline">\(X\)</span>.
+Again, we consider how conditioning an inference about the theory on whether
+all results are significant or all results are positive affects error rates.</p>
 <ul>
-<li><p>The approach of only looking at positive effects doesn’t do much better
-when the null is true. The FWER is very high, but the probability of all
-tests being positive is also high.</p></li>
-<li><p>The main takeaway is that you shouldn’t reject a theory because one of the
-observable implications was not statistically significant</p></li>
-<li><p>But if you <em>do</em> reject the null across all tests, this is highly confirmatory.
-The probability of doing this under the global sharp null is very very low.</p></li>
-<li><p>The important thing, as always, is to have highly-powered tests and to be
-wary of increasing the risk of family-wise false negatives.</p></li>
+<li><p>Again, we see that significance is not a probative way to look for observable
+theoretical implications. As soon as there are more than four studies,
+there is virtually no chance of confirming even a true theory by this metric.
+We see a sort of reverse multiple-comparisons problem: increasing the number
+of tests makes false rejections increasingly more likely when we are interested
+in the joint probability of all the tests saying the same thing.
+Unless the number of studies is small, whether all produce significant results
+essentially yields no information about whether the theory is correct.</p></li>
+<li><p>By contrast, looking at signs only can be highly probative. In this
+application, the optimal number of studies is about eight. At that point,
+there is virtually no chance of erroneously inferring that the theory is
+correct when the effects are zero, but when the theory is correct there is
+a good chance (almost 75%) that all of the available evidence will be signed
+accordingly. As the number of studies increases, so too does the probability
+of discordant results, and using the unanimity of signs to judge whether
+the theory is correct becomes increasingly unwise.</p></li>
 </ul>
-<p>Show, for a null design and for a non-null design, how increasing the number
-of studies affects inferences:</p>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" title="1"><span class="co"># Simulate design</span></a>
-<a class="sourceLine" id="cb138-2" title="2">replication_simulations &lt;-<span class="st"> </span><span class="kw">simulate_design</span>(replication_design)</a></code></pre></div>
-<ul>
-<li>Given theory is true (M mediates X on Y, all effects positive)
-<ul>
-<li>Red line is probability all results are positive</li>
-<li>Black line is probability all results are significant</li>
-</ul></li>
-</ul>
-<p><img src="book_files/figure-html/unnamed-chunk-349-1.png" width="672" /></p>
+<p><img src="book_files/figure-html/unnamed-chunk-347-1.png" width="672" /></p>
 
 <!-- note do_bookdown is set in index.rmd, so we know if you're running just this .Rmd or compiling the book-->
 <!-- start post here, do not edit above -->
+</div>
 </div>
             </section>
 
