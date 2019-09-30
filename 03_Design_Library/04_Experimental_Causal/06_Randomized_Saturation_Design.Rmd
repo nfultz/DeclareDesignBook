@@ -34,106 +34,138 @@ library(blockTools)
 ```
 
 
-Partial population designs---also known as randomized saturation designs (@bairdetal2018)---
+Randomized saturation designs (@bairdetal2018) offer researchers a way to estimate the diffusion of intervention effects within some geographic or social network. Most approaches work by first cluster-assigning non-overlapping groups of individuals to treatment saturations, then block-assigning individuals to treatment in the proportions determined by the saturations. 
 
-- Use Ghana study 
-- Show that works great if spillovers are contained by districts
-  - and reduces bias compared to when you don't address it?
-- But show that it doesn't work as great when:
-  - distal spillovers occur
-- Are there cases where the saturation actually makes the matter worse?
+@asunka2019, for example, wanted to know if the presence of election monitors at ballot stations would displace violence and fraud to other ballot stations. They randomized constituencies to low, medium, and high levels of saturation, and then randomized ballot stations to have election monitoring or not in low, medium, or high concentrations, depending on the randomized saturation. In the original study, the authors did not include a zero-saturation condition. Here, we declare a simplified version of their design in which a zero-saturation condition is included. 
+
+Main points to develop:
+
+- Randomized saturation is great when you get the model right. Though, show how IPW reduces the power to detect main effect, especially if there's no spillover.
+- Randomized saturation assumes a model that may be wrong. In particular, spillovers are restricted to containers. But this might not be correct.
+
+### Design Declaration
+
+- **M**odel: 
+Potential outcomes are defined in terms of `S`---the saturation---and `Z`---whether or not a ballot station is treated. We model spillovers in two ways. In the first, the amount of spillover that affects a unit is determined by how many other units in its network are treated. In the second, the amount of spillover a unit receives is determined by whether that unit's geographic neighbor is treated, irrespective of whether they share a network.
+
+- **I**nquiry: 
+We want to know the effect of having high and medium levels of saturation versus low saturation in the control: $E[Y_i(Z_i = 0, S_i = \text{high})-Y_i(Z_i = 0, S_i = \text{low})]$ and $E[Y_i(Z_i = 0, S_i = \text{medium})-Y_i(Z_i = 0, S_i = \text{low})]$. 
+
+- **D**ata strategy: We assign entire groups of individual ballot stations to one of three saturations: low (0%), medium (50%), and high (80%). We then randomize individuals within groups to treatment or control in the proportions dictated by the saturation. Thus, the saturation is cluster-randomized, whereas treatment is block-randomized.
+
+- **A**nswer strategy: We weight each individual by the inverse of the probability that they find themselves in the control, and run a regression comparing high and medium to low saturation control units.
+
 
 ```{r}
+N_groups <- 15
 
-N_groups <- 10
-ms <- c(0,0,N_groups,0)
-
-spillover_1 <- declare_step(
-  N_treated = ave(Z, G, FUN = sum),
-  S = as.numeric(N_treated > 0),
-  handler = fabricate) 
-
-spillover_2 <- declare_step(next_neighbor = c(N,1:(N-1)),
-                            S = Z[next_neighbor],
-                            handler = fabricate) 
-
-right_model <- 
-  declare_population(N = 100, X = 1:N, U = rnorm(N), G = ntile(X, N_groups)) + 
-  declare_assignment(assignment_variable = "saturation", 
+design <- 
+  declare_population(N = 60, X = 1:N, U = rnorm(N), G = ntile(X, N_groups)) + 
+  declare_assignment(assignment_variable = "S", 
                      clusters = G, 
-                     conditions = c(0, .50, .80),
-                     m_each = ms) +
-  declare_assignment(blocks = G, 
-                     block_prob = taepply(saturation,G,mean)) +
-  spillover_1 +
+                     conditions = c("low","med","high"),
+                     m_each = c(5,5,5)) +
+  declare_assignment(prob = 0,
+                     blocks = G,
+                     assignment_variable = "Z_S_low") +
+  declare_assignment(prob = .5,
+                     blocks = G,
+                     assignment_variable = "Z_S_med") +
+  declare_assignment(prob = .8,
+                     blocks = G,
+                     assignment_variable = "Z_S_high") +
+  declare_step(
+    spillover_low = ave(Z_S_low, G, FUN = sum),
+    spillover_med = ave(Z_S_med, G, FUN = sum),
+    spillover_high = ave(Z_S_high, G, FUN = sum),
+    handler = fabricate,
+    label = "spillover")  +
   declare_potential_outcomes(
-    Y ~ Z * .20 + S * .20 + U,
-    conditions = list(Z = c(0,1), S = c(0,1)) +
-  declare_estimand(ate = mean(Y_Z_1_S_0 - Y_Z_0_S_0)) +
+    Y ~ Z * -.20 + U + 
+      spillover_low * (S == "low") + 
+      spillover_med * (S == "med") + 
+      spillover_high * (S == "high"),
+    conditions = list(Z = c(0,1), S = c("low","med","high"))) +
+  declare_estimand(high = mean(Y_Z_0_S_high - Y_Z_0_S_low),
+                   med =  mean(Y_Z_0_S_med - Y_Z_0_S_low)) +
+  declare_reveal(Z,S) +
   declare_reveal(Y,c(Z, S)) +
-  declare_estimator(Y ~ )
+  # Need to add weights
+  declare_estimator(model = lm_robust, 
+                    formula = Y ~ S,
+                    subset = Z == 0 & S %in% c("high","low"), 
+                    estimand = "high",
+                    label = "dim - high vs low") +
+  declare_estimator(model = difference_in_means, 
+                    formula = Y ~ S,
+                    subset = Z == 0 & S %in% c("med","low"), 
+                    estimand = "med",
+                    label = "dim - med vs low")
+```
 
+Here's what our hypothetical country looks like:
 
+```{r}
 draw_data(design) %>% 
-  ggplot(aes(x = u, y = x, color = as.factor(g))) +
+  ggplot(aes(x = U, y = X, color = as.factor(G))) +
   geom_point() +
-  geom_hline(yintercept = seq(1,100,by = 20) - .5)
-
-# ONE FROM TOTAL N TREATED IN TILE
-# ANOTHER FROM NEAREST NEIGHBOR IF TREATED
-
-
-
-
-draw_data(design) %>% with(.,table(row, col))
-  
-  declare_potential_outcomes(
-    Y_Z_0_S_0 = .5 < e, 
-    Y_Z_1_S_0 = .5 < e + tau,
-    Y_Z_0_S_1 = .5 < e + tau / 2, 
-    Y_Z_1_S_1 = .5 < e + tau / 2) +
-  declare_estimand(ate_S0 = mean(Y_Z_1_S_0 - Y_Z_0_S_0)) +
-  declare_sampling(n = 4) +
-  declare_assignment(prob = .5) +
-  # MAKE THIS A DPLYER STEP
-  declare_step(next_neighbor = c(N,1:(N-1)),
-               S = Z[next_neighbor], 
-               handler = fabricate) +
-  declare_reveal(Y, c(Z, S)) +
-  declare_reveal(Y, c(Z, S)) +
-  declare_estimator(Y ~ Z + S, label = "DiM")   
-
-
-
-
-diagnose_design(spillover_design, redesign(spillover_design, N_sampled = 100, N = 100))
+  scale_color_discrete("Constituency") +
+  scale_y_continuous("Latitude") +
+  scale_x_continuous("Longitude") +
+  geom_hline(yintercept = seq(1,60,by = 4) - .5)
 ```
 
 
-This chunk is set to `echo = TRUE` and `eval = do_diagnosis`
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-simulations_pilot <- simulate_design(design, sims = sims)
+diagnosis <- diagnose_design(design, sims = sims)
 ```
 
-Right after you do simulations, you want to save the simulations rds. 
 
 ```{r, echo = FALSE, purl = FALSE}
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("section_template"), "/simulations_pilot.RDS")
+rds_file_path <- paste0(get_dropbox_path("06_Randomized_Saturation_Designs"), "/diagnosis.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(simulations_pilot, path = rds_file_path)
+  write_rds(diagnosis, path = rds_file_path)
 }
-simulations_pilot <- read_rds(rds_file_path)
+diagnosis <- read_rds(rds_file_path)
 ```
-
-Now all that simulating, saving, and loading is done, and we can use the simulations for whatever you want.
 
 ```{r}
-kable(head(simulations_pilot))
+diagnosis
+```
+
+- The high saturation is biased here because of the unequal assignment probs. Should be fine with IPW though.
+
+```{r}
+distal_design <- replace_step(design = design, step = "spillover",
+                              new_step = declare_step(next_neighbor = c(N,1:(N-1)),
+                                                      spillover_low = Z_S_low[next_neighbor],
+                                                      spillover_med = Z_S_med[next_neighbor],
+                                                      spillover_high = Z_S_high[next_neighbor],
+                                                      handler = fabricate) )
 ```
 
 
+```{r, eval = do_diagnosis & !exists("do_bookdown")}
+distal_diagnosis <- diagnose_design(distal_design, sims = sims)
+```
 
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("06_Randomized_Saturation_Designs"), "/distal_diagnosis.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(distal_diagnosis, path = rds_file_path)
+}
+distal_diagnosis <- read_rds(rds_file_path)
+```
+
+```{r}
+distal_diagnosis
+```
+
+
+- When there are next-neighbor spillovers that ignore boundaries, the RS estimator is indeed biased for the RS estimand
 
 
 
