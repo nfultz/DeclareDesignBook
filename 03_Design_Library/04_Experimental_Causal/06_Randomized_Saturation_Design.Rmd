@@ -24,7 +24,7 @@ source("scripts/before_chapter_script.R")
 ```{r partial_population_design, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
 do_diagnosis <- FALSE
-sims <- 100
+sims <- 500
 b_sims <- 20
 ```
 
@@ -49,35 +49,37 @@ Main points to develop:
 Potential outcomes are defined in terms of `S`---the saturation---and `Z`---whether or not a ballot station is treated. We model spillovers in two ways. In the first, the amount of spillover that affects a unit is determined by how many other units in its network are treated. In the second, the amount of spillover a unit receives is determined by whether that unit's geographic neighbor is treated, irrespective of whether they share a network.
 
 - **I**nquiry: 
-We want to know the effect of having high and medium levels of saturation versus low saturation in the control: $E[Y_i(Z_i = 0, S_i = \text{high})-Y_i(Z_i = 0, S_i = \text{low})]$ and $E[Y_i(Z_i = 0, S_i = \text{medium})-Y_i(Z_i = 0, S_i = \text{low})]$. 
+We want to know the effect of having high and medium levels of saturation versus low saturation in the control: $E[Y_i(Z_i = 0, S_i = \text{high})-Y_i(Z_i = 0, S_i = \text{low})]$ and $E[Y_i(Z_i = 0, S_i = \text{medium})-Y_i(Z_i = 0, S_i = \text{low})]$. We also want to know the "direct effect"--e.g. what happens to those directly treated if we disregard spillovers. Here it is defined over potential outcomes that the experiment does not reveal, since no one is treated in low-saturation constituencies: $E[Y_i(Z_i = 1, S_i = \text{low})-Y_i(Z_i = 0, S_i = \text{low})]$.  
 
-- **D**ata strategy: We assign entire groups of individual ballot stations to one of three saturations: low (0%), medium (50%), and high (80%). We then randomize individuals within groups to treatment or control in the proportions dictated by the saturation. Thus, the saturation is cluster-randomized, whereas treatment is block-randomized.
+- **D**ata strategy: We assign entire groups of individual ballot stations to one of three saturations: low (0%), medium (50%), and high (75%). We then randomize individuals within groups to treatment or control in the proportions dictated by the saturation. Thus, the saturation is cluster-randomized, whereas treatment is block-randomized.
 
-- **A**nswer strategy: We weight each individual by the inverse of the probability that they find themselves in the control, and run a regression comparing high and medium to low saturation control units.
+- **A**nswer strategy: We weight each individual by the inverse of the probability that they find themselves in the condition they're in. To estimate spillovers, we run one regression comparing high and one regression comparing medium to low saturation control units. To estimate the direct effect, we run a regression of the outcome on the treatment indicatior on the full sample, controlling for saturation.
 
 
 ```{r}
+N_individuals <- 60
 N_groups <- 15
+G_per_saturation <- c(5,5,5)
 
 design <- 
-  declare_population(N = 60, X = 1:N, U = rnorm(N), G = ntile(X, N_groups)) + 
+  declare_population(N = N_individuals, X = 1:N, U = rnorm(N), G = ntile(X, N_groups)) + 
   declare_assignment(assignment_variable = "S", 
                      clusters = G, 
                      conditions = c("low","med","high"),
-                     m_each = c(5,5,5)) +
+                     m_each = G_per_saturation) +
   declare_assignment(prob = 0,
                      blocks = G,
                      assignment_variable = "Z_S_low") +
   declare_assignment(prob = .5,
                      blocks = G,
                      assignment_variable = "Z_S_med") +
-  declare_assignment(prob = .8,
+  declare_assignment(prob = .75,
                      blocks = G,
                      assignment_variable = "Z_S_high") +
   declare_step(
-    spillover_low = ave(Z_S_low, G, FUN = sum),
-    spillover_med = ave(Z_S_med, G, FUN = sum),
-    spillover_high = ave(Z_S_high, G, FUN = sum),
+    spillover_low = ave(Z_S_low, G, FUN = sum) * .1,
+    spillover_med = ave(Z_S_med, G, FUN = sum) * .1,
+    spillover_high = ave(Z_S_high, G, FUN = sum) * .1,
     handler = fabricate,
     label = "spillover")  +
   declare_potential_outcomes(
@@ -87,34 +89,48 @@ design <-
       spillover_high * (S == "high"),
     conditions = list(Z = c(0,1), S = c("low","med","high"))) +
   declare_estimand(high = mean(Y_Z_0_S_high - Y_Z_0_S_low),
-                   med =  mean(Y_Z_0_S_med - Y_Z_0_S_low)) +
+                   med =  mean(Y_Z_0_S_med - Y_Z_0_S_low), 
+                   ate_no_spill = mean(Y_Z_1_S_low - Y_Z_0_S_low)) +
   declare_reveal(Z,S) +
+  declare_step(
+    w = 1 / (S_cond_prob * (Z_S_low_cond_prob * (S == "low") + 
+                   Z_S_med_cond_prob * (S == "med") + 
+                   Z_S_high_cond_prob * (S == "high"))),
+    handler = fabricate) +
   declare_reveal(Y,c(Z, S)) +
-  # Need to add weights
   declare_estimator(model = lm_robust, 
                     formula = Y ~ S,
                     subset = Z == 0 & S %in% c("high","low"), 
                     estimand = "high",
-                    label = "dim - high vs low") +
-  declare_estimator(model = difference_in_means, 
+                    weights = w,
+                    label = "high vs low") +
+  declare_estimator(model = lm_robust, 
                     formula = Y ~ S,
                     subset = Z == 0 & S %in% c("med","low"), 
+                    weights = w,
                     estimand = "med",
-                    label = "dim - med vs low")
+                    label = "med vs low") +
+  declare_estimator(model = lm_robust, 
+                    formula = Y ~ Z + S,
+                    term = "Z", 
+                    weights = w,
+                    estimand = "ate_no_spill",
+                    label = "main effect")
 ```
 
 Here's what our hypothetical country looks like:
 
 ```{r}
 draw_data(design) %>% 
-  ggplot(aes(x = U, y = X, color = as.factor(G))) +
+  ggplot(aes(x = 1, y = X, color = as.factor(G))) +
   geom_point() +
-  scale_color_discrete("Constituency") +
+  scale_color_discrete("Ballot station") +
   scale_y_continuous("Latitude") +
   scale_x_continuous("Longitude") +
-  geom_hline(yintercept = seq(1,60,by = 4) - .5)
+  geom_hline(yintercept = seq(1,N_individuals,by = N_individuals / N_groups) - .5)
 ```
 
+Let's diagnose
 
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
 diagnosis <- diagnose_design(design, sims = sims)
@@ -130,11 +146,23 @@ if (do_diagnosis & !exists("do_bookdown")) {
 diagnosis <- read_rds(rds_file_path)
 ```
 
+Our diagnosis shows this design does a pretty great job, under this model of spillovers:
+
 ```{r}
-diagnosis
+diagnosis %>% reshape_diagnosis() %>% kable()
 ```
 
-- The high saturation is biased here because of the unequal assignment probs. Should be fine with IPW though.
+- It's particularly nice, since we're able to estimate the direct effect (whose constitutive POs we never observe) by partialling out spillovers.
+
+- Show here: power tradeoffs for main effects versus spillovers, in terms of 
+  proportion of sample allocated to the "low" versus other conditions
+
+- and also in terms of IPW (equivalent sample size with everyone in the .5 condition)
+
+
+Now, we consider a model of spillovers in which fraud is displaced latitudinally, 
+from one neighbor to the next. Say, because there are roads traveling north and 
+fraudsters disregard boundaries (in reality, they are unlikely to do so).
 
 ```{r}
 distal_design <- replace_step(design = design, step = "spillover",
@@ -160,12 +188,13 @@ if (do_diagnosis & !exists("do_bookdown")) {
 distal_diagnosis <- read_rds(rds_file_path)
 ```
 
+- When there are next-neighbor spillovers that ignore boundaries, the estimator is biased again
+
 ```{r}
-distal_diagnosis
+distal_diagnosis %>% reshape_diagnosis() %>% kable()
 ```
 
 
-- When there are next-neighbor spillovers that ignore boundaries, the RS estimator is indeed biased for the RS estimand
 
 
 
