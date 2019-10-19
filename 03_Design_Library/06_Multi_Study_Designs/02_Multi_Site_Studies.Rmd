@@ -32,7 +32,7 @@ b_sims <- 20
 library(metafor)
 ```
 
-# why do this in multiple settings: what can you generalize to?
+### why do this in multiple settings: what can you generalize to?
 
 what is the population you are interested in?
 can you sample from it? if not, what is the population from which you are effectively sampling from?
@@ -155,18 +155,18 @@ small_study_five_sites_context <- replace_step(
 # diag <- diagnose_design(sims %>% filter(!is.na(estimate) & !is.na(std.error) & !is.na(statistic) & !is.na(p.value) & !is.na(conf.low) & !is.na(conf.high)), bootstrap_sims = 1000)
 ```
 
-# tradeoff: context-specific intervention and comparability
+### tradeoff: context-specific intervention and comparability
 
 
 
 
-# tradeoff: comparability and fidelity to context in outcome measurement
+### tradeoff: comparability and fidelity to context in outcome measurement
 
 
-# confounded sampling
+### confounded sampling
 
 - features that vary across but not within contexts
 - covariate profiles that do not exist in other contexts
 
-# estimation
+### estimation
 
