@@ -20,6 +20,11 @@ source("scripts/before_chapter_script.R")
 
 ## Experiments for sensitive questions
 
+- setup: a descriptive estimand, the proportion holding sensitive characteristic; two experimental designs to recover it, list experiments and randomized response
+- if identification assumptions are violated (focus on ceiling/floor), estimates of ATE still unbiased but not for the descriptive estimand
+- compare design where the ceiling/floor categories are minimized through Glynn (2013) design advice to use negatively-correlated items and a high prevalence and a low prevalence item
+- both designs exhibit bias-variance tradeoff (more control of variance with RR)
+
 ### List experiments
 
 ```{r sensitive_questions, echo = FALSE, output = FALSE, purl = FALSE}
@@ -78,10 +83,10 @@ list_design <-
     # shy voter (unobservable)
     shy = draw_binary(proportion_shy, N),
     
-    # Direct question response (1 if Trump supporter and not shy, 0 otherwise)
-    Y_direct = as.numeric(truthful_trump_vote == 1 & shy == 0),
+    # direct question response (1 if Trump supporter and not shy, 0 otherwise)
+    Y_direct = if_else(truthful_trump_vote == 1 & shy == 0, 1, 0),
     
-    # Nonsensitive list experiment items
+    # nonsensitive list experiment items
     raise_minimum_wage = draw_binary(.8, N),
     repeal_obamacare = draw_binary(.6, N),
     ban_assault_weapons = draw_binary(.5, N)
@@ -93,7 +98,8 @@ list_design <-
   ) +
   
   # Inquiry
-  declare_estimand(proportion_truthful_trump_vote = mean(truthful_trump_vote)) +
+  declare_estimand(proportion_truthful_trump_vote = mean(truthful_trump_vote),
+                   ATE = mean(Y_list_Z_1 - Y_list_Z_0)) +
   
   # Data Strategy
   declare_sampling(n = 500) +
@@ -102,17 +108,9 @@ list_design <-
   
   # Answer Strategy
   declare_estimator(
-    Y_direct ~ 1,
-    model = lm_robust,
-    term = "(Intercept)",
-    estimand = "proportion_truthful_trump_vote",
-    label = "direct"
-  ) +
+    Y_direct ~ 1, model = lm_robust, term = "(Intercept)", estimand = "proportion_truthful_trump_vote", label = "direct") +
   declare_estimator(
-    Y_list ~ Z,
-    model = difference_in_means,
-    estimand = "proportion_truthful_trump_vote",
-    label = "list")
+    Y_list ~ Z, model = difference_in_means, estimand = c("proportion_truthful_trump_vote", "ATE"), label = "list")
 
 ```
 
@@ -123,7 +121,7 @@ simulations_list <- simulate_design(list_design, sims = sims)
 
 ```{r, echo = FALSE, purl = FALSE}
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("list_experiments"), "/simulations_list.RDS")
+rds_file_path <- paste0(get_dropbox_path("sensitive_questions"), "/simulations_list.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
   write_rds(simulations_list, path = rds_file_path)
 }
@@ -135,6 +133,7 @@ The plot shows the sampling distribution of the direct and list experimetn estim
 ```{r, echo=FALSE}
 summary_df <- 
   simulations_list %>%
+  filter(estimand_label == "proportion_truthful_trump_vote") %>% 
   gather(key, value, estimand, estimate) %>%
   group_by(estimator_label, key) %>%
   summarize(average_value = mean(value))
@@ -146,26 +145,117 @@ simulations_list %>%
   facet_wrap(~estimator_label)
 ```
 
-### Randomized response technique
+#### Violations of identifying assumptions
 
-#### Declaration
+```{r}
+list_design_ceiling <- replace_step(
+  list_design, step = 2, 
+  new_step = declare_potential_outcomes(
+    Y_list_Z_0 = raise_minimum_wage + repeal_obamacare + ban_assault_weapons,
+    Y_list_Z_1_no_liars = Y_list_Z_0 + truthful_trump_vote,
+    Y_list_Z_1 = ifelse(Y_list_Z_1_no_liars == 4, 3, Y_list_Z_1_no_liars)
+  )
+)
+```
+
+```{r, eval = do_diagnosis}
+diagnosis_list_ceiling <- diagnose_design(list_design_ceiling, sims = sims, bootstrap_sims = b_sims)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("sensitive_questions"), "/list_ceiling_diagnosis.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis_list_ceiling, path = rds_file_path)
+}
+diagnosis_list_ceiling <- read_rds(rds_file_path)
+```
+
+```{r}
+kable(diagnosis_list_ceiling %>% get_diagnosands %>% select(estimator_label, estimand_label, bias, rmse))
+```
+
+See Blair and Imai (2012) and Li (2019) for methods for addressing violations no liars assumption through modeling and bounds.
+
+Li, Y. (n.d.). Relaxing the No Liars Assumption in List Experiment Analyses. Political Analysis, 1-16. doi:10.1017/pan.2019.7
+
+#### Mitigating the risk of ceiling effects
+
+Glynn (2013)
+
+```{r}
+list_design_glynn <- replace_step(
+  list_design, step = 1, 
+  new_step = declare_population(
+    N = 5000,
+    # true trump vote (unobservable)
+    truthful_trump_vote = draw_binary(0.45, N),
+    
+    # shy voter (unobservable)
+    shy = draw_binary(proportion_shy, N),
+    
+    # direct question response (1 if Trump supporter and not shy, 0 otherwise)
+    Y_direct = if_else(truthful_trump_vote == 1 & shy == 0, 1, 0),
+    
+    list2_item1 = draw_binary(0.5, N),
+    list2_item2 = correlate(given = list2_item1, rho = -.5, draw_binary, prob = 0.5), 
+    list2_item3 = draw_binary(0.1, N)  # low prevalence
+  )
+)
+
+list_design_glynn <- replace_step(
+  list_design_glynn, step = 2, 
+  declare_potential_outcomes(
+    Y_list_Z_0 = list2_item1 + list2_item2 + list2_item3,
+    Y_list_Z_1_no_liars = Y_list_Z_0 + truthful_trump_vote,
+    Y_list_Z_1 = ifelse(Y_list_Z_1_no_liars == 4, 3, Y_list_Z_1_no_liars)
+  )
+)
+```
+
+```{r, eval = do_diagnosis}
+diagnosis_list_glynn <- diagnose_design(list_design_glynn, sims = sims, bootstrap_sims = b_sims)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("sensitive_questions"), "/list_glynn_diagnosis.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis_list_glynn, path = rds_file_path)
+}
+diagnosis_list_glynn <- read_rds(rds_file_path)
+```
+
+```{r}
+kable(diagnosis_list_glynn %>% get_diagnosands %>% filter(estimator_label == "list") %>% select(estimator_label, bias, rmse))
+```
+
+### Randomized response technique
 
 ```{r}
 library(rr)
 
-rr_forced_known_tidy <- function(data) {
-  fit  <- rrreg(Y_forced_known ~ 1, data = data, p = 2/3, p0 = 1/6, p1 = 1/6, design = "forced-known")
-  pred <- as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE))
-  names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
-  pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+rr_forced_known <- function(data) {
+  fit  <- try(rrreg(Y_forced_known ~ 1, data = data, p = 2/3, p0 = 1/6, p1 = 1/6, design = "forced-known"))
+  pred <- try(as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE)))
+  if(class(fit) != "try-error" & class(pred) != "try-error") {
+    names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
+    pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+  } else {
+    pred <- data.frame(estimate = NA, std.error = NA, conf.low = NA, conf.high = NA, p.value = NA, error = TRUE)
+  }
   pred
 }
 
-rr_mirrored_tidy <- function(data) {
-  fit  <- rrreg(Y_mirrored ~ 1, data = data, p = 2/3, design = "mirrored")
-  pred <- as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE))
-  names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
-  pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+rr_mirrored <- function(data) {
+  fit  <- try(rrreg(Y_mirrored ~ 1, data = data, p = 2/3, design = "mirrored"))
+  pred <- try(as.data.frame(predict(fit, avg = TRUE, quasi.bayes = TRUE)))
+  if(class(fit) != "try-error" & class(pred) != "try-error") {
+    names(pred) <- c("estimate", "std.error", "conf.low", "conf.high")
+    pred$p.value <- with(pred, 2 * pnorm(-abs(estimate / std.error)))
+  } else {
+    pred <- data.frame(estimate = NA, std.error = NA, conf.low = NA, conf.high = NA, p.value = NA, error = TRUE)
+  }
   pred
 }
 
@@ -195,30 +285,50 @@ rr_design <-
   declare_reveal(Y_forced_known, dice) +
   declare_reveal(Y_mirrored, coin) +
   
-  declare_estimator(handler = tidy_estimator(rr_forced_known_tidy), label = "forced_known", estimand = "sensitive_item_proportion") +
-  declare_estimator(handler = tidy_estimator(rr_mirrored_tidy), label = "mirrored", estimand = "sensitive_item_proportion") +
+  declare_estimator(handler = tidy_estimator(rr_forced_known), label = "forced_known", estimand = "sensitive_item_proportion") +
+  declare_estimator(handler = tidy_estimator(rr_mirrored), label = "mirrored", estimand = "sensitive_item_proportion") +
   declare_estimator(Y_direct ~ 1, model = lm_robust, term = "(Intercept)", label = "direct", estimand = "sensitive_item_proportion")
 
 rr_design <- set_diagnosands(rr_design, diagnosands = declare_diagnosands(select = c(mean_estimate, bias, rmse, power)))
 ```
 
-<!-- # commented it out due to intermittent errors in RR -->
-<!-- ```{r, eval = do_diagnosis} -->
-<!-- rr_diagnosis <- diagnose_design(rr_design, sims = sims, bootstrap_sims = b_sims) -->
-<!-- ``` -->
+```{r, eval = do_diagnosis}
+rr_diagnosis <- diagnose_design(rr_design, sims = sims, bootstrap_sims = b_sims)
+```
 
-<!-- ```{r, echo = FALSE, purl = FALSE} -->
-<!-- # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file -->
-<!-- rds_file_path <- paste0(get_dropbox_path("list_experiments"), "/rr_diagnosis.RDS") -->
-<!-- if (do_diagnosis & !exists("do_bookdown")) { -->
-<!--   write_rds(rr_diagnosis, path = rds_file_path) -->
-<!-- } -->
-<!-- rr_diagnosis <- read_rds(rds_file_path) -->
-<!-- ``` -->
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("sensitive_questions"), "/rr_diagnosis.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(rr_diagnosis, path = rds_file_path)
+}
+rr_diagnosis <- read_rds(rds_file_path)
+```
 
-<!-- ```{r} -->
-<!-- kable(reshape_diagnosis(rr_diagnosis)) -->
-<!-- ``` -->
+```{r}
+kable(reshape_diagnosis(rr_diagnosis))
+```
+
+#### Bias-variance tradeoff
+
+```{r, eval = do_diagnosis}
+rr_designs <- redesign(rr_design, proportion_shy = c(0, 0.1, 0.25, 0.5), N = c(500, 1000, 2000, 5000))
+rr_tradeoff_diagnosis <- diagnose_design(rr_designs, sims = sims, bootstrap_sims = b_sims)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("sensitive_questions"), "/rr_tradeoff_diagnosis.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(rr_tradeoff_diagnosis, path = rds_file_path)
+}
+rr_tradeoff_diagnosis <- read_rds(rds_file_path)
+```
+
+```{r}
+# make a plot
+kable(reshape_diagnosis(rr_tradeoff_diagnosis))
+```
 
 
 ### References
