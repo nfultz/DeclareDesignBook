@@ -16,3 +16,7 @@ do_bookdown <- TRUE
 ```
 
 # Welcome {-} 
+
+Draft book manuscript. Comments welcomed. Please treat with caution.
+
+&copy; 2019 Graeme Blair, Jasper Cooper, Alexander Coppock, and Macartan Humphreys
