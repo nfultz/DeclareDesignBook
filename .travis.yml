@@ -11,7 +11,7 @@ cache:
     - $HOME/bin
     
 before_install:
-  - sudo apt-get install -y libgsl-dev libv8-dev
+  - sudo apt-get install -y libgsl-dev libv8-dev libudunits2-dev
   - mkdir ~/.R
   - echo "CXX_STD = CXX14" > ~/.R/Makevars
   - echo "CXX14 = g++" >> ~/.R/Makevars
@@ -22,7 +22,6 @@ r_packages:
   - checkpoint
 
 r_github_packages: 
-  - r-lib/remotes#340
   - ebenmichael/augsynth
   - malcolmbarrett/tidymeta
 
@@ -35,6 +34,7 @@ before_script:
 
 script:
   - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
+  - Rscript scripts/purl_R_scripts.R
   - echo 'book.declaredesign.org' > _book/CNAME
   
 deploy:
