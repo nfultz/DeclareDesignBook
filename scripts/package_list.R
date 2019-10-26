@@ -5,10 +5,24 @@
 
 bookwide_packages <-
   c(
+    # bookdown and knitr related packages
     "bookdown",
+    "knitr",
+    "kableExtra",
+    "gridExtra",
+    # DeclareDesign packages
+    "estimatr",
+    "fabricatr",
+    "randomizr",
     "DeclareDesign",
     "DesignLibrary",
-    "gridExtra",
-    "knitr",
-    "kableExtra"
+    # tidyverse packages
+    "ggplot2",
+    "dplyr",
+    "tidyr",
+    "readr",
+    "purrr",
+    "tibble",
+    "stringr",
+    "forcats"
   )
