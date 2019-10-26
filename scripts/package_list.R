@@ -6,20 +6,9 @@
 bookwide_packages <-
   c(
     "bookdown",
-    "randomizr",
-    "estimatr",
-    "fabricatr",
     "DeclareDesign",
     "DesignLibrary",
-    "dplyr",
-    "ggplot2",
-    "purrr",
-    "tidyr",
     "gridExtra",
-    "forcats",
-    "tibble",
-    "stringr",
     "knitr",
-    "kableExtra",
-    "readr"
+    "kableExtra"
   )
