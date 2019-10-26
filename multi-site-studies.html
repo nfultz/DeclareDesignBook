@@ -274,7 +274,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="14.5" data-path="process-tracing.html"><a href="process-tracing.html"><i class="fa fa-check"></i><b>14.5</b> Process tracing</a></li>
 <li class="chapter" data-level="14.6" data-path="synthetic-controls.html"><a href="synthetic-controls.html"><i class="fa fa-check"></i><b>14.6</b> Synthetic controls</a><ul>
-<li class="chapter" data-level="14.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-1"><i class="fa fa-check"></i><b>14.6.1</b> References</a></li>
+<li class="chapter" data-level="14.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#when-there-are-not-good-controls-standard-synth-will-get-the-wrong-answer"><i class="fa fa-check"></i><b>14.6.1</b> When there are not good controls, standard synth will get the wrong answer</a></li>
+<li class="chapter" data-level="14.6.2" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-1"><i class="fa fa-check"></i><b>14.6.2</b> References</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="15" data-path="experimental-designs-for-causal-inference.html"><a href="experimental-designs-for-causal-inference.html"><i class="fa fa-check"></i><b>15</b> Experimental designs for causal inference</a><ul>
@@ -352,116 +353,116 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>what is the population you are interested in?
 can you sample from it? if not, what is the population from which you are effectively sampling from?</p>
 <p>starting point: fixed budget and you’re thinking about a single large study in one context or a set of five studies in five different contexts with the same intervention and outcome measures</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" title="1">meta_re_estimator &lt;-<span class="st"> </span><span class="cf">function</span>(data){</a>
-<a class="sourceLine" id="cb149-2" title="2">  site_estimates_df &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-3" title="3"><span class="st">    </span><span class="kw">group_by</span>(site) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-4" title="4"><span class="st">    </span><span class="kw">do</span>(<span class="kw">tidy</span>(<span class="kw">lm_robust</span>(Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data =</span> .))) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-5" title="5"><span class="st">    </span><span class="kw">filter</span>(term <span class="op">==</span><span class="st"> &quot;Z&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-6" title="6"><span class="st">    </span>ungroup </a>
-<a class="sourceLine" id="cb149-7" title="7">  </a>
-<a class="sourceLine" id="cb149-8" title="8">  meta_fit &lt;-<span class="st"> </span><span class="kw">rma</span>(estimate, std.error, <span class="dt">data =</span> site_estimates_df, <span class="dt">method =</span> <span class="st">&quot;REML&quot;</span>)</a>
-<a class="sourceLine" id="cb149-9" title="9">  </a>
-<a class="sourceLine" id="cb149-10" title="10">  <span class="kw">with</span>(meta_fit, <span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb149-11" title="11">    <span class="dt">estimate =</span> <span class="kw">as.vector</span>(beta), <span class="dt">std.error =</span> se, <span class="dt">p.value =</span> pval, <span class="dt">conf.low =</span> ci.lb, <span class="dt">conf.high =</span> ci.ub))</a>
-<a class="sourceLine" id="cb149-12" title="12">}</a>
-<a class="sourceLine" id="cb149-13" title="13"></a>
-<a class="sourceLine" id="cb149-14" title="14">post_strat_estimator &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
-<a class="sourceLine" id="cb149-15" title="15">  <span class="cf">if</span>(<span class="kw">length</span>(<span class="kw">unique</span>(data<span class="op">$</span>site)) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) {</a>
-<a class="sourceLine" id="cb149-16" title="16">    fit &lt;-<span class="st"> </span><span class="kw">lm_robust</span>(Y <span class="op">~</span><span class="st"> </span>Z<span class="op">*</span><span class="kw">as.factor</span>(subject_type) <span class="op">+</span><span class="st"> </span><span class="kw">as.factor</span>(site), <span class="dt">data =</span> data)</a>
-<a class="sourceLine" id="cb149-17" title="17">    <span class="kw">tidy</span>(fit)</a>
-<a class="sourceLine" id="cb149-18" title="18">  } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb149-19" title="19">    fit &lt;-<span class="st"> </span><span class="kw">lm_robust</span>(Y <span class="op">~</span><span class="st"> </span>Z<span class="op">*</span><span class="kw">as.factor</span>(subject_type), <span class="dt">data =</span> data)</a>
-<a class="sourceLine" id="cb149-20" title="20">  }</a>
-<a class="sourceLine" id="cb149-21" title="21">  </a>
-<a class="sourceLine" id="cb149-22" title="22">  alpha &lt;-<span class="st"> </span><span class="fl">.05</span></a>
-<a class="sourceLine" id="cb149-23" title="23">  </a>
-<a class="sourceLine" id="cb149-24" title="24">  lh_fit &lt;-<span class="st"> </span><span class="kw">try</span>({ car<span class="op">::</span><span class="kw">linearHypothesis</span>(</a>
-<a class="sourceLine" id="cb149-25" title="25">    fit, </a>
-<a class="sourceLine" id="cb149-26" title="26">    <span class="dt">hypothesis.matrix =</span> <span class="kw">paste</span>(<span class="kw">paste</span>(<span class="kw">paste</span>(pr_type[<span class="dv">91</span><span class="op">:</span><span class="dv">100</span>][<span class="op">-</span><span class="dv">1</span>], <span class="st">&quot;*&quot;</span>, car<span class="op">::</span><span class="kw">matchCoefs</span>(fit, <span class="st">&quot;Z&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>), <span class="st">&quot; = 0&quot;</span>), </a>
-<a class="sourceLine" id="cb149-27" title="27">    <span class="dt">level =</span> <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>alpha) })</a>
-<a class="sourceLine" id="cb149-28" title="28">  </a>
-<a class="sourceLine" id="cb149-29" title="29">  <span class="cf">if</span>(<span class="op">!</span><span class="kw">inherits</span>(lh_fit, <span class="st">&quot;try-error&quot;</span>)) {</a>
-<a class="sourceLine" id="cb149-30" title="30">    <span class="kw">tibble</span>(<span class="dt">estimate =</span> <span class="kw">drop</span>(<span class="kw">attr</span>(lh_fit, <span class="st">&quot;value&quot;</span>)), </a>
-<a class="sourceLine" id="cb149-31" title="31">           <span class="dt">std.error =</span> <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">attr</span>(lh_fit, <span class="st">&quot;vcov&quot;</span>))),</a>
-<a class="sourceLine" id="cb149-32" title="32">           <span class="dt">df =</span> fit<span class="op">$</span>df.residual, </a>
-<a class="sourceLine" id="cb149-33" title="33">           <span class="dt">statistic =</span> estimate <span class="op">/</span><span class="st"> </span>std.error, </a>
-<a class="sourceLine" id="cb149-34" title="34">           <span class="dt">p.value =</span> <span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">pt</span>(<span class="kw">abs</span>(statistic), df, <span class="dt">lower.tail =</span> <span class="ot">FALSE</span>),</a>
-<a class="sourceLine" id="cb149-35" title="35">           <span class="dt">conf.low =</span> estimate <span class="op">+</span><span class="st"> </span>std.error <span class="op">*</span><span class="st"> </span><span class="kw">qt</span>(alpha <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, df),</a>
-<a class="sourceLine" id="cb149-36" title="36">           <span class="dt">conf.high =</span> estimate <span class="op">+</span><span class="st"> </span>std.error <span class="op">*</span><span class="st"> </span><span class="kw">qt</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>alpha <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, df))</a>
-<a class="sourceLine" id="cb149-37" title="37">  } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb149-38" title="38">    <span class="kw">tibble</span>(<span class="dt">estimate =</span> <span class="ot">NA</span>, <span class="dt">error =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb149-39" title="39">  }</a>
-<a class="sourceLine" id="cb149-40" title="40">}</a></code></pre></div>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb150-1" title="1">pr_type &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="co"># rows are sites, columns are types</span></a>
-<a class="sourceLine" id="cb150-2" title="2">  <span class="fl">0.005</span>, <span class="fl">0.005</span>, <span class="fl">0.09</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>,</a>
-<a class="sourceLine" id="cb150-3" title="3">  <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.005</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>,</a>
-<a class="sourceLine" id="cb150-4" title="4">  <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.005</span>, <span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.09</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb150-5" title="5">  <span class="dv">0</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>,</a>
-<a class="sourceLine" id="cb150-6" title="6">  <span class="fl">0.005</span>, <span class="fl">0.1</span>, <span class="fl">0.09</span>, <span class="fl">0.25</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>,</a>
-<a class="sourceLine" id="cb150-7" title="7">  <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.09</span>, <span class="fl">0.15</span>,</a>
-<a class="sourceLine" id="cb150-8" title="8">  <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>, <span class="fl">0.1</span>, <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb150-9" title="9">  <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="dv">0</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.1</span>, <span class="fl">0.005</span>, <span class="fl">0.09</span>,</a>
-<a class="sourceLine" id="cb150-10" title="10">  <span class="fl">0.005</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.15</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>,</a>
-<a class="sourceLine" id="cb150-11" title="11">  <span class="fl">0.005</span>, <span class="fl">0.09</span>, <span class="fl">0.15</span>, <span class="fl">0.1</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.25</span>, <span class="fl">0.15</span>)</a>
-<a class="sourceLine" id="cb150-12" title="12"></a>
-<a class="sourceLine" id="cb150-13" title="13"><span class="co"># need to have biased sampling to get bias here</span></a>
-<a class="sourceLine" id="cb150-14" title="14"><span class="co"># two kinds of populations, one in which the study type determines the subject types and you select on study type</span></a>
-<a class="sourceLine" id="cb150-15" title="15"><span class="co">#   a second kind where study type determines study shock </span></a>
-<a class="sourceLine" id="cb150-16" title="16"><span class="co">#   in second type if you adjust for subject type then you will be able to unbiased recover global</span></a>
-<a class="sourceLine" id="cb150-17" title="17"></a>
-<a class="sourceLine" id="cb150-18" title="18">multi_site_designer &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb150-19" title="19">  <span class="dt">N_sites =</span> <span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb150-20" title="20">  <span class="dt">n_study_sites =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb150-21" title="21">  <span class="dt">n_subjects_per_site =</span> <span class="dv">1000</span>,</a>
-<a class="sourceLine" id="cb150-22" title="22">  <span class="dt">subject_type_effects =</span> <span class="kw">seq</span>(<span class="dt">from =</span> <span class="fl">-0.1</span>, <span class="dt">to =</span> <span class="fl">0.1</span>, <span class="dt">length.out =</span> <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb150-23" title="23">) {</a>
-<a class="sourceLine" id="cb150-24" title="24">  <span class="kw">declare_population</span>(</a>
-<a class="sourceLine" id="cb150-25" title="25">    <span class="dt">site =</span> <span class="kw">add_level</span>(<span class="dt">N =</span> N_sites, <span class="dt">context_effect =</span> <span class="kw">rnorm</span>(N, <span class="dt">sd =</span> <span class="fl">0.05</span>)),</a>
-<a class="sourceLine" id="cb150-26" title="26">    <span class="dt">subject_types =</span> <span class="kw">add_level</span>(</a>
-<a class="sourceLine" id="cb150-27" title="27">      <span class="dt">N =</span> <span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb150-28" title="28">      <span class="dt">subject_type =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb150-29" title="29">      <span class="dt">subject_type_effect =</span> subject_type_effects,</a>
-<a class="sourceLine" id="cb150-30" title="30">      <span class="dt">type_proportion =</span> pr_type,</a>
-<a class="sourceLine" id="cb150-31" title="31">      <span class="dt">N_subjects =</span> <span class="kw">ceiling</span>(<span class="dv">2500</span> <span class="op">*</span><span class="st"> </span>type_proportion)</a>
-<a class="sourceLine" id="cb150-32" title="32">    ),</a>
-<a class="sourceLine" id="cb150-33" title="33">    <span class="dt">subjects =</span> <span class="kw">add_level</span>(<span class="dt">N =</span> N_subjects, <span class="dt">noise =</span> <span class="kw">rnorm</span>(N))</a>
-<a class="sourceLine" id="cb150-34" title="34">  ) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb150-35" title="35"><span class="st">    </span><span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span>Z <span class="op">*</span><span class="st"> </span>(<span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span>subject_type_effect) <span class="op">+</span><span class="st"> </span>noise) <span class="op">+</span></a>
-<a class="sourceLine" id="cb150-36" title="36"><span class="st">    </span><span class="kw">declare_estimand</span>(<span class="dt">ATE_OOS =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>), <span class="dt">subset =</span> site <span class="op">==</span><span class="st"> &quot;10&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="co"># estimator for out-of-sample site</span></a>
-<a class="sourceLine" id="cb150-37" title="37"><span class="st">    </span><span class="kw">declare_step</span>(filter, site <span class="op">!=</span><span class="st"> &quot;10&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="co"># subset to the in-sample sites</span></a>
-<a class="sourceLine" id="cb150-38" title="38"><span class="st">    </span><span class="kw">declare_sampling</span>(<span class="dt">clusters =</span> site, <span class="dt">n =</span> n_study_sites) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb150-39" title="39"><span class="st">    </span><span class="kw">declare_sampling</span>(<span class="dt">strata =</span> site, <span class="dt">n =</span> n_subjects_per_site) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb150-40" title="40"><span class="st">    </span><span class="kw">declare_assignment</span>(<span class="dt">blocks =</span> site, <span class="dt">prob =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb150-41" title="41"><span class="st">    </span><span class="kw">declare_estimand</span>(<span class="dt">study_site_ATE =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb150-42" title="42"><span class="st">    </span><span class="kw">declare_estimator</span>(<span class="dt">handler =</span> <span class="kw">tidy_estimator</span>(post_strat_estimator), <span class="dt">label =</span> <span class="st">&quot;post-strat&quot;</span>)</a>
-<a class="sourceLine" id="cb150-43" title="43">}</a>
-<a class="sourceLine" id="cb150-44" title="44"></a>
-<a class="sourceLine" id="cb150-45" title="45"><span class="co"># try to predict out-of-sample context effect. idea is to show that from one context we don&#39;t do too well not because of context effects but because we don&#39;t have enough data on different kinds of het groups (because which types exist vary across contexts)</span></a>
-<a class="sourceLine" id="cb150-46" title="46"></a>
-<a class="sourceLine" id="cb150-47" title="47">single_site_large_design &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">1</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">2500</span>)</a>
-<a class="sourceLine" id="cb150-48" title="48"></a>
-<a class="sourceLine" id="cb150-49" title="49">small_study_five_sites &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">5</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb150-50" title="50"></a>
-<a class="sourceLine" id="cb150-51" title="51"><span class="co"># now modify to *not* have het fx</span></a>
-<a class="sourceLine" id="cb150-52" title="52">single_site_large_design_no_het &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">1</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">2500</span>, <span class="dt">subject_type_effects =</span> <span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb150-53" title="53">  </a>
-<a class="sourceLine" id="cb150-54" title="54">small_study_five_sites_no_het &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">5</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">500</span>, <span class="dt">subject_type_effects =</span> <span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb150-55" title="55">  </a>
-<a class="sourceLine" id="cb150-56" title="56"><span class="co"># now modify to have context fx</span></a>
-<a class="sourceLine" id="cb150-57" title="57"></a>
-<a class="sourceLine" id="cb150-58" title="58">single_site_large_design_context &lt;-<span class="st"> </span><span class="kw">replace_step</span>(</a>
-<a class="sourceLine" id="cb150-59" title="59">  single_site_large_design,</a>
-<a class="sourceLine" id="cb150-60" title="60">  <span class="dt">step =</span> <span class="dv">2</span>, <span class="dt">new_step =</span> <span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span>Z <span class="op">*</span><span class="st"> </span>(<span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span>subject_type_effect <span class="op">+</span><span class="st"> </span>context_effect) <span class="op">+</span><span class="st"> </span>noise))</a>
-<a class="sourceLine" id="cb150-61" title="61"></a>
-<a class="sourceLine" id="cb150-62" title="62">small_study_five_sites_context &lt;-<span class="st"> </span><span class="kw">replace_step</span>(</a>
-<a class="sourceLine" id="cb150-63" title="63">  small_study_five_sites, </a>
-<a class="sourceLine" id="cb150-64" title="64">  <span class="dt">step =</span> <span class="dv">2</span>, <span class="dt">new_step =</span> <span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span>Z <span class="op">*</span><span class="st"> </span>(<span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span>subject_type_effect <span class="op">+</span><span class="st"> </span>context_effect) <span class="op">+</span><span class="st"> </span>noise))</a>
-<a class="sourceLine" id="cb150-65" title="65"></a>
-<a class="sourceLine" id="cb150-66" title="66"><span class="co"># sims &lt;- simulate_design(single_site_large_design, small_study_five_sites, </span></a>
-<a class="sourceLine" id="cb150-67" title="67"><span class="co">#                         single_site_large_design_no_het, small_study_five_sites_no_het, </span></a>
-<a class="sourceLine" id="cb150-68" title="68"><span class="co">#                         single_site_large_design_context, small_study_five_sites_context,</span></a>
-<a class="sourceLine" id="cb150-69" title="69"><span class="co">#                         sims = 1000)</span></a>
-<a class="sourceLine" id="cb150-70" title="70"><span class="co"># diag &lt;- diagnose_design(sims %&gt;% filter(!is.na(estimate) &amp; !is.na(std.error) &amp; !is.na(statistic) &amp; !is.na(p.value) &amp; !is.na(conf.low) &amp; !is.na(conf.high)), bootstrap_sims = 1000)</span></a></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" title="1">meta_re_estimator &lt;-<span class="st"> </span><span class="cf">function</span>(data){</a>
+<a class="sourceLine" id="cb153-2" title="2">  site_estimates_df &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb153-3" title="3"><span class="st">    </span><span class="kw">group_by</span>(site) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb153-4" title="4"><span class="st">    </span><span class="kw">do</span>(<span class="kw">tidy</span>(<span class="kw">lm_robust</span>(Y <span class="op">~</span><span class="st"> </span>Z, <span class="dt">data =</span> .))) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb153-5" title="5"><span class="st">    </span><span class="kw">filter</span>(term <span class="op">==</span><span class="st"> &quot;Z&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb153-6" title="6"><span class="st">    </span>ungroup </a>
+<a class="sourceLine" id="cb153-7" title="7">  </a>
+<a class="sourceLine" id="cb153-8" title="8">  meta_fit &lt;-<span class="st"> </span><span class="kw">rma</span>(estimate, std.error, <span class="dt">data =</span> site_estimates_df, <span class="dt">method =</span> <span class="st">&quot;REML&quot;</span>)</a>
+<a class="sourceLine" id="cb153-9" title="9">  </a>
+<a class="sourceLine" id="cb153-10" title="10">  <span class="kw">with</span>(meta_fit, <span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb153-11" title="11">    <span class="dt">estimate =</span> <span class="kw">as.vector</span>(beta), <span class="dt">std.error =</span> se, <span class="dt">p.value =</span> pval, <span class="dt">conf.low =</span> ci.lb, <span class="dt">conf.high =</span> ci.ub))</a>
+<a class="sourceLine" id="cb153-12" title="12">}</a>
+<a class="sourceLine" id="cb153-13" title="13"></a>
+<a class="sourceLine" id="cb153-14" title="14">post_strat_estimator &lt;-<span class="st"> </span><span class="cf">function</span>(data) {</a>
+<a class="sourceLine" id="cb153-15" title="15">  <span class="cf">if</span>(<span class="kw">length</span>(<span class="kw">unique</span>(data<span class="op">$</span>site)) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb153-16" title="16">    fit &lt;-<span class="st"> </span><span class="kw">lm_robust</span>(Y <span class="op">~</span><span class="st"> </span>Z<span class="op">*</span><span class="kw">as.factor</span>(subject_type) <span class="op">+</span><span class="st"> </span><span class="kw">as.factor</span>(site), <span class="dt">data =</span> data)</a>
+<a class="sourceLine" id="cb153-17" title="17">    <span class="kw">tidy</span>(fit)</a>
+<a class="sourceLine" id="cb153-18" title="18">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb153-19" title="19">    fit &lt;-<span class="st"> </span><span class="kw">lm_robust</span>(Y <span class="op">~</span><span class="st"> </span>Z<span class="op">*</span><span class="kw">as.factor</span>(subject_type), <span class="dt">data =</span> data)</a>
+<a class="sourceLine" id="cb153-20" title="20">  }</a>
+<a class="sourceLine" id="cb153-21" title="21">  </a>
+<a class="sourceLine" id="cb153-22" title="22">  alpha &lt;-<span class="st"> </span><span class="fl">.05</span></a>
+<a class="sourceLine" id="cb153-23" title="23">  </a>
+<a class="sourceLine" id="cb153-24" title="24">  lh_fit &lt;-<span class="st"> </span><span class="kw">try</span>({ car<span class="op">::</span><span class="kw">linearHypothesis</span>(</a>
+<a class="sourceLine" id="cb153-25" title="25">    fit, </a>
+<a class="sourceLine" id="cb153-26" title="26">    <span class="dt">hypothesis.matrix =</span> <span class="kw">paste</span>(<span class="kw">paste</span>(<span class="kw">paste</span>(pr_type[<span class="dv">91</span><span class="op">:</span><span class="dv">100</span>][<span class="op">-</span><span class="dv">1</span>], <span class="st">&quot;*&quot;</span>, car<span class="op">::</span><span class="kw">matchCoefs</span>(fit, <span class="st">&quot;Z&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>), <span class="st">&quot; = 0&quot;</span>), </a>
+<a class="sourceLine" id="cb153-27" title="27">    <span class="dt">level =</span> <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>alpha) })</a>
+<a class="sourceLine" id="cb153-28" title="28">  </a>
+<a class="sourceLine" id="cb153-29" title="29">  <span class="cf">if</span>(<span class="op">!</span><span class="kw">inherits</span>(lh_fit, <span class="st">&quot;try-error&quot;</span>)) {</a>
+<a class="sourceLine" id="cb153-30" title="30">    <span class="kw">tibble</span>(<span class="dt">estimate =</span> <span class="kw">drop</span>(<span class="kw">attr</span>(lh_fit, <span class="st">&quot;value&quot;</span>)), </a>
+<a class="sourceLine" id="cb153-31" title="31">           <span class="dt">std.error =</span> <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">attr</span>(lh_fit, <span class="st">&quot;vcov&quot;</span>))),</a>
+<a class="sourceLine" id="cb153-32" title="32">           <span class="dt">df =</span> fit<span class="op">$</span>df.residual, </a>
+<a class="sourceLine" id="cb153-33" title="33">           <span class="dt">statistic =</span> estimate <span class="op">/</span><span class="st"> </span>std.error, </a>
+<a class="sourceLine" id="cb153-34" title="34">           <span class="dt">p.value =</span> <span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">pt</span>(<span class="kw">abs</span>(statistic), df, <span class="dt">lower.tail =</span> <span class="ot">FALSE</span>),</a>
+<a class="sourceLine" id="cb153-35" title="35">           <span class="dt">conf.low =</span> estimate <span class="op">+</span><span class="st"> </span>std.error <span class="op">*</span><span class="st"> </span><span class="kw">qt</span>(alpha <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, df),</a>
+<a class="sourceLine" id="cb153-36" title="36">           <span class="dt">conf.high =</span> estimate <span class="op">+</span><span class="st"> </span>std.error <span class="op">*</span><span class="st"> </span><span class="kw">qt</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>alpha <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, df))</a>
+<a class="sourceLine" id="cb153-37" title="37">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb153-38" title="38">    <span class="kw">tibble</span>(<span class="dt">estimate =</span> <span class="ot">NA</span>, <span class="dt">error =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb153-39" title="39">  }</a>
+<a class="sourceLine" id="cb153-40" title="40">}</a></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" title="1">pr_type &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="co"># rows are sites, columns are types</span></a>
+<a class="sourceLine" id="cb154-2" title="2">  <span class="fl">0.005</span>, <span class="fl">0.005</span>, <span class="fl">0.09</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>,</a>
+<a class="sourceLine" id="cb154-3" title="3">  <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.005</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>,</a>
+<a class="sourceLine" id="cb154-4" title="4">  <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.005</span>, <span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.09</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb154-5" title="5">  <span class="dv">0</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>,</a>
+<a class="sourceLine" id="cb154-6" title="6">  <span class="fl">0.005</span>, <span class="fl">0.1</span>, <span class="fl">0.09</span>, <span class="fl">0.25</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>,</a>
+<a class="sourceLine" id="cb154-7" title="7">  <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.09</span>, <span class="fl">0.15</span>,</a>
+<a class="sourceLine" id="cb154-8" title="8">  <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>, <span class="fl">0.1</span>, <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb154-9" title="9">  <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="dv">0</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.1</span>, <span class="fl">0.005</span>, <span class="fl">0.09</span>,</a>
+<a class="sourceLine" id="cb154-10" title="10">  <span class="fl">0.005</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.15</span>, <span class="fl">0.09</span>, <span class="fl">0.005</span>, <span class="fl">0.15</span>,</a>
+<a class="sourceLine" id="cb154-11" title="11">  <span class="fl">0.005</span>, <span class="fl">0.09</span>, <span class="fl">0.15</span>, <span class="fl">0.1</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.15</span>, <span class="fl">0.005</span>, <span class="fl">0.25</span>, <span class="fl">0.15</span>)</a>
+<a class="sourceLine" id="cb154-12" title="12"></a>
+<a class="sourceLine" id="cb154-13" title="13"><span class="co"># need to have biased sampling to get bias here</span></a>
+<a class="sourceLine" id="cb154-14" title="14"><span class="co"># two kinds of populations, one in which the study type determines the subject types and you select on study type</span></a>
+<a class="sourceLine" id="cb154-15" title="15"><span class="co">#   a second kind where study type determines study shock </span></a>
+<a class="sourceLine" id="cb154-16" title="16"><span class="co">#   in second type if you adjust for subject type then you will be able to unbiased recover global</span></a>
+<a class="sourceLine" id="cb154-17" title="17"></a>
+<a class="sourceLine" id="cb154-18" title="18">multi_site_designer &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb154-19" title="19">  <span class="dt">N_sites =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb154-20" title="20">  <span class="dt">n_study_sites =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb154-21" title="21">  <span class="dt">n_subjects_per_site =</span> <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb154-22" title="22">  <span class="dt">subject_type_effects =</span> <span class="kw">seq</span>(<span class="dt">from =</span> <span class="fl">-0.1</span>, <span class="dt">to =</span> <span class="fl">0.1</span>, <span class="dt">length.out =</span> <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb154-23" title="23">) {</a>
+<a class="sourceLine" id="cb154-24" title="24">  <span class="kw">declare_population</span>(</a>
+<a class="sourceLine" id="cb154-25" title="25">    <span class="dt">site =</span> <span class="kw">add_level</span>(<span class="dt">N =</span> N_sites, <span class="dt">context_effect =</span> <span class="kw">rnorm</span>(N, <span class="dt">sd =</span> <span class="fl">0.05</span>)),</a>
+<a class="sourceLine" id="cb154-26" title="26">    <span class="dt">subject_types =</span> <span class="kw">add_level</span>(</a>
+<a class="sourceLine" id="cb154-27" title="27">      <span class="dt">N =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb154-28" title="28">      <span class="dt">subject_type =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb154-29" title="29">      <span class="dt">subject_type_effect =</span> subject_type_effects,</a>
+<a class="sourceLine" id="cb154-30" title="30">      <span class="dt">type_proportion =</span> pr_type,</a>
+<a class="sourceLine" id="cb154-31" title="31">      <span class="dt">N_subjects =</span> <span class="kw">ceiling</span>(<span class="dv">2500</span> <span class="op">*</span><span class="st"> </span>type_proportion)</a>
+<a class="sourceLine" id="cb154-32" title="32">    ),</a>
+<a class="sourceLine" id="cb154-33" title="33">    <span class="dt">subjects =</span> <span class="kw">add_level</span>(<span class="dt">N =</span> N_subjects, <span class="dt">noise =</span> <span class="kw">rnorm</span>(N))</a>
+<a class="sourceLine" id="cb154-34" title="34">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb154-35" title="35"><span class="st">    </span><span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span>Z <span class="op">*</span><span class="st"> </span>(<span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span>subject_type_effect) <span class="op">+</span><span class="st"> </span>noise) <span class="op">+</span></a>
+<a class="sourceLine" id="cb154-36" title="36"><span class="st">    </span><span class="kw">declare_estimand</span>(<span class="dt">ATE_OOS =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>), <span class="dt">subset =</span> site <span class="op">==</span><span class="st"> &quot;10&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="co"># estimator for out-of-sample site</span></a>
+<a class="sourceLine" id="cb154-37" title="37"><span class="st">    </span><span class="kw">declare_step</span>(filter, site <span class="op">!=</span><span class="st"> &quot;10&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="co"># subset to the in-sample sites</span></a>
+<a class="sourceLine" id="cb154-38" title="38"><span class="st">    </span><span class="kw">declare_sampling</span>(<span class="dt">clusters =</span> site, <span class="dt">n =</span> n_study_sites) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb154-39" title="39"><span class="st">    </span><span class="kw">declare_sampling</span>(<span class="dt">strata =</span> site, <span class="dt">n =</span> n_subjects_per_site) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb154-40" title="40"><span class="st">    </span><span class="kw">declare_assignment</span>(<span class="dt">blocks =</span> site, <span class="dt">prob =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb154-41" title="41"><span class="st">    </span><span class="kw">declare_estimand</span>(<span class="dt">study_site_ATE =</span> <span class="kw">mean</span>(Y_Z_<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>Y_Z_<span class="dv">0</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb154-42" title="42"><span class="st">    </span><span class="kw">declare_estimator</span>(<span class="dt">handler =</span> <span class="kw">tidy_estimator</span>(post_strat_estimator), <span class="dt">label =</span> <span class="st">&quot;post-strat&quot;</span>)</a>
+<a class="sourceLine" id="cb154-43" title="43">}</a>
+<a class="sourceLine" id="cb154-44" title="44"></a>
+<a class="sourceLine" id="cb154-45" title="45"><span class="co"># try to predict out-of-sample context effect. idea is to show that from one context we don&#39;t do too well not because of context effects but because we don&#39;t have enough data on different kinds of het groups (because which types exist vary across contexts)</span></a>
+<a class="sourceLine" id="cb154-46" title="46"></a>
+<a class="sourceLine" id="cb154-47" title="47">single_site_large_design &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">1</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">2500</span>)</a>
+<a class="sourceLine" id="cb154-48" title="48"></a>
+<a class="sourceLine" id="cb154-49" title="49">small_study_five_sites &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">5</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">500</span>)</a>
+<a class="sourceLine" id="cb154-50" title="50"></a>
+<a class="sourceLine" id="cb154-51" title="51"><span class="co"># now modify to *not* have het fx</span></a>
+<a class="sourceLine" id="cb154-52" title="52">single_site_large_design_no_het &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">1</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">2500</span>, <span class="dt">subject_type_effects =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb154-53" title="53">  </a>
+<a class="sourceLine" id="cb154-54" title="54">small_study_five_sites_no_het &lt;-<span class="st"> </span><span class="kw">multi_site_designer</span>(<span class="dt">n_study_sites =</span> <span class="dv">5</span>, <span class="dt">n_subjects_per_site =</span> <span class="dv">500</span>, <span class="dt">subject_type_effects =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb154-55" title="55">  </a>
+<a class="sourceLine" id="cb154-56" title="56"><span class="co"># now modify to have context fx</span></a>
+<a class="sourceLine" id="cb154-57" title="57"></a>
+<a class="sourceLine" id="cb154-58" title="58">single_site_large_design_context &lt;-<span class="st"> </span><span class="kw">replace_step</span>(</a>
+<a class="sourceLine" id="cb154-59" title="59">  single_site_large_design,</a>
+<a class="sourceLine" id="cb154-60" title="60">  <span class="dt">step =</span> <span class="dv">2</span>, <span class="dt">new_step =</span> <span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span>Z <span class="op">*</span><span class="st"> </span>(<span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span>subject_type_effect <span class="op">+</span><span class="st"> </span>context_effect) <span class="op">+</span><span class="st"> </span>noise))</a>
+<a class="sourceLine" id="cb154-61" title="61"></a>
+<a class="sourceLine" id="cb154-62" title="62">small_study_five_sites_context &lt;-<span class="st"> </span><span class="kw">replace_step</span>(</a>
+<a class="sourceLine" id="cb154-63" title="63">  small_study_five_sites, </a>
+<a class="sourceLine" id="cb154-64" title="64">  <span class="dt">step =</span> <span class="dv">2</span>, <span class="dt">new_step =</span> <span class="kw">declare_potential_outcomes</span>(Y <span class="op">~</span><span class="st"> </span>Z <span class="op">*</span><span class="st"> </span>(<span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span>subject_type_effect <span class="op">+</span><span class="st"> </span>context_effect) <span class="op">+</span><span class="st"> </span>noise))</a>
+<a class="sourceLine" id="cb154-65" title="65"></a>
+<a class="sourceLine" id="cb154-66" title="66"><span class="co"># sims &lt;- simulate_design(single_site_large_design, small_study_five_sites, </span></a>
+<a class="sourceLine" id="cb154-67" title="67"><span class="co">#                         single_site_large_design_no_het, small_study_five_sites_no_het, </span></a>
+<a class="sourceLine" id="cb154-68" title="68"><span class="co">#                         single_site_large_design_context, small_study_five_sites_context,</span></a>
+<a class="sourceLine" id="cb154-69" title="69"><span class="co">#                         sims = 1000)</span></a>
+<a class="sourceLine" id="cb154-70" title="70"><span class="co"># diag &lt;- diagnose_design(sims %&gt;% filter(!is.na(estimate) &amp; !is.na(std.error) &amp; !is.na(statistic) &amp; !is.na(p.value) &amp; !is.na(conf.low) &amp; !is.na(conf.high)), bootstrap_sims = 1000)</span></a></code></pre></div>
 </div>
 <div id="tradeoff-context-specific-intervention-and-comparability" class="section level3">
 <h3><span class="header-section-number">16.2.2</span> tradeoff: context-specific intervention and comparability</h3>

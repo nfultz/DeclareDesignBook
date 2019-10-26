@@ -274,7 +274,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="14.5" data-path="process-tracing.html"><a href="process-tracing.html"><i class="fa fa-check"></i><b>14.5</b> Process tracing</a></li>
 <li class="chapter" data-level="14.6" data-path="synthetic-controls.html"><a href="synthetic-controls.html"><i class="fa fa-check"></i><b>14.6</b> Synthetic controls</a><ul>
-<li class="chapter" data-level="14.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-1"><i class="fa fa-check"></i><b>14.6.1</b> References</a></li>
+<li class="chapter" data-level="14.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#when-there-are-not-good-controls-standard-synth-will-get-the-wrong-answer"><i class="fa fa-check"></i><b>14.6.1</b> When there are not good controls, standard synth will get the wrong answer</a></li>
+<li class="chapter" data-level="14.6.2" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-1"><i class="fa fa-check"></i><b>14.6.2</b> References</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="15" data-path="experimental-designs-for-causal-inference.html"><a href="experimental-designs-for-causal-inference.html"><i class="fa fa-check"></i><b>15</b> Experimental designs for causal inference</a><ul>
@@ -424,25 +425,25 @@ estimator
 Z
 </td>
 <td style="text-align:right;">
--0.0490616
+0.2227215
 </td>
 <td style="text-align:right;">
-0.2739563
+0.3264459
 </td>
 <td style="text-align:right;">
--0.1790856
+0.6822618
 </td>
 <td style="text-align:right;">
-0.8586244
+0.4985425
 </td>
 <td style="text-align:right;">
--0.5998902
+-0.4346286
 </td>
 <td style="text-align:right;">
-0.501767
+0.8800717
 </td>
 <td style="text-align:right;">
-47.99173
+45.36395
 </td>
 <td style="text-align:left;">
 Y
@@ -494,25 +495,25 @@ Y
 001
 </td>
 <td style="text-align:right;">
-0.4248346
+-1.3523271
 </td>
 <td style="text-align:right;">
-0.4248346
+-1.3523271
 </td>
 <td style="text-align:right;">
-0.6748346
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
-0
+-1.1023271
 </td>
 <td style="text-align:right;">
 0.5
 </td>
 <td style="text-align:right;">
-0.4248346
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+-1.1023271
 </td>
 </tr>
 <tr>
@@ -520,39 +521,13 @@ Y
 002
 </td>
 <td style="text-align:right;">
-0.2921182
+-0.7237033
 </td>
 <td style="text-align:right;">
-0.2921182
+-0.7237033
 </td>
 <td style="text-align:right;">
-0.5421182
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
-0.5421182
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-004
-</td>
-<td style="text-align:right;">
-1.2131997
-</td>
-<td style="text-align:right;">
-1.2131997
-</td>
-<td style="text-align:right;">
-1.4631997
+-0.4737033
 </td>
 <td style="text-align:right;">
 0.5
@@ -564,21 +539,21 @@ Y
 0.5
 </td>
 <td style="text-align:right;">
-1.4631997
+-0.4737033
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-007
+006
 </td>
 <td style="text-align:right;">
--1.4173713
+0.3585086
 </td>
 <td style="text-align:right;">
--1.4173713
+0.3585086
 </td>
 <td style="text-align:right;">
--1.1673713
+0.6085086
 </td>
 <td style="text-align:right;">
 0.5
@@ -590,7 +565,7 @@ Y
 0.5
 </td>
 <td style="text-align:right;">
--1.4173713
+0.3585086
 </td>
 </tr>
 <tr>
@@ -598,39 +573,13 @@ Y
 008
 </td>
 <td style="text-align:right;">
--1.1181129
+-0.0191530
 </td>
 <td style="text-align:right;">
--1.1181129
+-0.0191530
 </td>
 <td style="text-align:right;">
--0.8681129
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.5
-</td>
-<td style="text-align:right;">
--0.8681129
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-010
-</td>
-<td style="text-align:right;">
--1.3796300
-</td>
-<td style="text-align:right;">
--1.3796300
-</td>
-<td style="text-align:right;">
--1.1296300
+0.2308470
 </td>
 <td style="text-align:right;">
 0.5
@@ -642,7 +591,59 @@ Y
 0.5
 </td>
 <td style="text-align:right;">
--1.3796300
+-0.0191530
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+009
+</td>
+<td style="text-align:right;">
+-0.0550281
+</td>
+<td style="text-align:right;">
+-0.0550281
+</td>
+<td style="text-align:right;">
+0.1949719
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+0.1949719
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+010
+</td>
+<td style="text-align:right;">
+0.7643561
+</td>
+<td style="text-align:right;">
+0.7643561
+</td>
+<td style="text-align:right;">
+1.0143561
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+1.0143561
 </td>
 </tr>
 </tbody>
@@ -721,25 +722,25 @@ estimator
 Z
 </td>
 <td style="text-align:right;">
--0.2585883
+-0.3010792
 </td>
 <td style="text-align:right;">
-0.2642527
+0.188783
 </td>
 <td style="text-align:right;">
--0.9785647
+-1.594843
 </td>
 <td style="text-align:right;">
-0.3327256
+0.1173209
 </td>
 <td style="text-align:right;">
--0.7899714
+-0.680667
 </td>
 <td style="text-align:right;">
-0.2727947
+0.0785086
 </td>
 <td style="text-align:right;">
-47.76556
+47.93078
 </td>
 <td style="text-align:left;">
 Y
@@ -820,25 +821,25 @@ estimator
 Z
 </td>
 <td style="text-align:right;">
-0.1615751
+0.3175358
 </td>
 <td style="text-align:right;">
-0.2946895
+0.2423225
 </td>
 <td style="text-align:right;">
-0.5482894
+1.310385
 </td>
 <td style="text-align:right;">
-0.5861665
+0.1963148
 </td>
 <td style="text-align:right;">
--0.4317379
+-0.1697132
 </td>
 <td style="text-align:right;">
-0.7548882
+0.8047847
 </td>
 <td style="text-align:right;">
-45.61856
+47.89786
 </td>
 <td style="text-align:left;">
 Y
@@ -864,25 +865,25 @@ estimator
 Z
 </td>
 <td style="text-align:right;">
--0.0711997
+0.4425311
 </td>
 <td style="text-align:right;">
-0.3181168
+0.2481185
 </td>
 <td style="text-align:right;">
--0.2238162
+1.783547
 </td>
 <td style="text-align:right;">
-0.8239084
+0.0808223
 </td>
 <td style="text-align:right;">
--0.7118321
+-0.0563487
 </td>
 <td style="text-align:right;">
-0.5694327
+0.9414110
 </td>
 <td style="text-align:right;">
-45.22418
+47.98461
 </td>
 <td style="text-align:left;">
 Y
@@ -908,25 +909,25 @@ estimator
 Z
 </td>
 <td style="text-align:right;">
--0.2015843
+0.4963841
 </td>
 <td style="text-align:right;">
-0.2684092
+0.2786012
 </td>
 <td style="text-align:right;">
--0.7510337
+1.781702
 </td>
 <td style="text-align:right;">
-0.4564015
+0.0812151
 </td>
 <td style="text-align:right;">
--0.7416499
+-0.0639871
 </td>
 <td style="text-align:right;">
-0.3384812
+1.0567554
 </td>
 <td style="text-align:right;">
-46.68570
+47.32619
 </td>
 <td style="text-align:left;">
 Y
@@ -952,25 +953,25 @@ estimator
 Z
 </td>
 <td style="text-align:right;">
-0.1256536
+-0.3844193
 </td>
 <td style="text-align:right;">
-0.2913844
+0.2548717
 </td>
 <td style="text-align:right;">
-0.4312296
+-1.508285
 </td>
 <td style="text-align:right;">
-0.6683486
+0.1384238
 </td>
 <td style="text-align:right;">
--0.4611325
+-0.8976614
 </td>
 <td style="text-align:right;">
-0.7124397
+0.1288229
 </td>
 <td style="text-align:right;">
-45.25788
+45.30661
 </td>
 <td style="text-align:left;">
 Y
@@ -996,25 +997,25 @@ estimator
 Z
 </td>
 <td style="text-align:right;">
-0.2767956
+0.7340671
 </td>
 <td style="text-align:right;">
-0.3536827
+0.2561452
 </td>
 <td style="text-align:right;">
-0.7826099
+2.865824
 </td>
 <td style="text-align:right;">
-0.4377056
+0.0062576
 </td>
 <td style="text-align:right;">
--0.4343569
+0.2184385
 </td>
 <td style="text-align:right;">
-0.9879480
+1.2496957
 </td>
 <td style="text-align:right;">
-47.93276
+45.88444
 </td>
 <td style="text-align:left;">
 Y

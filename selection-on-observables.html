@@ -274,7 +274,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="14.5" data-path="process-tracing.html"><a href="process-tracing.html"><i class="fa fa-check"></i><b>14.5</b> Process tracing</a></li>
 <li class="chapter" data-level="14.6" data-path="synthetic-controls.html"><a href="synthetic-controls.html"><i class="fa fa-check"></i><b>14.6</b> Synthetic controls</a><ul>
-<li class="chapter" data-level="14.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-1"><i class="fa fa-check"></i><b>14.6.1</b> References</a></li>
+<li class="chapter" data-level="14.6.1" data-path="synthetic-controls.html"><a href="synthetic-controls.html#when-there-are-not-good-controls-standard-synth-will-get-the-wrong-answer"><i class="fa fa-check"></i><b>14.6.1</b> When there are not good controls, standard synth will get the wrong answer</a></li>
+<li class="chapter" data-level="14.6.2" data-path="synthetic-controls.html"><a href="synthetic-controls.html#references-1"><i class="fa fa-check"></i><b>14.6.2</b> References</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="15" data-path="experimental-designs-for-causal-inference.html"><a href="experimental-designs-for-causal-inference.html"><i class="fa fa-check"></i><b>15</b> Experimental designs for causal inference</a><ul>
@@ -377,15 +378,15 @@ Figure 14.1: DAG with one observed confounder
 ## Research design diagnosis based on 100 simulations. Diagnosand estimates with bootstrapped standard errors in parentheses (20 replicates).
 ## 
 ##  Design Label Estimand Label Estimator Label Term N Sims   Bias   RMSE
-##      design_1            ATE             DIM    Z    100   0.96   1.00
-##                                                          (0.03) (0.02)
-##      design_1            ATE             OLS    Z    100  -0.00   0.23
+##      design_1            ATE             DIM    Z    100   0.96   0.99
+##                                                          (0.02) (0.02)
+##      design_1            ATE             OLS    Z    100   0.01   0.23
 ##                                                          (0.02) (0.01)
 ##   Power Coverage Mean Estimate SD Estimate Mean Se Type S Rate
 ##    1.00     0.05          1.46        0.27    0.27        0.00
-##  (0.00)   (0.02)        (0.03)      (0.02)  (0.00)      (0.00)
-##    0.56     0.97          0.50        0.23    0.23        0.00
-##  (0.05)   (0.02)        (0.02)      (0.01)  (0.00)      (0.00)
+##  (0.00)   (0.02)        (0.02)      (0.01)  (0.00)      (0.00)
+##    0.61     0.96          0.51        0.23    0.23        0.00
+##  (0.03)   (0.02)        (0.02)      (0.01)  (0.00)      (0.00)
 ##  Mean Estimand
 ##           0.50
 ##         (0.00)
@@ -415,15 +416,15 @@ Figure 14.1: DAG with one observed confounder
 ## Research design diagnosis based on 100 simulations. Diagnosand estimates with bootstrapped standard errors in parentheses (20 replicates).
 ## 
 ##  Design Label Estimand Label Estimator Label Term N Sims   Bias   RMSE
-##      design_2            ATE             DIM    Z    100   1.27   1.31
-##                                                          (0.04) (0.04)
-##      design_2            ATE             OLS    Z    100   0.79   0.85
-##                                                          (0.03) (0.03)
+##      design_2            ATE             DIM    Z    100   1.30   1.34
+##                                                          (0.03) (0.04)
+##      design_2            ATE             OLS    Z    100   0.75   0.84
+##                                                          (0.02) (0.03)
 ##   Power Coverage Mean Estimate SD Estimate Mean Se Type S Rate
-##    1.00     0.03          1.77        0.32    0.33        0.00
-##  (0.00)   (0.02)        (0.04)      (0.02)  (0.00)      (0.00)
-##    0.95     0.38          1.29        0.32    0.36        0.00
-##  (0.02)   (0.05)        (0.03)      (0.02)  (0.00)      (0.00)
+##    1.00     0.03          1.80        0.35    0.33        0.00
+##  (0.00)   (0.02)        (0.03)      (0.03)  (0.00)      (0.00)
+##    0.91     0.44          1.25        0.38    0.36        0.00
+##  (0.03)   (0.04)        (0.02)      (0.04)  (0.01)      (0.00)
 ##  Mean Estimand
 ##           0.50
 ##         (0.00)
@@ -457,13 +458,13 @@ Figure 14.2: DAG with unobserved confounding
 ##  Design Label Estimand Label Estimator Label Term N Sims   Bias   RMSE
 ##      design_3            ATE             DIM    Z    100   1.73   1.74
 ##                                                          (0.02) (0.02)
-##      design_3            ATE             OLS    Z    100   1.03   1.04
-##                                                          (0.01) (0.01)
+##      design_3            ATE             OLS    Z    100   1.02   1.03
+##                                                          (0.02) (0.02)
 ##   Power Coverage Mean Estimate SD Estimate Mean Se Type S Rate
-##    1.00     0.00          2.23        0.22    0.22        0.00
-##  (0.00)   (0.00)        (0.02)      (0.02)  (0.00)      (0.00)
-##    1.00     0.00          1.53        0.16    0.20        0.00
-##  (0.00)   (0.00)        (0.01)      (0.01)  (0.00)      (0.00)
+##    1.00     0.00          2.23        0.20    0.22        0.00
+##  (0.00)   (0.00)        (0.02)      (0.01)  (0.00)      (0.00)
+##    1.00     0.00          1.52        0.16    0.19        0.00
+##  (0.00)   (0.00)        (0.02)      (0.01)  (0.00)      (0.00)
 ##  Mean Estimand
 ##           0.50
 ##         (0.00)
@@ -496,15 +497,15 @@ Figure 14.3: DAG with one observed mediator
 ## Research design diagnosis based on 100 simulations. Diagnosand estimates with bootstrapped standard errors in parentheses (20 replicates).
 ## 
 ##  Design Label Estimand Label Estimator Label Term N Sims   Bias   RMSE
-##      design_4            ATE             DIM    Z    100   0.05   0.29
-##                                                          (0.03) (0.01)
-##      design_4            ATE             OLS    Z    100  -0.47   0.51
+##      design_4            ATE             DIM    Z    100   0.04   0.29
+##                                                          (0.03) (0.02)
+##      design_4            ATE             OLS    Z    100  -0.49   0.54
 ##                                                          (0.02) (0.02)
 ##   Power Coverage Mean Estimate SD Estimate Mean Se Type S Rate
-##    0.94     0.98          1.05        0.29    0.28        0.00
-##  (0.02)   (0.01)        (0.03)      (0.01)  (0.00)      (0.00)
-##    0.71     0.41          0.53        0.21    0.21        0.00
-##  (0.05)   (0.05)        (0.02)      (0.02)  (0.00)      (0.00)
+##    0.97     0.91          1.04        0.29    0.28        0.00
+##  (0.02)   (0.02)        (0.03)      (0.02)  (0.00)      (0.00)
+##    0.65     0.37          0.51        0.23    0.21        0.00
+##  (0.06)   (0.04)        (0.02)      (0.02)  (0.00)      (0.00)
 ##  Mean Estimand
 ##           1.00
 ##         (0.00)
