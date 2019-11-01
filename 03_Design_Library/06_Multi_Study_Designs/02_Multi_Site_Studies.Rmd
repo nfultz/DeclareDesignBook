@@ -30,6 +30,7 @@ b_sims <- 20
 
 ```{r, echo = FALSE}
 library(metafor)
+library(car)
 ```
 
 ### why do this in multiple settings: what can you generalize to?
@@ -53,7 +54,7 @@ meta_re_estimator <- function(data){
     estimate = as.vector(beta), std.error = se, p.value = pval, conf.low = ci.lb, conf.high = ci.ub))
 }
 
-post_strat_estimator <- function(data) {
+post_strat_estimator <- function(data, pr_types_population) {
   if(length(unique(data$site)) > 1) {
     fit <- lm_robust(Y ~ Z*as.factor(subject_type) + as.factor(site), data = data)
     tidy(fit)
@@ -63,9 +64,9 @@ post_strat_estimator <- function(data) {
   
   alpha <- .05
   
-  lh_fit <- try({ car::linearHypothesis(
+  lh_fit <- try({ linearHypothesis(
     fit, 
-    hypothesis.matrix = paste(paste(paste(pr_type[91:100][-1], "*", car::matchCoefs(fit, "Z"), sep = ""), collapse = " + "), " = 0"), 
+    hypothesis.matrix = paste(paste(paste(pr_types_population[91:100][-1], "*", matchCoefs(fit, "Z"), sep = ""), collapse = " + "), " = 0"), 
     level = 1 - alpha) })
   
   if(!inherits(lh_fit, "try-error")) {
@@ -77,24 +78,12 @@ post_strat_estimator <- function(data) {
            conf.low = estimate + std.error * qt(alpha / 2, df),
            conf.high = estimate + std.error * qt(1 - alpha / 2, df))
   } else {
-    tibble(estimate = NA, error = TRUE)
+    tibble(error = TRUE)
   }
 }
 ```
 
 ```{r}
-pr_type <- c( # rows are sites, columns are types
-  0.005, 0.005, 0.09, 0.15, 0.25, 0.1, 0, 0.1, 0.15, 0.15,
-  0.1, 0.15, 0.15, 0.15, 0.25, 0.005, 0, 0.1, 0.09, 0.005,
-  0.15, 0.15, 0.15, 0.005, 0.005, 0, 0.25, 0.09, 0.1, 0.1,
-  0, 0.15, 0.005, 0.09, 0.005, 0.15, 0.25, 0.1, 0.1, 0.15,
-  0.005, 0.1, 0.09, 0.25, 0.15, 0.15, 0.005, 0, 0.1, 0.15,
-  0.005, 0.15, 0.25, 0.1, 0, 0.1, 0.005, 0.15, 0.09, 0.15,
-  0.15, 0.15, 0.005, 0.25, 0.1, 0.15, 0.09, 0.005, 0.1, 0,
-  0.25, 0.1, 0.15, 0, 0.005, 0.15, 0.15, 0.1, 0.005, 0.09,
-  0.005, 0.1, 0.1, 0.15, 0, 0.25, 0.15, 0.09, 0.005, 0.15,
-  0.005, 0.09, 0.15, 0.1, 0, 0.1, 0.15, 0.005, 0.25, 0.15)
-
 # need to have biased sampling to get bias here
 # two kinds of populations, one in which the study type determines the subject types and you select on study type
 #   a second kind where study type determines study shock 
@@ -104,69 +93,74 @@ multi_site_designer <- function(
   N_sites = 10,
   n_study_sites = 5,
   n_subjects_per_site = 1000,
-  subject_type_effects = seq(from = -0.1, to = 0.1, length.out = 10)
+  feasible_effect = 0,
+  subject_type_effects = seq(from = -0.1, to = 0.1, length.out = 10),
+  pr_types = c( # rows are sites, columns are types
+    0.005, 0.005, 0.09, 0.15, 0.25, 0.1, 0, 0.1, 0.15, 0.15,
+    0.1, 0.15, 0.15, 0.15, 0.25, 0.005, 0, 0.1, 0.09, 0.005,
+    0.15, 0.15, 0.15, 0.005, 0.005, 0, 0.25, 0.09, 0.1, 0.1,
+    0, 0.15, 0.005, 0.09, 0.005, 0.15, 0.25, 0.1, 0.1, 0.15,
+    0.005, 0.1, 0.09, 0.25, 0.15, 0.15, 0.005, 0, 0.1, 0.15,
+    0.005, 0.15, 0.25, 0.1, 0, 0.1, 0.005, 0.15, 0.09, 0.15,
+    0.15, 0.15, 0.005, 0.25, 0.1, 0.15, 0.09, 0.005, 0.1, 0,
+    0.25, 0.1, 0.15, 0, 0.005, 0.15, 0.15, 0.1, 0.005, 0.09,
+    0.005, 0.1, 0.1, 0.15, 0, 0.25, 0.15, 0.09, 0.005, 0.15,
+    0.005, 0.09, 0.15, 0.1, 0, 0.1, 0.15, 0.005, 0.25, 0.15)
 ) {
   declare_population(
-    site = add_level(N = N_sites, context_effect = rnorm(N, sd = 0.05)),
+    site = add_level(N = N_sites, feasible_site = c(rep(1, 9), 0)),
     subject_types = add_level(
       N = 10,
       subject_type = 1:10,
       subject_type_effect = subject_type_effects,
-      type_proportion = pr_type,
+      type_proportion = pr_types,
       N_subjects = ceiling(2500 * type_proportion)
     ),
     subjects = add_level(N = N_subjects, noise = rnorm(N))
   ) + 
-    declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect) + noise) +
-    declare_estimand(ATE_OOS = mean(Y_Z_1 - Y_Z_0), subset = site == "10") + # estimator for out-of-sample site
-    declare_step(filter, site != "10") + # subset to the in-sample sites
-    declare_sampling(clusters = site, n = n_study_sites) + 
+    declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect) + feasible_effect * feasible_site + noise) +
+    declare_estimand(ATE_OOS = mean(Y_Z_1 - Y_Z_0), subset = site == "10") + # true effect for out-of-sample site
+    declare_sampling(clusters = site, strata = feasible_site, n = c(0, n_study_sites)) + 
     declare_sampling(strata = site, n = n_subjects_per_site) + 
     declare_assignment(blocks = site, prob = 0.5) + 
     declare_estimand(study_site_ATE = mean(Y_Z_1 - Y_Z_0)) +
-    declare_estimator(handler = tidy_estimator(post_strat_estimator), label = "post-strat")
+    declare_estimator(handler = tidy_estimator(post_strat_estimator), pr_types_population = pr_types, label = "post-strat")
 }
-
-# try to predict out-of-sample context effect. idea is to show that from one context we don't do too well not because of context effects but because we don't have enough data on different kinds of het groups (because which types exist vary across contexts)
 
 single_site_large_design <- multi_site_designer(n_study_sites = 1, n_subjects_per_site = 2500)
 
 small_study_five_sites <- multi_site_designer(n_study_sites = 5, n_subjects_per_site = 500)
 
-# now modify to *not* have het fx
-single_site_large_design_no_het <- multi_site_designer(n_study_sites = 1, n_subjects_per_site = 2500, subject_type_effects = 0)
-  
-small_study_five_sites_no_het <- multi_site_designer(n_study_sites = 5, n_subjects_per_site = 500, subject_type_effects = 0)
-  
-# now modify to have context fx
-
-single_site_large_design_context <- replace_step(
-  single_site_large_design,
-  step = 2, new_step = declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect + context_effect) + noise))
-
-small_study_five_sites_context <- replace_step(
-  small_study_five_sites, 
-  step = 2, new_step = declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect + context_effect) + noise))
-
-# sims <- simulate_design(single_site_large_design, small_study_five_sites, 
-#                         single_site_large_design_no_het, small_study_five_sites_no_het, 
-#                         single_site_large_design_context, small_study_five_sites_context,
+# sims <- simulate_design(single_site_large_design, small_study_five_sites,
 #                         sims = 1000)
 # diag <- diagnose_design(sims %>% filter(!is.na(estimate) & !is.na(std.error) & !is.na(statistic) & !is.na(p.value) & !is.na(conf.low) & !is.na(conf.high)), bootstrap_sims = 1000)
 ```
 
-### tradeoff: context-specific intervention and comparability
+## When there are heterogeneous effects, you can get good predictions out of sample even when average effects differ substantially (and you do better with multiple sites when sites in the the population have different proportions of subject types that are correlated with het fx)
+
+Two notable features of the design:
+- there must be het fx for this to work (otherwise our estimates get biased toward zero because of overfitting to the het variables)
+- we have to have information about the covariate in the population and the sample (here we used the proportion of people in each het type)
+
+Findings:
+- these two strategies are both unbiased
+- the design with five sites has half the RMSE of the one-site design. this is because of the variation in the proportions of types across sites. 
+- interestingly there is poor coverage (anti-conservative) when you use the single site design
+
+(when you have contextual variation as well, i.e. effect differs across sites for reasons not captured by the het fx, coverage is off for all designs. will keep this point out, seems like too much)
+
+## you can improve site-level effect estimates by analyzing with simple Bayesian model because of its shrinkage property, even when the Bayesian model is wrong about distribution of effects in population
+
+- This is the point from the blog post; I will modify the above design so it can also make this point, switching between the normal distribution and uniform distribution for the fx distribution
+
+### when things break down: confounded sampling
+
+<!-- - het fx that systematically differ in places that are sampled to study vs others -->
+- mean effect differs in places that are sampled vs not sampled
+<!-- - covariate profiles that do not exist in other contexts -->
 
 
-
-
-### tradeoff: comparability and fidelity to context in outcome measurement
-
-
-### confounded sampling
-
-- features that vary across but not within contexts
-- covariate profiles that do not exist in other contexts
-
-### estimation
+Other points I decided to abandon to keep this simple:
+- tradeoff: context-specific intervention and comparability
+- tradeoff: comparability and fidelity to context in outcome measurement
 
