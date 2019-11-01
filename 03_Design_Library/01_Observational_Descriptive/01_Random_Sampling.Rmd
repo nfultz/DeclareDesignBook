@@ -1,5 +1,5 @@
 ---
-title: "Stratified clustered random sampling"
+title: "Random sampling"
 output: html_document
 bibliography: ../../bib/book.bib 
 ---
