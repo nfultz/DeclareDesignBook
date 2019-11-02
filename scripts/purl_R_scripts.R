@@ -14,5 +14,12 @@ for (file in rmds){
       file.remove(file_r)
     }
     knitr::purl(file, documentation = 0, output = file_r)
+    
+    
+    fileConn <- file(file_r)
+    line1 <- 'packages <- c("knitr", "tidyverse", "DeclareDesign", "DesignLibrary")'
+    line2 <- 'lapply(packages, require, character.only = T)'
+    writeLines(c("# ---", paste0("# ", yaml_title), "# --- \n", line1, line2, "", readLines(fileConn)), fileConn)
+    close(fileConn)
   }
 }
