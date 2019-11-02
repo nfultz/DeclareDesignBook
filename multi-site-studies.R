@@ -1,4 +1,5 @@
 library(metafor)
+library(car)
 
 meta_re_estimator <- function(data){
   site_estimates_df <- data %>% 
@@ -13,7 +14,7 @@ meta_re_estimator <- function(data){
     estimate = as.vector(beta), std.error = se, p.value = pval, conf.low = ci.lb, conf.high = ci.ub))
 }
 
-post_strat_estimator <- function(data) {
+post_strat_estimator <- function(data, pr_types_population) {
   if(length(unique(data$site)) > 1) {
     fit <- lm_robust(Y ~ Z*as.factor(subject_type) + as.factor(site), data = data)
     tidy(fit)
@@ -23,9 +24,9 @@ post_strat_estimator <- function(data) {
   
   alpha <- .05
   
-  lh_fit <- try({ car::linearHypothesis(
+  lh_fit <- try({ linearHypothesis(
     fit, 
-    hypothesis.matrix = paste(paste(paste(pr_type[91:100][-1], "*", car::matchCoefs(fit, "Z"), sep = ""), collapse = " + "), " = 0"), 
+    hypothesis.matrix = paste(paste(paste(pr_types_population[91:100][-1], "*", matchCoefs(fit, "Z"), sep = ""), collapse = " + "), " = 0"), 
     level = 1 - alpha) })
   
   if(!inherits(lh_fit, "try-error")) {
@@ -37,21 +38,9 @@ post_strat_estimator <- function(data) {
            conf.low = estimate + std.error * qt(alpha / 2, df),
            conf.high = estimate + std.error * qt(1 - alpha / 2, df))
   } else {
-    tibble(estimate = NA, error = TRUE)
+    tibble(error = TRUE)
   }
 }
-
-pr_type <- c( # rows are sites, columns are types
-  0.005, 0.005, 0.09, 0.15, 0.25, 0.1, 0, 0.1, 0.15, 0.15,
-  0.1, 0.15, 0.15, 0.15, 0.25, 0.005, 0, 0.1, 0.09, 0.005,
-  0.15, 0.15, 0.15, 0.005, 0.005, 0, 0.25, 0.09, 0.1, 0.1,
-  0, 0.15, 0.005, 0.09, 0.005, 0.15, 0.25, 0.1, 0.1, 0.15,
-  0.005, 0.1, 0.09, 0.25, 0.15, 0.15, 0.005, 0, 0.1, 0.15,
-  0.005, 0.15, 0.25, 0.1, 0, 0.1, 0.005, 0.15, 0.09, 0.15,
-  0.15, 0.15, 0.005, 0.25, 0.1, 0.15, 0.09, 0.005, 0.1, 0,
-  0.25, 0.1, 0.15, 0, 0.005, 0.15, 0.15, 0.1, 0.005, 0.09,
-  0.005, 0.1, 0.1, 0.15, 0, 0.25, 0.15, 0.09, 0.005, 0.15,
-  0.005, 0.09, 0.15, 0.1, 0, 0.1, 0.15, 0.005, 0.25, 0.15)
 
 # need to have biased sampling to get bias here
 # two kinds of populations, one in which the study type determines the subject types and you select on study type
@@ -62,52 +51,93 @@ multi_site_designer <- function(
   N_sites = 10,
   n_study_sites = 5,
   n_subjects_per_site = 1000,
-  subject_type_effects = seq(from = -0.1, to = 0.1, length.out = 10)
+  feasible_effect = 0,
+  subject_type_effects = seq(from = -0.1, to = 0.1, length.out = 10),
+  pr_types = c( # rows are sites, columns are types
+    0.005, 0.005, 0.09, 0.15, 0.25, 0.1, 0, 0.1, 0.15, 0.15,
+    0.1, 0.15, 0.15, 0.15, 0.25, 0.005, 0, 0.1, 0.09, 0.005,
+    0.15, 0.15, 0.15, 0.005, 0.005, 0, 0.25, 0.09, 0.1, 0.1,
+    0, 0.15, 0.005, 0.09, 0.005, 0.15, 0.25, 0.1, 0.1, 0.15,
+    0.005, 0.1, 0.09, 0.25, 0.15, 0.15, 0.005, 0, 0.1, 0.15,
+    0.005, 0.15, 0.25, 0.1, 0, 0.1, 0.005, 0.15, 0.09, 0.15,
+    0.15, 0.15, 0.005, 0.25, 0.1, 0.15, 0.09, 0.005, 0.1, 0,
+    0.25, 0.1, 0.15, 0, 0.005, 0.15, 0.15, 0.1, 0.005, 0.09,
+    0.005, 0.1, 0.1, 0.15, 0, 0.25, 0.15, 0.09, 0.005, 0.15,
+    0.005, 0.09, 0.15, 0.1, 0, 0.1, 0.15, 0.005, 0.25, 0.15)
 ) {
   declare_population(
-    site = add_level(N = N_sites, context_effect = rnorm(N, sd = 0.05)),
+    site = add_level(N = N_sites, feasible_site = sample(c(rep(1, 8), rep(0, 2)), N, replace = FALSE)),
     subject_types = add_level(
       N = 10,
       subject_type = 1:10,
       subject_type_effect = subject_type_effects,
-      type_proportion = pr_type,
+      type_proportion = pr_types,
       N_subjects = ceiling(2500 * type_proportion)
     ),
     subjects = add_level(N = N_subjects, noise = rnorm(N))
   ) + 
-    declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect) + noise) +
-    declare_estimand(ATE_OOS = mean(Y_Z_1 - Y_Z_0), subset = site == "10") + # estimator for out-of-sample site
-    declare_step(filter, site != "10") + # subset to the in-sample sites
-    declare_sampling(clusters = site, n = n_study_sites) + 
+    declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect + feasible_effect * feasible_site) + noise) +
+    declare_estimand(ATE_feasible = mean(Y_Z_1 - Y_Z_0), subset = feasible_site == FALSE) + # true effect for feasible sites
+    declare_sampling(clusters = site, strata = feasible_site, strata_n = c(0, n_study_sites)) + 
     declare_sampling(strata = site, n = n_subjects_per_site) + 
     declare_assignment(blocks = site, prob = 0.5) + 
     declare_estimand(study_site_ATE = mean(Y_Z_1 - Y_Z_0)) +
-    declare_estimator(handler = tidy_estimator(post_strat_estimator), label = "post-strat")
+    declare_estimator(handler = tidy_estimator(post_strat_estimator), pr_types_population = pr_types, label = "post-strat")
 }
-
-# try to predict out-of-sample context effect. idea is to show that from one context we don't do too well not because of context effects but because we don't have enough data on different kinds of het groups (because which types exist vary across contexts)
 
 single_site_large_design <- multi_site_designer(n_study_sites = 1, n_subjects_per_site = 2500)
 
 small_study_five_sites <- multi_site_designer(n_study_sites = 5, n_subjects_per_site = 500)
 
-# now modify to *not* have het fx
-single_site_large_design_no_het <- multi_site_designer(n_study_sites = 1, n_subjects_per_site = 2500, subject_type_effects = 0)
-  
-small_study_five_sites_no_het <- multi_site_designer(n_study_sites = 5, n_subjects_per_site = 500, subject_type_effects = 0)
-  
-# now modify to have context fx
 
-single_site_large_design_context <- replace_step(
-  single_site_large_design,
-  step = 2, new_step = declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect + context_effect) + noise))
 
-small_study_five_sites_context <- replace_step(
-  small_study_five_sites, 
-  step = 2, new_step = declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect + context_effect) + noise))
 
-# sims <- simulate_design(single_site_large_design, small_study_five_sites, 
-#                         single_site_large_design_no_het, small_study_five_sites_no_het, 
-#                         single_site_large_design_context, small_study_five_sites_context,
-#                         sims = 1000)
-# diag <- diagnose_design(sims %>% filter(!is.na(estimate) & !is.na(std.error) & !is.na(statistic) & !is.na(p.value) & !is.na(conf.low) & !is.na(conf.high)), bootstrap_sims = 1000)
+
+kable(get_diagnosands(diagnosis_small_large))
+
+## stan_model <- "
+## data {
+##   int<lower=0> J;         // number of sites
+##   real y[J];              // estimated effects
+##   real<lower=0> sigma[J]; // s.e. of effect estimates
+## }
+## parameters {
+##   real mu;
+##   real<lower=0> tau;
+##   real eta[J];
+## }
+## transformed parameters {
+##   real theta[J];
+##   real tau_sq = tau^2;
+##   for (j in 1:J)
+##     theta[j] = mu + tau * eta[j];
+## }
+## model {
+##   target += normal_lpdf(eta | 0, 1);
+##   target += normal_lpdf(y | theta, sigma);
+## }
+## "
+## 
+## stan_re_estimator <- function(data) {
+##   site_estimates_df <- data %>%
+##     group_by(site) %>%
+##     do(tidy(lm_robust(Y ~ Z, data = .))) %>%
+##     filter(term == "Z") %>%
+##     ungroup
+## 
+##   J      <- nrow(site_estimates_df)
+##   df     <- list(J = J, y = site_estimates_df$estimate, sigma = site_estimates_df$std.error)
+##   fit    <- stan(model_code = stan_model, data = site_estimates_df)
+##   fit_sm <- summary(fit)$summary
+##   data.frame(estimate = fit_sm[,1][c("mu", "tau", "theta[1]", "prob_pos")])
+## }
+## 
+## bayes_estimator <- declare_estimator(handler = stan_re_estimator)
+
+small_study_five_sites_feasible_effects <- multi_site_designer(n_study_sites = 5, n_subjects_per_site = 500, feasible_effect  = -0.25)
+
+
+
+
+
+kable(get_diagnosands(diagnosis_feasible_effects))
