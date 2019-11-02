@@ -1,11 +1,5 @@
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 
-
-
-
-
-
-
 N_units <- 2
 N_time_periods <- 2
 
@@ -39,10 +33,12 @@ two_period_design <-
   
   declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1]), 
                     estimator_label = "DiM", handler = summarize, label = "DiM")
-  
-# diagnosis <- diagnose_design(
-#   two_period_design, diagnosands = declare_diagnosands(select = bias), 
-#   sims = 1000, bootstrap_sims = 1000)
+
+
+
+
+
+kable(get_diagnosands(diagnosis_two_period))
 
 set.seed(2)
 draw_data(two_period_design) %>% 
@@ -79,4 +75,9 @@ multi_period_design <-
   declare_estimator(Y ~ Z + time, fixed_effects = ~ units + periods, 
                     model = lm_robust, label = "twoway-fe", estimand = "ATE") 
   
-# diagnose_design(multi_period_design, diagnosands = declare_diagnosands(select = bias), sims = 500, bootstrap_sims = 1000)
+
+
+
+
+
+kable(get_diagnosands(diagnosis_multi_period))
