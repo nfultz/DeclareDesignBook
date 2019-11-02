@@ -24,8 +24,8 @@ source("scripts/before_chapter_script.R")
 ```{r multi_site_studies, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
 do_diagnosis <- FALSE
-sims <- 100
-b_sims <- 20
+sims <- 1000
+b_sims <- 1000
 ```
 
 ```{r, echo = FALSE}
@@ -33,12 +33,22 @@ library(metafor)
 library(car)
 ```
 
-### why do this in multiple settings: what can you generalize to?
+### Unbiased estimates of out-of-sample sites in presence of heterogeneous effects
 
-what is the population you are interested in?
-can you sample from it? if not, what is the population from which you are effectively sampling from?
+starting point is fixed budget and you're thinking about two possible designs: (1) a single large study in one context or (2) a set of five studies in five different contexts with the same intervention and outcome measures
 
-starting point: fixed budget and you're thinking about a single large study in one context or a set of five studies in five different contexts with the same intervention and outcome measures
+When there are heterogeneous effects, you can get good predictions out of sample even when average effects differ substantially (and you do better with multiple sites when sites in the the population have different proportions of subject types that are correlated with het fx)
+
+Two notable features of the design:
+- there must be het fx for this to work (otherwise our estimates get biased toward zero because of overfitting to the het variables)
+- we have to have information about the covariate in the population and the sample (here we used the proportion of people in each het type)
+
+Findings:
+- these two strategies are both unbiased
+- the design with five sites has half the RMSE of the one-site design. this is because of the variation in the proportions of types across sites.
+- interestingly there is poor coverage (anti-conservative) when you use the single site design
+
+(when you have contextual variation as well, i.e. effect differs across sites for reasons not captured by the het fx, coverage is off for all designs. will keep this point out, seems like too much and you don't need contextual effects to get different effects across sites, those come from different proportions of types)
 
 ```{r}
 meta_re_estimator <- function(data){
@@ -108,7 +118,7 @@ multi_site_designer <- function(
     0.005, 0.09, 0.15, 0.1, 0, 0.1, 0.15, 0.005, 0.25, 0.15)
 ) {
   declare_population(
-    site = add_level(N = N_sites, feasible_site = c(rep(1, 9), 0)),
+    site = add_level(N = N_sites, feasible_site = sample(c(rep(1, 8), rep(0, 2)), N, replace = FALSE)),
     subject_types = add_level(
       N = 10,
       subject_type = 1:10,
@@ -118,9 +128,9 @@ multi_site_designer <- function(
     ),
     subjects = add_level(N = N_subjects, noise = rnorm(N))
   ) + 
-    declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect) + feasible_effect * feasible_site + noise) +
-    declare_estimand(ATE_OOS = mean(Y_Z_1 - Y_Z_0), subset = site == "10") + # true effect for out-of-sample site
-    declare_sampling(clusters = site, strata = feasible_site, n = c(0, n_study_sites)) + 
+    declare_potential_outcomes(Y ~ Z * (0.1 + subject_type_effect + feasible_effect * feasible_site) + noise) +
+    declare_estimand(ATE_feasible = mean(Y_Z_1 - Y_Z_0), subset = feasible_site == FALSE) + # true effect for feasible sites
+    declare_sampling(clusters = site, strata = feasible_site, strata_n = c(0, n_study_sites)) + 
     declare_sampling(strata = site, n = n_subjects_per_site) + 
     declare_assignment(blocks = site, prob = 0.5) + 
     declare_estimand(study_site_ATE = mean(Y_Z_1 - Y_Z_0)) +
@@ -130,37 +140,104 @@ multi_site_designer <- function(
 single_site_large_design <- multi_site_designer(n_study_sites = 1, n_subjects_per_site = 2500)
 
 small_study_five_sites <- multi_site_designer(n_study_sites = 5, n_subjects_per_site = 500)
-
-# sims <- simulate_design(single_site_large_design, small_study_five_sites,
-#                         sims = 1000)
-# diag <- diagnose_design(sims %>% filter(!is.na(estimate) & !is.na(std.error) & !is.na(statistic) & !is.na(p.value) & !is.na(conf.low) & !is.na(conf.high)), bootstrap_sims = 1000)
 ```
 
-## When there are heterogeneous effects, you can get good predictions out of sample even when average effects differ substantially (and you do better with multiple sites when sites in the the population have different proportions of subject types that are correlated with het fx)
+```{r, warning = FALSE, eval = do_diagnosis & !exists("do_bookdown")}
+simulations_small_large <- simulate_design(single_site_large_design, small_study_five_sites, sims = sims)
+diagnosis_small_large <- diagnose_design(simulations_small_large %>% filter(!is.na(estimate) & !is.na(std.error) & !is.na(statistic) & !is.na(p.value) & !is.na(conf.low) & !is.na(conf.high)), bootstrap_sims = b_sims)
+```
 
-Two notable features of the design:
-- there must be het fx for this to work (otherwise our estimates get biased toward zero because of overfitting to the het variables)
-- we have to have information about the covariate in the population and the sample (here we used the proportion of people in each het type)
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("multi_site_studies"), "/diagnosis_small_large.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis_small_large, path = rds_file_path)
+}
+diagnosis_small_large <- read_rds(rds_file_path)
+```
 
-Findings:
-- these two strategies are both unbiased
-- the design with five sites has half the RMSE of the one-site design. this is because of the variation in the proportions of types across sites. 
-- interestingly there is poor coverage (anti-conservative) when you use the single site design
+```{r}
+kable(get_diagnosands(diagnosis_small_large))
+```
 
-(when you have contextual variation as well, i.e. effect differs across sites for reasons not captured by the het fx, coverage is off for all designs. will keep this point out, seems like too much)
+### Bayesian estimation can improve estimates of effects for sampled sites
 
-## you can improve site-level effect estimates by analyzing with simple Bayesian model because of its shrinkage property, even when the Bayesian model is wrong about distribution of effects in population
+you can improve site-level effect estimates by analyzing with simple Bayesian model because of its shrinkage property, even when the Bayesian model is wrong about distribution of effects in population
 
-- This is the point from the blog post; I will modify the above design so it can also make this point, switching between the normal distribution and uniform distribution for the fx distribution
+this is the point from the blog post; I will modify the above design so it can also make this point, switching between the normal distribution and uniform distribution for the fx distribution
+
+```{r, eval = FALSE}
+stan_model <- " 
+data {
+  int<lower=0> J;         // number of sites 
+  real y[J];              // estimated effects
+  real<lower=0> sigma[J]; // s.e. of effect estimates 
+}
+parameters {
+  real mu; 
+  real<lower=0> tau;
+  real eta[J];
+}
+transformed parameters {
+  real theta[J];
+  real tau_sq = tau^2;
+  for (j in 1:J)
+    theta[j] = mu + tau * eta[j];
+}
+model {
+  target += normal_lpdf(eta | 0, 1);
+  target += normal_lpdf(y | theta, sigma);
+}
+"
+
+stan_re_estimator <- function(data) {
+  site_estimates_df <- data %>% 
+    group_by(site) %>% 
+    do(tidy(lm_robust(Y ~ Z, data = .))) %>% 
+    filter(term == "Z") %>% 
+    ungroup 
+  
+  J      <- nrow(site_estimates_df)
+  df     <- list(J = J, y = site_estimates_df$estimate, sigma = site_estimates_df$std.error)
+  fit    <- stan(model_code = stan_model, data = site_estimates_df)
+  fit_sm <- summary(fit)$summary
+  data.frame(estimate = fit_sm[,1][c("mu", "tau", "theta[1]", "prob_pos")])
+}
+
+bayes_estimator <- declare_estimator(handler = stan_re_estimator)
+```
 
 ### when things break down: confounded sampling
 
-<!-- - het fx that systematically differ in places that are sampled to study vs others -->
-- mean effect differs in places that are sampled vs not sampled
-<!-- - covariate profiles that do not exist in other contexts -->
+none of these designs work when you're trying to make predictions for sites that are systematically different, i.e. are not in the same population as the sampling frame
+
+the design was set up to include several sites where researchers could not feasibly set up experiments. in the original design, effects do not depend on whether sites are feasible for the experiment. when effects do vary, there are systematic differences for those target sites. those differences might come from three sources: mean effect size differs in places that are sampled vs not sampled; individual-level het fx sizes that systematically differ in places that are sampled to study vs others; covariate profiles that do not exist in sites outside the sampling frame. I introduce effects in the first way and show there is substantial bias.
+
+
+```{r}
+small_study_five_sites_feasible_effects <- multi_site_designer(n_study_sites = 5, n_subjects_per_site = 500, feasible_effect  = -0.25)
+```
+
+```{r, warning = FALSE, eval = do_diagnosis & !exists("do_bookdown")}
+simulations_feasible_effects <- simulate_design(small_study_five_sites_feasible_effects, sims = sims)
+diagnosis_feasible_effects <- diagnose_design(simulations_feasible_effects %>% filter(!is.na(estimate) & !is.na(std.error) & !is.na(statistic) & !is.na(p.value) & !is.na(conf.low) & !is.na(conf.high)), bootstrap_sims = b_sims)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("multi_site_studies"), "/diagnosis_feasible_effects.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(diagnosis_feasible_effects, path = rds_file_path)
+}
+diagnosis_feasible_effects <- read_rds(rds_file_path)
+```
+
+```{r}
+kable(get_diagnosands(diagnosis_feasible_effects))
+```
 
 
 Other points I decided to abandon to keep this simple:
-- tradeoff: context-specific intervention and comparability
+- tradeoff: context-specific interventions and comparability of intervention effects
 - tradeoff: comparability and fidelity to context in outcome measurement
 
