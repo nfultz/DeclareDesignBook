@@ -1,3 +1,10 @@
+# ---
+# Random sampling
+# --- 
+
+packages <- c("knitr", "tidyverse", "DeclareDesign", "DesignLibrary")
+lapply(packages, require, character.only = T)
+
 # Model -------------------------------------------------------------------
 N <- 2100
 fixed_population <- declare_population(N = N, Y = sample(1:7, N, replace = TRUE))()

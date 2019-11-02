@@ -1,3 +1,10 @@
+# ---
+# Encouragement designs
+# --- 
+
+packages <- c("knitr", "tidyverse", "DeclareDesign", "DesignLibrary")
+lapply(packages, require, character.only = T)
+
 types <- c("Always-Taker", "Never-Taker", "Complier", "Defier")
 direct_effect_of_encouragement <- 0.0
 proportion_defiers <- 0.0

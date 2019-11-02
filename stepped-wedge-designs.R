@@ -1,3 +1,10 @@
+# ---
+# Stepped wedge designs
+# --- 
+
+packages <- c("knitr", "tidyverse", "DeclareDesign", "DesignLibrary")
+lapply(packages, require, character.only = T)
+
 p_00 <- p_W1 <- p_W2 <- p_W3 <- 1/4
 
 design <- 

@@ -1,3 +1,10 @@
+# ---
+# Specifying the model
+# --- 
+
+packages <- c("knitr", "tidyverse", "DeclareDesign", "DesignLibrary")
+lapply(packages, require, character.only = T)
+
 # load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
 
 population <- declare_population(N = 8, e = runif(N), X = rnorm(N, e, 1)) 

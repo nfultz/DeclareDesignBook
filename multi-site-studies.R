@@ -1,3 +1,10 @@
+# ---
+# Multi-site studies
+# --- 
+
+packages <- c("knitr", "tidyverse", "DeclareDesign", "DesignLibrary")
+lapply(packages, require, character.only = T)
+
 library(metafor)
 library(car)
 
