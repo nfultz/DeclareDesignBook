@@ -10,19 +10,19 @@ lapply(packages, require, character.only = T)
 N_units <- 2
 N_time_periods <- 2
 
-two_period_design <- 
+two_period_two_group_design <- 
   
   declare_population(
-    units = add_level(N = N_units, unit_shock = rnorm(N)),
+    units = add_level(N = N_units, unit_shock = rnorm(N, sd = 0.5)),
     periods = add_level(N = N_time_periods, nest = FALSE,
                         time = (1:N_time_periods) - N_time_periods + 1),
-    unit_period = cross_levels(by = join(units, periods), unit_time_shock = rnorm(N))
+    unit_period = cross_levels(by = join(units, periods), unit_time_shock = rnorm(N, sd = 0.01))
   ) + 
   
   # internal note: the unbiasedness obtains whether or not there is a unit-time shock
   declare_potential_outcomes(
     Y_Z_0 = unit_shock + 0.5 * time + unit_time_shock, # common pretreatment trend
-    Y_Z_1 = Y_Z_0 + 0.2) +
+    Y_Z_1 = Y_Z_0 + 1) +
   
   declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0), subset = time == 1) + 
   
@@ -31,26 +31,33 @@ two_period_design <-
   declare_reveal(
     Y = case_when(Z == 0 | time < 1 ~ Y_Z_0, TRUE ~ Y_Z_1), handler = mutate) +
   
-  declare_estimator(estimate = (mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1])) - 
-                      (mean(Y[Z == 1 & time == 0]) - mean(Y[Z == 0 & time == 0])), 
-                    estimator_label = "DiD", handler = summarize, label = "DiD") + 
+  declare_estimator(estimate = (mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1])) -
+                      (mean(Y[Z == 1 & time == 0]) - mean(Y[Z == 0 & time == 0])),
+                    estimator_label = "DiD", handler = summarize, label = "DiD") +
   
-  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 1 & time == 0]), 
-                    estimator_label = "Diff", handler = summarize, label = "Diff") + 
+  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 1 & time == 0]),
+                    estimator_label = "Diff", handler = summarize, label = "Over-Time") +
   
-  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1]), 
+  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1]),
                     estimator_label = "DiM", handler = summarize, label = "DiM")
 
 
 
 
 
-kable(get_diagnosands(diagnosis_two_period))
+kable(get_diagnosands(diagnosis_two_period_two_group))
 
-set.seed(2)
-draw_data(two_period_design) %>% 
-  ggplot(aes(time, Y, color = as.factor(Z))) + 
-  geom_line()
+# add an additional pretreatment time period in order to visually test for parallel pre-trends
+three_period_two_group_design <- redesign(two_period_two_group_design, N_time_periods = 3)
+
+draw_data(three_period_two_group_design) %>% 
+  group_by(Z, time) %>% 
+  summarize(Y = mean(Y)) %>% 
+  mutate(Z_color = factor(Z, levels = c(FALSE, TRUE), labels = c("Untreated", "Treated"))) %>% 
+  ggplot(aes(time, Y, color = Z_color)) + 
+  geom_line() + 
+  scale_color_discrete("") +
+  scale_x_discrete("Time", limits = c(-1, 0, 1))
 
 N_units <- 20
 N_time_periods <- 20
@@ -87,4 +94,4 @@ multi_period_design <-
 
 
 
-kable(get_diagnosands(diagnosis_multi_period))
+kable(get_diagnosands(diagnosis_multi_period_multi_group))
