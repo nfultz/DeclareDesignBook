@@ -38,19 +38,19 @@ b_sims <- 1000
 N_units <- 2
 N_time_periods <- 2
 
-two_period_design <- 
+two_period_two_group_design <- 
   
   declare_population(
-    units = add_level(N = N_units, unit_shock = rnorm(N)),
+    units = add_level(N = N_units, unit_shock = rnorm(N, sd = 0.5)),
     periods = add_level(N = N_time_periods, nest = FALSE,
                         time = (1:N_time_periods) - N_time_periods + 1),
-    unit_period = cross_levels(by = join(units, periods), unit_time_shock = rnorm(N))
+    unit_period = cross_levels(by = join(units, periods), unit_time_shock = rnorm(N, sd = 0.01))
   ) + 
   
   # internal note: the unbiasedness obtains whether or not there is a unit-time shock
   declare_potential_outcomes(
     Y_Z_0 = unit_shock + 0.5 * time + unit_time_shock, # common pretreatment trend
-    Y_Z_1 = Y_Z_0 + 0.2) +
+    Y_Z_1 = Y_Z_0 + 1) +
   
   declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0), subset = time == 1) + 
   
@@ -59,34 +59,34 @@ two_period_design <-
   declare_reveal(
     Y = case_when(Z == 0 | time < 1 ~ Y_Z_0, TRUE ~ Y_Z_1), handler = mutate) +
   
-  declare_estimator(estimate = (mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1])) - 
-                      (mean(Y[Z == 1 & time == 0]) - mean(Y[Z == 0 & time == 0])), 
-                    estimator_label = "DiD", handler = summarize, label = "DiD") + 
+  declare_estimator(estimate = (mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1])) -
+                      (mean(Y[Z == 1 & time == 0]) - mean(Y[Z == 0 & time == 0])),
+                    estimator_label = "DiD", handler = summarize, label = "DiD") +
   
-  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 1 & time == 0]), 
-                    estimator_label = "Diff", handler = summarize, label = "Diff") + 
+  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 1 & time == 0]),
+                    estimator_label = "Diff", handler = summarize, label = "Over-Time") +
   
-  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1]), 
+  declare_estimator(estimate = mean(Y[Z == 1 & time == 1]) - mean(Y[Z == 0 & time == 1]),
                     estimator_label = "DiM", handler = summarize, label = "DiM")
 ```
 
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-diagnosis_two_period <- diagnose_design(
-  two_period_design, diagnosands = declare_diagnosands(select = bias),
+diagnosis_two_period_two_group <- diagnose_design(
+  two_period_two_group_design, diagnosands = declare_diagnosands(select = bias),
   sims = sims, bootstrap_sims = b_sims)
 ```
 
 ```{r, echo = FALSE, purl = FALSE}
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("difference_in_differences"), "/diagnosis_two_period.RDS")
+rds_file_path <- paste0(get_dropbox_path("difference_in_differences"), "/diagnosis_two_period_two_group.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(diagnosis_two_period, path = rds_file_path)
+  write_rds(diagnosis_two_period_two_group, path = rds_file_path)
 }
-diagnosis_two_period <- read_rds(rds_file_path)
+diagnosis_two_period_two_group <- read_rds(rds_file_path)
 ```
 
 ```{r}
-kable(get_diagnosands(diagnosis_two_period))
+kable(get_diagnosands(diagnosis_two_period_two_group))
 ```
 
 ### Parallel trends assumption
@@ -94,13 +94,23 @@ kable(get_diagnosands(diagnosis_two_period))
 - Introduce assumption and visual test
 
 ```{r}
-set.seed(2)
-draw_data(two_period_design) %>% 
-  ggplot(aes(time, Y, color = as.factor(Z))) + 
-  geom_line()
+# add an additional pretreatment time period in order to visually test for parallel pre-trends
+three_period_two_group_design <- redesign(two_period_two_group_design, N_time_periods = 3)
 ```
 
-- Show that evaluating parallel trends assumption by looking at a single pretreatment time period is flawed
+```{r}
+draw_data(three_period_two_group_design) %>% 
+  group_by(Z, time) %>% 
+  summarize(Y = mean(Y)) %>% 
+  mutate(Z_color = factor(Z, levels = c(FALSE, TRUE), labels = c("Untreated", "Treated"))) %>% 
+  ggplot(aes(time, Y, color = Z_color)) + 
+  geom_line() + 
+  scale_color_discrete("") +
+  scale_x_discrete("Time", limits = c(-1, 0, 1))
+```
+
+- Formal test (DID on T = -1 and T = 0 periods, i.e. a year backward from the DiD)
+- There is a result that shows that the two-step procedure of the parallel trends assumption then DID if test passes that shows poor coverage of SEs in final DID (https://arxiv.org/abs/1804.01208). Cite here.
 
 ### Multi-period design
 
@@ -140,20 +150,20 @@ multi_period_design <-
 ```
 
 ```{r, eval = do_diagnosis & !exists("do_bookdown")}
-diagnosis_multi_period <- diagnose_design(multi_period_design, diagnosands = declare_diagnosands(select = bias), sims = sims, bootstrap_sims = b_sims)
+diagnosis_multi_period_multi_group <- diagnose_design(multi_period_design, diagnosands = declare_diagnosands(select = bias), sims = sims, bootstrap_sims = b_sims)
 ```
 
 ```{r, echo = FALSE, purl = FALSE}
 # figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
-rds_file_path <- paste0(get_dropbox_path("difference_in_differences"), "/diagnosis_multi_period.RDS")
+rds_file_path <- paste0(get_dropbox_path("difference_in_differences"), "/diagnosis_multi_period_multi_group.RDS")
 if (do_diagnosis & !exists("do_bookdown")) {
-  write_rds(diagnosis_multi_period, path = rds_file_path)
+  write_rds(diagnosis_multi_period_multi_group, path = rds_file_path)
 }
-diagnosis_multi_period <- read_rds(rds_file_path)
+diagnosis_multi_period_multi_group <- read_rds(rds_file_path)
 ```
 
 ```{r}
-kable(get_diagnosands(diagnosis_multi_period))
+kable(get_diagnosands(diagnosis_multi_period_multi_group))
 ```
 
 - Show that in case where some units switch back and forth between T and C during panel there is bias (point to Imai and Kim appear with weighted FE estimator to fix this)

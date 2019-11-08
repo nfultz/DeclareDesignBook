@@ -7,7 +7,7 @@ bookdown::gitbook:
         after: |
           <li><a href="https://declaredesign.org" target="blank">DeclareDesign</a></li>
         before: |
-          <li><a href="./">Research Design</a></li>
+          <li><a href="./"><b>Research Design</b></a></li>
         collapse: section
       sharing:
         all: false
