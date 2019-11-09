@@ -5,7 +5,7 @@
 packages <- c("knitr", "tidyverse", "DeclareDesign", "DesignLibrary")
 lapply(packages, require, character.only = T)
 
-# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(reshape2)
 
 tau <- .10
 N <- 8
@@ -24,3 +24,117 @@ simple_design_data <- draw_data(simple_design)
 
 estimates_df <- difference_in_means(Y ~ Z, data = simple_design_data)
 kable(tidy(estimates_df))
+
+# haven't gotten something good here. 
+
+
+
+test_sample_estimator <-
+  function(data){
+    r_sq_full <- lm_robust(Y ~ Z + X, data = data, subset = train == 1)$r.squared
+    r_sq_short <- lm_robust(Y ~ Z, data = data, subset = train == 1)$r.squared
+    if(r_sq_full > r_sq_short) {
+      fit <- lm_robust(Y ~ Z + X, subset = train == 0, data = data)
+      return(tidy(fit) %>% filter(term == "Z") %>% mutate(which = "full"))
+    } else {
+      fit <- lm_robust(Y ~ Z, subset = train == 0, data = data)
+      return(tidy(fit) %>% filter(term == "Z") %>% mutate(which = "short"))
+    }
+  }
+
+design <-
+  declare_population(
+    N = 100, X = rbinom(N, 1, 0.5), train = rbinom(N, 1, 0.5), u = rnorm(N)
+  ) + 
+  declare_potential_outcomes(Y ~ Z + u) + 
+  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) + 
+  declare_assignment(prob = 0.5) + 
+  declare_reveal(Y, Z) + 
+  declare_estimator(
+    handler = tidy_estimator(test_sample_estimator),
+    estimand = "ATE") 
+
+# diagnose_design(design, sims = 5000)  
+
+
+
+ATE <- 0.0
+
+design <- 
+  declare_population(N = 1000,
+                     binary_covariate = rbinom(N, 1, 0.5),
+                     normal_error = rnorm(N)) +
+  # crucial step in POs: effects are not heterogeneous
+  declare_potential_outcomes(Y ~ ATE * Z + normal_error) +
+  declare_assignment(prob = 0.5) +
+  declare_estimator(Y ~ Z, subset = (binary_covariate == 0), label = "CATE_0") + 
+  declare_estimator(Y ~ Z, subset = (binary_covariate == 1), label = "CATE_1") +
+  declare_estimator(Y ~ Z * binary_covariate, 
+                    model = lm_robust, term = "Z:binary_covariate", label = "interaction")
+
+estimates <- draw_estimates(design)
+
+g1 <- ggplot(data = estimates %>% filter(term == "Z"), aes(estimator_label, estimate)) + 
+  geom_point() + 
+  geom_errorbar(aes(x = estimator_label, ymin = conf.low, ymax = conf.high), width = 0.2) + 
+  ylab("Estimate (95% confidence interval)") +
+  geom_hline(yintercept = 0, lty = "dashed") +
+  ggtitle("Visualization A") +
+  dd_theme() + 
+  theme(axis.title.x = element_blank())
+
+g2 <- ggplot(data = estimates, aes(estimator_label, estimate)) + 
+  geom_point() + 
+  geom_errorbar(aes(x = estimator_label, ymin = conf.low, ymax = conf.high), width = 0.2) + 
+  ylab("Estimate (95% confidence interval)") +
+  geom_hline(yintercept = 0, lty = "dashed") +
+  ggtitle("Visualization B") +
+  dd_theme() + 
+  theme(axis.title.x = element_blank())
+
+grid.arrange(g1, g2, nrow = 1)
+
+# sweep across all ATEs from 0 to 0.5
+designs <- redesign(design, ATE = seq(0, 0.5, 0.05))
+
+
+
+
+
+# Summarize simulations ---------------------------------------------------
+
+reshaped_simulations <-
+  simulations_one_significant_not_other %>%
+  transmute(ATE,
+            sim_ID,
+            estimator_label,
+            estimate,
+            conf.high,
+            conf.low,
+            significant = p.value < 0.05) %>%
+  melt(measure.vars = c("estimate", "conf.high", "conf.low", "significant")) %>%
+  dcast(ATE + sim_ID  ~ estimator_label + variable)
+
+
+# Plot 1 ------------------------------------------------------------------
+
+gg_df <- 
+  reshaped_simulations %>%
+  group_by(ATE) %>%
+  summarize(`Significant for one group but not the other` = mean(xor(CATE_0_significant, CATE_1_significant)),
+            `Difference in subgroup effects is significant` = mean(interaction_significant)) %>%
+  gather(condition, power, -ATE)
+
+ggplot(gg_df, aes(ATE, power, color = condition)) +
+  geom_point() +
+  geom_line() +
+  geom_label(data = (. %>% filter(ATE == 0.2)),
+             aes(label = condition),
+             nudge_y = 0.02) +
+  dd_theme() +
+  scale_color_manual(values = c("red", "blue")) +
+  theme(legend.position = "none") +
+  labs(
+    x = "True constant effect size",
+    y = "Probability of result (akin to statistical power)"
+  )
