@@ -24,12 +24,12 @@ source("scripts/before_chapter_script.R")
 ```{r choosing_an_answer_strategy, echo = FALSE, output = FALSE, purl = FALSE}
 # run the diagnosis (set to TRUE) on your computer for this section only before pushing to Github. no diagnosis will ever take place on github.
 do_diagnosis <- FALSE
-sims <- 100
-b_sims <- 20
+sims <- 1000
+b_sims <- 1000
 ```
 
 ```{r, echo = FALSE}
-# load packages for this section here. note many (DD, tidyverse) are already available, see scripts/package-list.R
+library(reshape2)
 ```
 
 ```{r, echo = FALSE}
@@ -49,7 +49,9 @@ simple_design <- population + potential_outcomes + estimand +
 simple_design_data <- draw_data(simple_design)
 ```
 
-## What is included in an answer strategy
+## What belongs in an answer strategy
+
+### estimate-estimator pairs 
 
 - once you have the data, you need to have a procedure to develop an answer or a decision from it. it should be quantitative or qualitative. 
 
@@ -66,7 +68,7 @@ kable(tidy(estimates_df))
 
 - in this case, there is a single statistic (the average difference between outcomes in treated and controlled) that represents the *estimate*. this is our guess of the estimand, the average treatment effect. 
 
-- these are basically all diagnostic statistics. need to highlight the estimate as the most important part of the answer strategy. 
+### measures of uncertainty 
 
 - in addition, we have several statistics that assess the *uncertainty of the estimate*, here the standard error and a frequentist confidence interval. the answer strategy is not just how you get to the answer, but how sure you are of it. 
 
@@ -74,34 +76,190 @@ kable(tidy(estimates_df))
 
 - your answer strategy is the full set of steps from first seeing the data until the estimate of the estimand you present in the paper, which is usually more than just the estimate, its uncertainty measure, and associated hypothesis test. 
 
-- *procedures*, if any, by which you explore the data and determine a final set of estimates are part of the answer strategy. for example, we sometimes find that the model we planned to run to analyze the data cannot be estimated. in these cases, there is an iterative estimation procedure in which a first model is run, changes to the specification are made, and a second or third model is presented as the result. that full set of steps -- a decision tree, depending on what is estimable -- is the answer strategy and we can evaluate whether it is a good one not only under the realized data but under other possible realizations where the decision *tree* would be the same but the decisions different.
+
+### procedures 
 
 - precommittment is part of the answer strategy
 
-- *procedures for addressing deviations from expected analyses* are part of the answer strategy. whether a study has a PAP or not, we often have a way we expect to analyze the data if things go well. when they do not -- because data are missing, there is noncompliance to an intervention, or the study is suspended for example -- the answers will change. these procedures determine the answer the study provides (or in some cases does not), so are part of the answer strategy. *standard operating procedures* (lin and green) are documents that systematize these procedures in advange.
+- *procedures*, if any, by which you explore the data and determine a final set of estimates are part of the answer strategy. for example, we sometimes find that the model we planned to run to analyze the data cannot be estimated. in these cases, there is an iterative estimation procedure in which a first model is run, changes to the specification are made, and a second or third model is presented as the result. that full set of steps -- a decision tree, depending on what is estimable -- is the answer strategy and we can evaluate whether it is a good one not only under the realized data but under other possible realizations where the decision *tree* would be the same but the decisions different.
 
 - *procedures where you run two procedures and pick the best fit or preferred on some dimensions* 
+  - show example of a procedure of this form (model selection?) where the coverage is off if you don't account for the multi step
 
-- *how you present the estimates* --- graphically, in tables, and in text --- are all parts of the answer strategy. this is because the inferences readers make about the estimand from your paper do not just come from the numerical estimate. in some cases, the number may not even be presented exactly, and instead a graphic of the estimate and its confidence interval is what readers rely on.
+```{r}
+# haven't gotten something good here. 
+
+
+
+test_sample_estimator <-
+  function(data){
+    r_sq_full <- lm_robust(Y ~ Z + X, data = data, subset = train == 1)$r.squared
+    r_sq_short <- lm_robust(Y ~ Z, data = data, subset = train == 1)$r.squared
+    if(r_sq_full > r_sq_short) {
+      fit <- lm_robust(Y ~ Z + X, subset = train == 0, data = data)
+      return(tidy(fit) %>% filter(term == "Z") %>% mutate(which = "full"))
+    } else {
+      fit <- lm_robust(Y ~ Z, subset = train == 0, data = data)
+      return(tidy(fit) %>% filter(term == "Z") %>% mutate(which = "short"))
+    }
+  }
+
+design <-
+  declare_population(
+    N = 100, X = rbinom(N, 1, 0.5), train = rbinom(N, 1, 0.5), u = rnorm(N)
+  ) + 
+  declare_potential_outcomes(Y ~ Z + u) + 
+  declare_estimand(ATE = mean(Y_Z_1 - Y_Z_0)) + 
+  declare_assignment(prob = 0.5) + 
+  declare_reveal(Y, Z) + 
+  declare_estimator(
+    handler = tidy_estimator(test_sample_estimator),
+    estimand = "ATE") 
+
+# diagnose_design(design, sims = 5000)  
+```
+
+- *procedures for testing assumptions of identification strategy before running analysis*, such as falsification or placebo tests. in these tests, you run a test and only analyze the data using the analysis strategy you proposed if it passes the test indicating a failure to reject the null of no violation of the assumptions.
+  - show example of RDD where the method is *biased* if you don't use the assumption test but the procedure is *unbiased*
+
+```{r}
+
+```
+
+- *procedures for addressing deviations from expected analyses* are part of the answer strategy. whether a study has a PAP or not, we often have a way we expect to analyze the data if things go well. when they do not -- because data are missing, there is noncompliance to an intervention, or the study is suspended for example -- the answers will change. these procedures determine the answer the study provides (or in some cases does not), so are part of the answer strategy. *standard operating procedures* (lin and green) are documents that systematize these procedures in advange.
+
+### robustness checks
 
 - *robustness checks* are part of the answer strategy. often, a single estimator is presented as the main analysis but then a series of alternative specifications are displayed in an appendix (such as including or excluding covariates and their interactions, different subsets of the data, or alternative statistical models). the purpose is to provide readers with evidence about how dependent the main results are on the specification, data subset, and statistical model used. when this is the case, the decision a reader makes based on their inferences about the estimand from the estimate depend not only on the main estimate but also the robustness checks. as a result, we want to assess the properties of the two together. (**or is it a diagnostic statistic??** CHANGE THIS TO TALK ABOUT THIS AS A SET OF STATISTICS THAT ARE FOR A SINGLE RUN. ROBUSTNESS OF THE ANSWER STRATEGY. ROBUSTNESS AS A DIAGNOSTIC STATISTIC.)
 - distinguish this from changes to the model where we do robustnesss vis a vis a fixed answer and data strategy. 
 - two notions of "robustness". one is fix I D A and change M, is this "design" robust to changes in M. the other is, within a given run, is the estimate "robust" to changing the estimation procedure, so this is a diagnostic statistic.
 - note I must be defined across these changes in M.
 
+### presentation of results
+
+- *how you present the estimates* --- graphically, in tables, and in text --- are all parts of the answer strategy. this is because the inferences readers make about the estimand from your paper do not just come from the numerical estimate. in some cases, the number may not even be presented exactly, and instead a graphic of the estimate and its confidence interval is what readers rely on.
+
+    - lots of advice to present graphically (cite), what are implications of that? the decisions made from your results by readers are not just a function of numerical estimates but how they are presented. 
+    
+We explore this by comparing two possible graphical displays of conditional avareage treatment effects in an experiment. A common presentational format is to present the average treatment effect in one group and then the other along with confidence intervals. Inferences are made --- either by the author, or by readers --- as a function of whether one is significant and not the other. If that is true, the inference is that there is a difference in CATEs. An alternative is to present the estimated difference along with the two effects. The inferences can then directly be based on whether the confidence interval of the difference crosses zero. We illustrate these two visual answer strategies below:
+    
+```{r, echo = FALSE}
+ATE <- 0.0
+
+design <- 
+  declare_population(N = 1000,
+                     binary_covariate = rbinom(N, 1, 0.5),
+                     normal_error = rnorm(N)) +
+  # crucial step in POs: effects are not heterogeneous
+  declare_potential_outcomes(Y ~ ATE * Z + normal_error) +
+  declare_assignment(prob = 0.5) +
+  declare_estimator(Y ~ Z, subset = (binary_covariate == 0), label = "CATE_0") + 
+  declare_estimator(Y ~ Z, subset = (binary_covariate == 1), label = "CATE_1") +
+  declare_estimator(Y ~ Z * binary_covariate, 
+                    model = lm_robust, term = "Z:binary_covariate", label = "interaction")
+```
+
+```{r, echo = FALSE, fig.height = 3}
+estimates <- draw_estimates(design)
+
+g1 <- ggplot(data = estimates %>% filter(term == "Z"), aes(estimator_label, estimate)) + 
+  geom_point() + 
+  geom_errorbar(aes(x = estimator_label, ymin = conf.low, ymax = conf.high), width = 0.2) + 
+  ylab("Estimate (95% confidence interval)") +
+  geom_hline(yintercept = 0, lty = "dashed") +
+  ggtitle("Visualization A") +
+  dd_theme() + 
+  theme(axis.title.x = element_blank())
+
+g2 <- ggplot(data = estimates, aes(estimator_label, estimate)) + 
+  geom_point() + 
+  geom_errorbar(aes(x = estimator_label, ymin = conf.low, ymax = conf.high), width = 0.2) + 
+  ylab("Estimate (95% confidence interval)") +
+  geom_hline(yintercept = 0, lty = "dashed") +
+  ggtitle("Visualization B") +
+  dd_theme() + 
+  theme(axis.title.x = element_blank())
+
+grid.arrange(g1, g2, nrow = 1)
+```
+
+We now demonstrate that the answer strategy on the left is flawed. XXYY describe sims.
+
+
+```{r, echo = FALSE}
+# sweep across all ATEs from 0 to 0.5
+designs <- redesign(design, ATE = seq(0, 0.5, 0.05))
+```
+
+```{r, echo = FALSE, eval = do_diagnosis & !exists("do_bookdown")}
+simulations_one_significant_not_other <- simulate_design(designs, sims = sims)
+```
+
+```{r, echo = FALSE, purl = FALSE}
+# figure out where the dropbox path is, create the directory if it doesn't exist, and name the RDS file
+rds_file_path <- paste0(get_dropbox_path("answer_strategy"), "/simulations_one_significant_not_other.RDS")
+if (do_diagnosis & !exists("do_bookdown")) {
+  write_rds(simulations_one_significant_not_other, path = rds_file_path)
+}
+simulations_one_significant_not_other <- read_rds(rds_file_path)
+```
+
+```{r, echo = FALSE, fig.height = 3}
+# Summarize simulations ---------------------------------------------------
+
+reshaped_simulations <-
+  simulations_one_significant_not_other %>%
+  transmute(ATE,
+            sim_ID,
+            estimator_label,
+            estimate,
+            conf.high,
+            conf.low,
+            significant = p.value < 0.05) %>%
+  melt(measure.vars = c("estimate", "conf.high", "conf.low", "significant")) %>%
+  dcast(ATE + sim_ID  ~ estimator_label + variable)
+
+
+# Plot 1 ------------------------------------------------------------------
+
+gg_df <- 
+  reshaped_simulations %>%
+  group_by(ATE) %>%
+  summarize(`Significant for one group but not the other` = mean(xor(CATE_0_significant, CATE_1_significant)),
+            `Difference in subgroup effects is significant` = mean(interaction_significant)) %>%
+  gather(condition, power, -ATE)
+
+ggplot(gg_df, aes(ATE, power, color = condition)) +
+  geom_point() +
+  geom_line() +
+  geom_label(data = (. %>% filter(ATE == 0.2)),
+             aes(label = condition),
+             nudge_y = 0.02) +
+  dd_theme() +
+  scale_color_manual(values = c("red", "blue")) +
+  theme(legend.position = "none") +
+  labs(
+    x = "True constant effect size",
+    y = "Probability of result (akin to statistical power)"
+  )
+```
+
+### multiple comparisons
+
 - your answer strategy should take into account *how many statistical tests* you are conducting, not just focus on the estimate-estimand pair. when you present the results from many null hypothesis  tests, the rate of falsely rejecting at least one of those tests even when all are true goes up, due to the multiple comparisons problem. if you plan to adjust for this problem, those adjustments are part of your answer strategy, because they will typically adjust the p-values you report and the decisions readers make with them.
 
 - as this seection has highlighted, the answer strategy is intimately connected with the data strategy. people often think of their entire research design as the answer strategy. but they can't be separated.
 
-## what are the properties of a good answer strategy
+<!-- ## what are the properties of a good answer strategy -->
 
-- typically, we want to find an estimation strategy that, given the model and data strategy, produces estimates that have as close as possible as often as possible to the estimand. there are several ways of thinking about how close they are and how often. *bias, MSE.* as we discuss in section XX (diagnosis), you should select the set of diagnosands to purpose, depending on why you are conducting the research and what decisions you expect readers to make in response to it.
+<!-- - typically, we want to find an estimation strategy that, given the model and data strategy, produces estimates that have as close as possible as often as possible to the estimand. there are several ways of thinking about how close they are and how often. *bias, MSE.* as we discuss in section XX (diagnosis), you should select the set of diagnosands to purpose, depending on why you are conducting the research and what decisions you expect readers to make in response to it. -->
 
-- we often think about increasing the power of a design by changing our sample size or other aspects of the data strategy. but there is often significant room to grow power through the answer strategy alone, holding the data strategy constant. in an experiment, controlling for pretreatment covariates that are very predictive of the outcome often yields significant power gains, for example. 
+<!-- - we often think about increasing the power of a design by changing our sample size or other aspects of the data strategy. but there is often significant room to grow power through the answer strategy alone, holding the data strategy constant. in an experiment, controlling for pretreatment covariates that are very predictive of the outcome often yields significant power gains, for example.  -->
 
-- best in the set (among set of simple linear models, what is the best model)
+<!-- - best in the set (among set of simple linear models, what is the best model) -->
 
-## how to select an answer strategy
+
+## How to select an answer strategy
 
 - introduce classes of estimators: qual/quant, frequentist/bayesian, design based and model based (logit probit etc.)
 
@@ -114,5 +272,6 @@ kable(tidy(estimates_df))
 - this is true not just for experiments but for surveys (how did you sample), natural experiments (how did nature assign the treatment), and other designs
 
 - you can *select an answer strategy in advance*, by simulating data. when estimators are selected with the data in hand, choices are often made in response to the realized data through examining model fit statistics that appear ideal in the context of this data, but are not ideal from the perspective of other data that could have been collected. we want answer strategies that perform well no matter how the data turn out. 
+  - issues are: overfitting, selecting a suboptimal estimator from design perspective that passes a model fit statistic (show this is worse in a simple example)
 
 - to compare answer strategies, you can imagine the estimators that are possible *if things go well* as well as *if things go wrong*, when there is missing data or there are outliers in variables. a good answer strategy (which might be a single estimator, or a procedure if-this-then-that) can handle both states of the world. 
