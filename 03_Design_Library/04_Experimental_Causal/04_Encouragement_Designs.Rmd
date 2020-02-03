@@ -48,10 +48,10 @@ design <-
   ) +
   declare_potential_outcomes(
     D ~ case_when(
-      Z == 0 & type %in% c("Never-Taker", "Complier") ~ 0,
-      Z == 1 & type %in% c("Never-Taker", "Defier") ~ 0,
-      Z == 0 & type %in% c("Always-Taker", "Defier") ~ 1,
-      Z == 1 & type %in% c("Always-Taker", "Complier") ~ 1
+      type %in% "Never-Taker" ~ 0,
+      type %in% "Defier" ~ 1 - Z,
+      type %in% "Always-Taker" ~ 1,
+      type %in% "Complier" ~ Z
     )
   ) +
   declare_potential_outcomes(
